@@ -129,6 +129,7 @@
         </template>
       </vTableCustom>
     </div>
+    <fileDetail ref="fileDetailRefs" />
   </div>
 </template>
 
@@ -136,6 +137,7 @@
 import { ref } from 'vue'
 import leftTabs from './components/leftTabs.vue'
 import vTableCustom from '@/components/TableCustom/index.vue'
+import fileDetail from './components/fileDetail.vue'
 import { columns } from './components/Columns.js'
 
 const options = [
@@ -200,8 +202,11 @@ const clickFile = () => {
   isLevelText.value = false
 }
 
+const fileDetailRefs = ref(null)
+
 const handleDetail = (rows) => {
   console.log(rows)
+  fileDetailRefs.value.handleEdit(rows)
 }
 </script>
 
