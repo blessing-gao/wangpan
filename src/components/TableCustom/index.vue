@@ -329,4 +329,9 @@ defineExpose({
 .table-toolbar-left {
   width: 100%;
 }
+
+.el-table__body-header .cell{
+  display: flex;
+  align-items: center;
+}
 </style>

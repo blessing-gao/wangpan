@@ -16,10 +16,10 @@
             <span class="custom-tree-node">
               <template v-if="data.children">
                 <!-- 一级节点，插入图片 -->
-                <img style="margin-right: 12px" src="/icons/编组 32.svg" />
+                <img style="margin-right: 12px; width: 14px;" src="/icons/编组 32.svg" />
               </template>
               <template v-else>
-                <img style="margin-right: 12px" src="/icons/文件 (2).svg" />
+                <img style="margin-right: 12px; width: 12px;" src="/icons/文件 (2).svg" />
               </template>
               <span>{{ node.label }}</span>
             </span>
@@ -38,13 +38,13 @@
           <template #default="{ node, data }">
             <span class="custom-tree-node">
               <template v-if="data.label == '最近使用'">
-                <img style="margin-right: 12px" src="/icons/矩形.svg" />
+                <img style="margin-right: 12px; width: 12px;" src="/icons/矩形.svg" />
               </template>
               <template v-if="data.label == '常用文件'">
-                <img style="margin-right: 12px" src="/icons/常用文件.svg" />
+                <img style="margin-right: 12px; width: 12px;" src="/icons/常用文件.svg" />
               </template>
               <template v-if="data.label == '回收站'">
-                <img style="margin-right: 12px" src="/icons/垃圾桶.svg" />
+                <img style="margin-right: 12px; width: 12px;" src="/icons/垃圾桶.svg" />
               </template>
               <span>{{ node.label }}</span>
             </span>

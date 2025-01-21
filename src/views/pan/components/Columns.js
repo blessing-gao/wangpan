@@ -9,12 +9,14 @@ export const columns = [
     label: '创建时间',
     align: 'left',
     width: '200',
+    sortable: true,
   },
   {
     prop: 'modifiedTime',
     label: '修改时间',
     align: 'left',
     width: '200',
+    sortable: true,
   },
   {
     prop: 'type',
