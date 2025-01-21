@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>项目</title>
+    <defs>
+        <linearGradient x1="-16.3874739%" y1="21.4305069%" x2="79.4655193%" y2="56.4417388%" id="linearGradient-1">
+            <stop stop-color="#4EC8FF" offset="0%"></stop>
+            <stop stop-color="#0A97FF" offset="100%"></stop>
+        </linearGradient>
+        <path d="M4,0 L28,0 C30.209139,-4.05812251e-16 32,1.790861 32,4 L32,26 C32,28.209139 30.209139,30 28,30 L4,30 C1.790861,30 2.705415e-16,28.209139 0,26 L0,4 C-2.705415e-16,1.790861 1.790861,4.05812251e-16 4,0 Z" id="path-2"></path>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-4">
+            <stop stop-color="#C7EFFE" offset="0%"></stop>
+            <stop stop-color="#BBEBFE" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="pc端" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon" transform="translate(-940.000000, -98.000000)">
+            <g id="编组" transform="translate(940.000000, 98.000000)">
+                <g id="路径-4" transform="translate(0.000000, 1.000000)">
+                    <mask id="mask-3" fill="white">
+                        <use xlink:href="#path-2"></use>
+                    </mask>
+                    <use id="蒙版" fill="url(#linearGradient-1)" xlink:href="#path-2"></use>
+                    <path d="M14.7515373,32 C19.4391721,23.6811079 25.3684545,20.0616503 32.5393844,21.1416272 C32.5845785,21.2083147 32.7381171,21.2083147 33,21.1416272 L32.8815702,32.6811108 L14.7515373,32.6811108 L14.7515373,32 Z" id="路径-2" fill="#4FC1FF" mask="url(#mask-3)"></path>
+                    <path d="M-2.26985097e-13,14.75 C0.443045062,14.75 19.0967689,10.6690499 21.6245756,32.5 C21.5791913,32.4477475 14.3709994,32.4477475 -2.26985097e-13,32.5 C-0.295363375,20.6666667 -0.295363375,14.75 -2.26985097e-13,14.75 Z" fill="#8DD7FE" mask="url(#mask-3)"></path>
+                </g>
+                <circle id="椭圆形" fill="url(#linearGradient-4)" cx="22" cy="10" r="4"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

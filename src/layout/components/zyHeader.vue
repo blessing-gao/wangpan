@@ -1,0 +1,156 @@
+<template>
+  <div class="zy_header">
+    <div class="left_header">
+      <div class="left_header_icon">
+        <img src="/assets/位图 2.png" class="menu-item-icon" />
+      </div>
+      <div class="left_header_text">浙音网盘</div>
+    </div>
+
+    <div class="search_input">
+      <el-input
+        placeholder="输入并搜索文件..."
+        :prefix-icon="Search"
+        @click="clickInput"
+      >
+        <template #append>
+          <img
+            style="cursor: pointer"
+            src="/icons/xiangji.svg"
+            @click="clickXiangji"
+          />
+        </template>
+      </el-input>
+    </div>
+
+    <div class="right_header">
+      <div class="organization">切换组织</div>
+      <div class="bottom_icon">
+        <img src="/icons/下拉.svg" class="menu-item-icon" />
+      </div>
+      <div class="right_header_icon">
+        <userAvatar />
+      </div>
+      <div class="right_ai_icon">
+        <img src="/assets/编组 11.png" class="menu-item-icon" />
+      </div>
+    </div>
+  </div>
+  <uploadSearch ref="uploadSearchRef" />
+  <inputSearch ref="inputSearchRefs" />
+</template>
+
+<script setup>
+import { Search } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import uploadSearch from '../../components/uploadSearch.vue'
+import inputSearch from '../../components/inputSearch.vue'
+import userAvatar from '../../components/userAvatar.vue'
+
+const uploadSearchRef = ref(null)
+
+const clickXiangji = () => {
+  uploadSearchRef.value.handleEdit()
+}
+
+const inputSearchRefs = ref(null)
+
+const clickInput = () => {
+  inputSearchRefs.value.handleEdit()
+}
+</script>
+
+<style lang="scss" scoped>
+.zy_header {
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative; /* 使内部元素能相对其定位 */
+}
+.left_header {
+  display: flex;
+  align-items: center;
+  .left_header_icon {
+    margin-right: 17px;
+    background: #d9d9d9;
+    width: 20px;
+    height: 31px;
+  }
+  .left_header_text {
+    font-family: PingFangSC-Regular;
+    font-size: 18px;
+    color: #333333;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+}
+
+:deep(.search_input .el-input__inner) {
+  height: 36px;
+}
+
+.search_input {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%); /* 使其水平居中 */
+  width: 41.7%;
+}
+:deep(.search_input .el-input-group__prepend) {
+  border-bottom-left-radius: 18px;
+  border-top-left-radius: 18px;
+  background: #f4f5f7;
+  padding-left: 16px;
+  padding-right: 0;
+  box-shadow: none;
+}
+:deep(.search_input .el-input-group__append) {
+  border-bottom-right-radius: 18px;
+  border-top-right-radius: 18px;
+  background: #f4f5f7;
+  padding-right: 16px;
+  padding-left: 0;
+  box-shadow: none;
+}
+
+:deep(.search_input .el-input__wrapper.is-focus) {
+  box-shadow: none;
+}
+:deep(.search_input .el-input__wrapper:hover) {
+  box-shadow: none;
+}
+:deep(.search_input .el-input__wrapper) {
+  background: #f4f5f7;
+  padding: 0;
+  padding-left: 16px;
+  box-shadow: none;
+  border-bottom-left-radius: 18px;
+  border-top-left-radius: 18px;
+}
+
+.right_header {
+  display: flex;
+  align-items: center;
+  .organization {
+    margin-right: 8px;
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #555555;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+  .bottom_icon {
+    margin-right: 28px;
+  }
+  .right_header_icon {
+    background: #d9d9d9;
+    border-radius: 50%;
+    height: 28px;
+    width: 28px;
+    margin-right: 18px;
+  }
+  .right_ai_icon {
+    display: flex;
+  }
+}
+</style>

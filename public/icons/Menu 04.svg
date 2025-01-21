@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Menu 04</title>
+    <defs>
+        <path d="M32,4 L32,26 C32,28.209139 30.209139,30 28,30 L4,30 C1.790861,30 2.705415e-16,28.209139 0,26 L0,4 C-2.705415e-16,1.790861 1.790861,4.05812251e-16 4,0 L28,0 C30.209139,-4.05812251e-16 32,1.790861 32,4 Z" id="path-1"></path>
+        <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="32" height="30" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+    </defs>
+    <g id="pc端" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon" transform="translate(-162.000000, -426.000000)">
+            <g id="Component-2" transform="translate(156.000000, 420.000000)">
+                <path d="M0,0 L32,0 L32,30 L0,30 L0,0 Z" id="路径"></path>
+                <use id="路径" stroke="#D9D9D9" mask="url(#mask-2)" stroke-width="2" stroke-dasharray="0,0" fill-rule="nonzero" xlink:href="#path-1"></use>
+                <g id="Menu-04" transform="translate(6.000000, 6.000000)">
+                    <path d="M0,0 L20,0 L20,20 L0,20 L0,0 Z" id="路径"></path>
+                    <path d="M11.2534956,15 L3.33349562,15 M16.6634956,10 L3.33349562,10 M16.6634956,5 L3.33349562,5" id="Icon" stroke="#333333" stroke-dasharray="0,0"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
