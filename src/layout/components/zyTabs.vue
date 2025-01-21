@@ -1,6 +1,11 @@
 <template>
   <div>
-    <el-menu :default-active="activeMenu" class="el-menu-vertical" router style="margin-top: 35px; border: 0;">
+    <el-menu
+      :default-active="activeMenu"
+      class="el-menu-vertical"
+      router
+      style="margin-top: 35px; border: 0"
+    >
       <!-- 仅遍历 Home 路由下的 children -->
       <el-menu-item
         v-for="route in routes"
@@ -11,7 +16,7 @@
           <!-- 添加图标和标题，并使用 flex 布局 -->
           <div class="menu-item-content">
             <img
-              :src="getIconSrc(route.meta?.icon)"
+              :src="getIconSrc(route.name)"
               :class="['menu-item-icon', getIconClass(route.path)]"
               class="menu-item-icon"
             />
@@ -44,13 +49,17 @@ const getIconClass = (path) => {
   return route.path === path ? 'active-icon' : '' // 判断是否是当前路由，激活时添加 'active-icon' 类
 }
 
-const getIconSrc = (icon) => {
-  if (icon === '工作台') {
-    return '/icons/工作台.svg' // 本地图标路径
-  } else if (icon === '网盘') {
-    return '/icons/网盘.svg' // 本地图标路径
-  } else if (icon === '中台') {
-    return '/icons/数字中台.svg' // 本地图标路径
+const getIconSrc = (routeName) => {
+  if (routeName === 'home') {
+    return route.path === '/home' ? '/icons/home-active.svg' : '/icons/home.svg'
+  } else if (routeName === 'pan') {
+    return route.path === '/pan' ? '/icons/pan-active.svg' : '/icons/pan.svg'
+  } else if (routeName === 'middle-platform') {
+    return route.path === '/middle-platform'
+      ? '/icons/middle-platform-active.svg'
+      : '/icons/middle-platform.svg'
+  } else if (routeName === 'task') {
+    return route.path === '/task' ? '/icons/task-active.svg' : '/icons/task.svg'
   }
 }
 </script>
@@ -95,13 +104,7 @@ const getIconSrc = (icon) => {
 }
 
 .active-icon {
-  transform: scale(1.2); /* 放大图标 */
-  filter: brightness(1.2); /* 增加图标亮度 */
   fill: #de3a05;
-}
-
-.active-icon {
-  filter: brightness(1.2) saturate(1.5); /* 改变颜色，通过滤镜调整亮度和饱和度 */
 }
 
 /* 针对SVG图标的颜色变化 */
