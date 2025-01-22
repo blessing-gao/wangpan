@@ -49,29 +49,51 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref, getCurrentInstance } from 'vue'
+import * as detailApi from '@/api/detail.js'
+const { proxy } = getCurrentInstance()
 
 const input = ref('')
 
 const tagList = ref(['小提琴', '编辑器', '版本', '必填', '钢琴'])
 
 const handleTagList = () => {
-  tagList.value = tagList.value.map((item) => {
-    return {
-      title: item,
-      closable: false,
-    }
-  })
+  let params = {}
+  detailApi
+    .getTagData()
+    .then((res) => {
+      tagList.value = tagList.value.map((item) => {
+        return {
+          title: item,
+          closable: false,
+        }
+      })
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
 }
 
-handleTagList()
+onMounted(() => {
+  handleTagList()
+})
 
 const addTag = () => {
-  tagList.value.push({
-    title: input.value,
-    closable: false,
-  })
-  input.value = ''
+  let params = {}
+  detailApi
+    .addTag(params)
+    .then((res) => {
+      tagList.value.push({
+        title: input.value,
+        closable: false,
+      })
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+    .finallu(() => {
+      input.value = ''
+    })
 }
 
 const isRemove = ref(true)
@@ -84,12 +106,28 @@ const handleRemoveBtn = () => {
 }
 
 const handleClose = (record) => {
-  tagList.value.splice(record.item, 1)
+  let params = {}
+  detailApi
+    .removeTag(params)
+    .then((res) => {
+      tagList.value.splice(record.item, 1)
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
 }
 
 // 全部删除
 const handleAllRemove = () => {
-  tagList.value = []
+  let params = {}
+  detailApi
+    .removeTag(params)
+    .then((res) => {
+      tagList.value = []
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
 }
 
 // 确定

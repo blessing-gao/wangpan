@@ -11,7 +11,7 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 
-// import * as courseApi from '@/api/course/course-api'
+import * as detailApi from '@/api/detail.js'
 
 import 'vue3-video-play/dist/style.css'
 import { videoPlay } from 'vue3-video-play/dist'
@@ -57,19 +57,19 @@ let playerOptions = reactive({
 
 const videoRefs = ref()
 const getVideo = async () => {
-  playerOptions.src =
-    import.meta.env.VITE_STATIC_PREFIX +
-    '/static/video/1759038606728617986/视频/视频.m3u8'
-  // await courseApi
-  //   .previewCourse(props.content.id)
-  //   .then((res) => {
-  //     if (res.code === 200) {
-  //       playerOptions.src = process.env.VUE_APP_STATIC_PREFIX + res.data;
-  //     }
-  //   })
-  //   .catch((err) => {
-  //     console.error(err);
-  //   });
+  // playerOptions.src =
+  //   import.meta.env.VITE_STATIC_PREFIX +
+  //   '/static/video/1759038606728617986/视频/视频.m3u8'
+  await detailApi
+    .detailOptions(props.content.id)
+    .then((res) => {
+      if (res.code === 200) {
+        // playerOptions.src = process.env.VUE_APP_STATIC_PREFIX + res.data
+      }
+    })
+    .catch((err) => {
+      console.error(err)
+    })
 }
 
 onMounted(() => {

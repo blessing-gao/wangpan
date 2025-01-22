@@ -1,11 +1,16 @@
 <template>
   <div>
-    <el-dialog v-model="centerDialogVisible" width="66.7%" align-center>
+    <el-dialog
+      v-model="centerDialogVisible"
+      width="66.7%"
+      align-center
+      @close="handleClose"
+    >
       <template #header>
         <div class="dialog-header">智能总结</div>
       </template>
       <div class="dialog-content">
-        <el-button plain style="margin-bottom: 16px;">智能生成</el-button>
+        <el-button plain style="margin-bottom: 16px">智能生成</el-button>
         <el-input
           v-model="textarea"
           :disabled="disabled"
@@ -50,6 +55,13 @@ const handleEditor = () => {
 const handleOk = () => {
   textarea.value = ''
   centerDialogVisible.value = false
+  disabled.value = true
+}
+
+const handleClose = () => {
+  textarea.value = ''
+  centerDialogVisible.value = false
+  disabled.value = true
 }
 
 defineExpose({

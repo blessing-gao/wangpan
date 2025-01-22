@@ -236,7 +236,7 @@ const handleDetail = (rows) => {
 }
 
 const handleNodeClick = (data) => {
-  proxy.$modal.msg('调用接口，查看目录下文件')
+  getTableData()
 }
 </script>
 

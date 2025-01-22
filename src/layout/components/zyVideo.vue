@@ -25,7 +25,7 @@
       </el-page-header>
     </div>
     <div class="video-detail-content">
-      <preivewVideo :previewBoolean="true" />
+      <preivewVideo :previewBoolean="true" :content="{id: 123456}" />
       <div class="video-detail-content-right">
         <el-tabs
           v-model="activeName"
