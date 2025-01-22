@@ -7,8 +7,15 @@
       style="margin-top: 0"
       :modal="false"
       :show-close="false"
+      @close="handleClose"
     >
-      <el-input placeholder="输入并搜索文件..." :prefix-icon="Search">
+      <el-input
+        placeholder="输入并搜索文件..."
+        :prefix-icon="Search"
+        v-model="searchInput"
+        :autofocus="true"
+        @keyup.enter="handleSearch"
+      >
         <template #append>
           <img style="cursor: pointer" src="/icons/xiangji.svg" />
         </template>
@@ -47,9 +54,11 @@
 
 <script setup>
 import { Search } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { ref, getCurrentInstance } from 'vue'
 
 import advancedSearch from './advancedSearch.vue'
+
+const { proxy } = getCurrentInstance()
 
 const dialogTableVisible = ref(false)
 
@@ -80,6 +89,17 @@ const advancedSearchRefs = ref(null)
 
 const clickAdvancedSearch = () => {
   advancedSearchRefs.value.handleEdit()
+}
+
+const searchInput = ref('')
+
+const handleSearch = () => {
+  proxy.$modal.msg('搜索')
+}
+ 
+const handleClose = () => {
+  historyList.value = []
+  searchInput.value = []
 }
 
 defineExpose({

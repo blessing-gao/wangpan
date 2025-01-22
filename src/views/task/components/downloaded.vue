@@ -29,7 +29,7 @@
         </div>
         <div class="table-top">
           <div class="top-one">我下载的</div>
-          <el-radio-group v-model="checkRadio">
+          <el-radio-group v-model="checkRadio" @change="handleChange">
             <el-radio-button :value="1" class="custom-radio">
               <template #default>下载中（{{ downloading }}）</template>
             </el-radio-button>
@@ -56,20 +56,85 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, getCurrentInstance, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { downloadColumns } from './Columns'
 import vTableCustom from '@/components/TableCustom/index.vue'
+import * as taskApi from '@/api/task.js'
+
+const { proxy } = getCurrentInstance()
 
 const loading = ref(false)
 
-const tableData = ref([
-  {
-    fileName: '测试1',
-    fileSize: '测试1',
-    modifiedTime: '测试1',
-  },
-])
+const tableData = ref([])
+
+const getData = async () => {
+  let params = {}
+  await taskApi
+    .getDownloadData(params)
+    .then((res) => {})
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+}
+
+const getTableData = () => {
+  loading.value = true
+  let params = {}
+  taskApi
+    .getDownloadingData(params)
+    .then((res) => {
+      tableData.value = [
+        {
+          fileName: '测试1',
+          fileSize: '测试1',
+          modifiedTime: '测试1',
+        },
+      ]
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getDownloadedList = () => {
+  loading.value = true
+  let params = {}
+  taskApi
+    .getDownloadedData(params)
+    .then((res) => {
+      tableData.value = [
+        {
+          fileName: '测试2',
+          fileSize: '测试1',
+          modifiedTime: '测试1',
+        },
+      ]
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+onMounted(async () => {
+  await getData()
+  getTableData()
+})
+
+const handleChange = () => {
+  if (checkRadio.value == '1') {
+    getTableData()
+  } else {
+    getDownloadedList()
+  }
+}
+
 const rowKey = ref('id')
 
 const downloading = ref(0)
@@ -103,10 +168,9 @@ const handleRowMouseLeave = (column) => {
 const router = useRouter()
 
 const handleCellDblclick = (column) => {
-  console.log(column)
   router.push({
     name: 'VideoDetail',
-    params: {
+    query: {
       id: '123456',
     },
   })

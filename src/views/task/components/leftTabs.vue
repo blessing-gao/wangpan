@@ -9,38 +9,35 @@
         />
         <span>我的任务</span>
       </div>
-      <el-tree
-        :data="otherList"
-        :props="defaultProps"
-        highlight-current
-        accordion
-        :style="{ '--selected-bg-color': selectedBgColor }"
-        @node-click="handleNodeClick"
-      >
-        <template #default="{ node, data }">
-          <span class="custom-tree-node">
-            <template v-if="data.label == '我上传的'">
-              <img
-                style="margin-right: 12px; width: 14px"
-                src="/icons/矩形.svg"
-              />
-            </template>
-            <template v-if="data.label == '我下载的'">
-              <img
-                style="margin-right: 12px; width: 14px"
-                src="/icons/常用文件.svg"
-              />
-            </template>
-            <template v-if="data.label == '智能处理'">
-              <img
-                style="margin-right: 12px; width: 14px"
-                src="/icons/垃圾桶.svg"
-              />
-            </template>
-            <span>{{ node.label }}</span>
-          </span>
-        </template>
-      </el-tree>
+      <el-radio-group v-model="radio" @change="handleNodeClick">
+        <el-radio-button value="我上传的">
+          <template #default>
+            <img
+              style="margin-right: 12px; width: 14px"
+              src="/icons/矩形.svg"
+            />
+            我上传的
+          </template>
+        </el-radio-button>
+        <el-radio-button value="我下载的">
+          <template #default>
+            <img
+              style="margin-right: 12px; width: 14px"
+              src="/icons/常用文件.svg"
+            />
+            我下载的
+          </template>
+        </el-radio-button>
+        <el-radio-button value="智能处理">
+          <template #default>
+            <img
+              style="margin-right: 12px; width: 14px"
+              src="/icons/垃圾桶.svg"
+            />
+            智能处理
+          </template>
+        </el-radio-button>
+      </el-radio-group>
     </div>
   </div>
 </template>
@@ -48,24 +45,7 @@
 <script setup>
 import { ref } from 'vue'
 
-const selectedBgColor = '#f9f3ee' // 可以动态修改这个值
-
-const defaultProps = {
-  children: 'children',
-  label: 'label',
-}
-
-const otherList = ref([
-  {
-    label: '我上传的',
-  },
-  {
-    label: '我下载的',
-  },
-  {
-    label: '智能处理',
-  },
-])
+const radio = ref('我上传的')
 
 const emits = defineEmits(['handleNodeClick'])
 
@@ -104,20 +84,33 @@ const handleNodeClick = (data) => {
   margin-bottom: 12px;
 }
 
-/* 修改选中节点的背景色 */
-:deep(.el-tree .el-tree-node__content:hover) {
-  background: #f9f3ee; /* 你想要的任何颜色 */
+:deep(.el-radio-button, .el-radio-button__inner) {
+  display: block !important;
+  width: 100%;
 }
 
-:deep(.el-tree-node__content) {
+:deep(.el-radio-button__inner) {
+  border: 0 !important;
+  width: 100%;
   height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 :deep(
-  .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content
+  .el-radio-button.is-active
+    .el-radio-button__original-radio:not(:disabled)
+    + .el-radio-button__inner
 ) {
-  background-color: #f9f3ee;
-  color: #de3a05;
+  background-color: #f9f3ee !important;
+  color: #de3a05 !important;
+  box-shadow: none;
+}
+
+:deep(.el-radio-button__inner:hover) {
+  color: #de3a05 !important;
+  background-color: #f9f3ee !important;
 }
 
 .custom-tree-node {

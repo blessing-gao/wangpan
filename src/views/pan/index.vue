@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100%; display: flex">
-    <leftTabs />
+    <leftTabs @handleNodeClick="handleNodeClick" />
     <!-- 详细表格信息 -->
     <!-- :pageSize="formInline.pageSize"
       :currentPage="formInline.currentPage"
@@ -134,11 +134,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref, getCurrentInstance } from 'vue'
+import { useRouter } from 'vue-router'
 import leftTabs from './components/leftTabs.vue'
 import vTableCustom from '@/components/TableCustom/index.vue'
 import fileDetail from './components/fileDetail.vue'
 import { columns } from './components/Columns.js'
+import * as panApi from '@/api/pan.js'
+
+const { proxy } = getCurrentInstance()
+const router = useRouter()
 
 const options = [
   {
@@ -153,14 +158,35 @@ const options = [
 
 const loading = ref(false)
 
-const tableData = ref([
-  {
-    fileName: '测试1',
-    createTime: '测试1',
-    modifiedTime: '测试1',
-    type: '测试1',
-  },
-])
+const tableData = ref([])
+
+const getTableData = () => {
+  loading.value = true
+  let params = {}
+  panApi
+    .getTableList(params)
+    .then((res) => {
+      tableData.value = [
+        {
+          fileName: '测试1',
+          createTime: '测试1',
+          modifiedTime: '测试1',
+          type: '测试1',
+        },
+      ]
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+onMounted(() => {
+  getTableData()
+})
+
 const rowKey = ref('id')
 
 const checkedNumber = ref('')
@@ -200,13 +226,17 @@ const handleCellDblclick = (column) => {
 
 const clickFile = () => {
   isLevelText.value = false
+  getTableData()
 }
 
 const fileDetailRefs = ref(null)
 
 const handleDetail = (rows) => {
-  console.log(rows)
   fileDetailRefs.value.handleEdit(rows)
+}
+
+const handleNodeClick = (data) => {
+  proxy.$modal.msg('调用接口，查看目录下文件')
 }
 </script>
 

@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 
 const centerDialogVisible = ref(false)

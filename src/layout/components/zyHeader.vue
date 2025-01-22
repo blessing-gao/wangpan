@@ -24,10 +24,37 @@
     </div>
 
     <div class="right_header">
-      <div class="organization">切换组织</div>
-      <div class="bottom_icon">
-        <img src="/icons/下拉.svg" class="menu-item-icon" />
-      </div>
+      <el-popover
+        placement="bottom"
+        :width="130"
+        trigger="hover"
+        @show="handleShow"
+      >
+        <template #reference>
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              cursor: pointer;
+            "
+          >
+            <div class="organization">切换组织</div>
+            <div class="bottom_icon">
+              <img src="/icons/下拉.svg" class="menu-item-icon" />
+            </div>
+          </div>
+        </template>
+        <div
+          class="organization-content"
+          v-for="(item, index) in organizationList"
+          :key="index"
+          @click="handleChange(item)"
+        >
+          {{ item }}
+        </div>
+      </el-popover>
+
       <div class="right_header_icon">
         <userAvatar />
       </div>
@@ -42,10 +69,13 @@
 
 <script setup>
 import { Search } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { ref, getCurrentInstance, onMounted } from 'vue'
 import uploadSearch from '../../components/uploadSearch.vue'
 import inputSearch from '../../components/inputSearch.vue'
 import userAvatar from '../../components/userAvatar.vue'
+import * as headerApi from '@/api/header.js'
+
+const { proxy } = getCurrentInstance()
 
 const uploadSearchRef = ref(null)
 
@@ -57,6 +87,34 @@ const inputSearchRefs = ref(null)
 
 const clickInput = () => {
   inputSearchRefs.value.handleEdit()
+}
+
+const organizationList = ref([])
+
+onMounted(()=>{
+  handleShow()
+})
+
+const handleShow = () => {
+  let params = {}
+  headerApi
+    .organizationData(params)
+    .then((res) => {
+      organizationList.value = ['测试']
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+}
+
+const handleChange = (value) => {
+  let data = {}
+  headerApi
+    .changeOrganization(data)
+    .then((res) => {})
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
 }
 </script>
 
@@ -152,5 +210,16 @@ const clickInput = () => {
   .right_ai_icon {
     display: flex;
   }
+}
+
+.organization-content {
+  padding: 6px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.organization-content:hover {
+  color: #de3a05;
+  background: rgba(255, 215, 202, 0.5);
 }
 </style>

@@ -5,6 +5,5 @@ const router = createRouter({
   history: createWebHistory(),
   routes: constantRoutes,
 })
-console.log(router);
 
 export default router

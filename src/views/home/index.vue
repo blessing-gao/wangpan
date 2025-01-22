@@ -33,12 +33,15 @@
             v-for="(item, index) in historyList"
             :key="index"
             class="history-content"
+            @click="handleClick(item)"
           >
-            <div class="history-img"></div>
+            <div class="history-img">
+              <img :src="item.image" :alt="item.name" />
+            </div>
             <div class="history-detail">
-              <div class="history-detail-title">{{ item.title }}</div>
-              <div class="history-detail-synopsis">{{ item.synopsis }}</div>
-              <div class="history-detail-time">今天{{ item.time }}观看</div>
+              <div class="history-detail-title">{{ item.name }}</div>
+              <div class="history-detail-synopsis">{{ item.remark }}</div>
+              <div class="history-detail-time">{{ item.lastViewed }}</div>
             </div>
           </div>
         </div>
@@ -52,6 +55,7 @@
           v-for="(item, index) in uploadList"
           :key="index"
           class="upload-content-list"
+          @click="handleClick(item)"
         >
           <div>
             <img
@@ -60,9 +64,9 @@
             />
           </div>
           <div>
-            <div class="upload-content-title">{{ item.title }}</div>
+            <div class="upload-content-title">{{ item.name }}</div>
             <div class="upload-content-user">
-              {{ item.user }} 上传于 {{ item.time }}
+              {{ item.uploader }} 上传于 {{ item.lastModified }}
             </div>
           </div>
         </div>
@@ -72,36 +76,52 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-const classifyList = reactive([
-  {
-    name: '相册',
-    size: '789MB',
-    quantity: '112',
-  },
-  {
-    name: '视频',
-    size: '8g',
-    quantity: '394',
-  },
-  {
-    name: '音频',
-    size: '456MB',
-    quantity: '98',
-  },
-  {
-    name: '文档',
-    size: '1.22g',
-    quantity: '524',
-  },
-])
+import { ref, onMounted, getCurrentInstance } from 'vue'
+import * as homeApi from '@/api/home.js'
+import { useRouter } from 'vue-router'
+
+const { proxy } = getCurrentInstance()
+
+const classifyList = ref()
+
+const getClassification = async () => {
+  let params = {
+    org_id: 1,
+    user_id: 1,
+  }
+  await homeApi
+    .channelList(params)
+    .then((res) => {
+      if (!res.status) {
+        proxy.$modal.msgError(res.message)
+      } else {
+        let data = res.data
+        const result = [
+          { name: '相册', size: data.photo_size, quantity: data.photo },
+          { name: '视频', size: data.video_size, quantity: data.video },
+          { name: '音乐', size: data.music_size, quantity: data.music },
+          { name: '文档', size: data.doc_size, quantity: data.doc },
+        ]
+        classifyList.value = result
+      }
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+}
+
+onMounted(async () => {
+  await getClassification()
+  await getHistoryList()
+  await getUploadList()
+})
 
 const getIconSrc = (name) => {
   if (name === '相册') {
     return '/icons/项目.svg' // 本地图标路径
   } else if (name === '视频') {
     return '/icons/编组 3.svg' // 本地图标路径
-  } else if (name === '音频') {
+  } else if (name === '音乐') {
     return '/icons/编组 4.svg' // 本地图标路径
   } else if (name === '文档') {
     return '/icons/编组 5.svg' // 本地图标路径
@@ -120,81 +140,111 @@ const getnameColor = (name) => {
   }
 }
 
-const historyList = ref([
-  {
-    title: '小提琴教学第1课',
-    synopsis: '关于视频的一些介绍抱佛脚卡的肌肤大煞风景的撒了富士康地方',
-    time: '18:10',
-    img: '',
-  },
-  {
-    title: '吉他教程',
-    synopsis: '关于视频的一些介绍抱佛脚卡的肌肤大煞',
-    time: '18:10',
-    img: '',
-  },
-  {
-    title: '钢琴教学第3课',
-    synopsis: '关于视频的一些介绍抱',
-    time: '18:10',
-    img: '',
-  },
-  {
-    title: '声乐教学第1课',
-    synopsis:
-      '关于视频的一些介绍抱佛脚卡的肌肤大煞风景的撒了富士康地方大煞风景的测试测试测试关于视频的一些介绍抱佛脚卡的肌肤大煞风景的撒了富士康地方大煞风景的测试测试测试关于视频的一些介绍抱佛脚卡的肌肤大煞风景的撒了富士康地方大煞风景的测试测试测试',
-    time: '18:10',
-    img: '',
-  },
-])
+// const historyList = ref([
+//   {
+//     title: '小提琴教学第1课',
+//     synopsis: '关于视频的一些介绍抱佛脚卡的肌肤大煞风景的撒了富士康地方',
+//     time: '18:10',
+//     img: '',
+//   },
+// ])
 
-const uploadList = ref([
-  {
-    title: '浙江mmexport1711162590173.jpg等多个文件',
-    type: 'zip',
-    user: '李丽',
-    time: '1小时前',
-  },
-  {
-    title: '浙江音乐学院校小提琴乐队学院报名表及乐队片段分谱',
-    type: 'word',
-    user: '李丽',
-    time: '今天 12:56',
-  },
-  {
-    title: '小提琴教学第1课',
-    type: 'class',
-    user: '李丽',
-    time: '2天前 14:30',
-  },
-  {
-    title: '浙江音乐学院室内小提琴演奏',
-    type: 'music',
-    user: '李丽',
-    time: '3天前 15:20',
-  },
-  {
-    title: '浙江音乐学院校小提琴乐队表等多个文件',
-    type: 'medium',
-    user: '李丽',
-    time: '2024.12.11 12:34',
-  },
-  {
-    title: '浙江音乐学院校小提琴乐队学院报名表及乐队片段分谱课件',
-    type: 'ppt',
-    user: '李丽',
-    time: '2024.12.12 11:32',
-  },
-  {
-    title: '浙江音乐学院室内小提琴演奏',
-    type: 'music',
-    user: '李丽',
-    time: '2024.12.11 12:34 ',
-  },
-])
+const historyList = ref([])
+
+const getHistoryList = async () => {
+  let params = {
+    org_id: 1,
+    user_id: 1,
+  }
+  await homeApi
+    .getHistoryList(params)
+    .then((res) => {
+      if (!res.status) {
+        proxy.$modal.msgError(res.message)
+      } else {
+        historyList.value = res.data
+      }
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+}
+
+// const uploadList = ref([
+//   {
+//     title: '浙江mmexport1711162590173.jpg等多个文件',
+//     type: 'zip',
+//     user: '李丽',
+//     time: '1小时前',
+//   },
+//   {
+//     title: '浙江音乐学院校小提琴乐队学院报名表及乐队片段分谱',
+//     type: 'word',
+//     user: '李丽',
+//     time: '今天 12:56',
+//   },
+//   {
+//     title: '小提琴教学第1课',
+//     type: 'class',
+//     user: '李丽',
+//     time: '2天前 14:30',
+//   },
+//   {
+//     title: '浙江音乐学院室内小提琴演奏',
+//     type: 'music',
+//     user: '李丽',
+//     time: '3天前 15:20',
+//   },
+//   {
+//     title: '浙江音乐学院校小提琴乐队表等多个文件',
+//     type: 'medium',
+//     user: '李丽',
+//     time: '2024.12.11 12:34',
+//   },
+//   {
+//     title: '浙江音乐学院校小提琴乐队学院报名表及乐队片段分谱课件',
+//     type: 'ppt',
+//     user: '李丽',
+//     time: '2024.12.12 11:32',
+//   },
+//   {
+//     title: '浙江音乐学院室内小提琴演奏',
+//     type: 'music',
+//     user: '李丽',
+//     time: '2024.12.11 12:34 ',
+//   },
+// ])
+
+const uploadList = ref([])
+
+const getUploadList = async () => {
+  await homeApi
+    .getUploadList()
+    .then((res) => {
+      if (!res.status) {
+        proxy.$modal.msgError(res.message)
+      } else {
+        uploadList.value = res.data
+      }
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+}
 
 const getUploadIconSrc = (name) => {
   return `/icons/${name}.svg`
+}
+
+const router = useRouter()
+const handleClick = (item) => {
+  console.log(item)
+  router.push({
+    name: 'VideoDetail',
+    query: {
+      id: '123456',
+    },
+  })
 }
 </script>
 

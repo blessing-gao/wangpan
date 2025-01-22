@@ -16,6 +16,7 @@ const constantRoutes = [
         meta: {
           icon: '工作台',
           title: '工作台',
+          keepAlive: true
         },
         component: () =>
           import(/* webpackChunkName: "dashboard" */ '../views/home/index.vue'),
@@ -26,6 +27,7 @@ const constantRoutes = [
         meta: {
           icon: '网盘',
           title: '网盘',
+          keepAlive: true
         },
         component: () =>
           import(/* webpackChunkName: "dashboard" */ '../views/pan/index.vue'),
@@ -36,6 +38,7 @@ const constantRoutes = [
         meta: {
           icon: '中台',
           title: '中台',
+          keepAlive: true
         },
         component: () =>
           import(
@@ -48,6 +51,7 @@ const constantRoutes = [
         meta: {
           icon: '任务',
           title: '任务',
+          keepAlive: true
         },
         component: () =>
           import(/* webpackChunkName: "dashboard" */ '../views/task/index.vue'),
@@ -55,7 +59,7 @@ const constantRoutes = [
     ],
   },
   {
-    path: '/video-detail/:id', // 视频详情页的路由路径
+    path: '/video-detail', // 视频详情页的路由路径
     name: 'VideoDetail',
     component: zyVideo,
     meta: {

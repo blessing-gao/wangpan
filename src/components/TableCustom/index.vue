@@ -334,4 +334,8 @@ defineExpose({
   display: flex;
   align-items: center;
 }
+
+.el-scrollbar__view{
+  width: 100%;
+}
 </style>

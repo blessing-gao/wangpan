@@ -6,10 +6,17 @@
       style="margin-top: 0; padding: 10px 0 0 24px"
       :modal="false"
       :close-on-click-modal="false"
+      @close="handleClose"
     >
       <template #header>
         <div class="custom-dialog">
-          <el-input placeholder="请输入..." style="width: 96%">
+          <el-input
+            placeholder="请输入..."
+            style="width: 96%"
+            v-model="searchInput"
+            :autofocus="true"
+            @keyup.enter="handleSearch"
+          >
             <template #prepend>
               <img style="cursor: pointer" src="/icons/编组 14.svg" />
             </template>
@@ -31,20 +38,36 @@
           </div>
         </el-tab-pane>
         <el-tab-pane label="相册" name="second">
-          <div class="left"></div>
-          <div class="right"></div>
+          <div class="left">
+            <leftContent />
+          </div>
+          <div class="right">
+            <rightContent />
+          </div>
         </el-tab-pane>
         <el-tab-pane label="视频" name="third">
-          <div class="left"></div>
-          <div class="right"></div>
+          <div class="left">
+            <leftContent />
+          </div>
+          <div class="right">
+            <rightContent />
+          </div>
         </el-tab-pane>
         <el-tab-pane label="音频" name="fourth">
-          <div class="left"></div>
-          <div class="right"></div>
+          <div class="left">
+            <leftContent />
+          </div>
+          <div class="right">
+            <rightContent />
+          </div>
         </el-tab-pane>
         <el-tab-pane label="文档" name="fourth1">
-          <div class="left"></div>
-          <div class="right"></div>
+          <div class="left">
+            <leftContent />
+          </div>
+          <div class="right">
+            <rightContent />
+          </div>
         </el-tab-pane>
       </el-tabs>
     </el-dialog>
@@ -52,10 +75,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, getCurrentInstance } from 'vue'
 
 import leftContent from './leftContent.vue'
 import rightContent from './rightContent.vue'
+
+const { proxy } = getCurrentInstance()
 
 const dialogTableVisible = ref(false)
 
@@ -66,6 +91,16 @@ const handleEdit = () => {
 const activeName = ref('first')
 
 const handleClick = () => {}
+
+const searchInput = ref('')
+
+const handleSearch = () => {
+  proxy.$modal.msg('搜索')
+}
+
+const handleClose = () => {
+  searchInput.value = ''
+}
 
 defineExpose({
   handleEdit,

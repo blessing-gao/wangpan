@@ -17,7 +17,7 @@ import { ref } from 'vue'
 const dataDefault = ref('我上传的')
 
 const handleNodeClick = (data) => {
-  dataDefault.value = data.label
+  dataDefault.value = data
 }
 </script>
 

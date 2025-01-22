@@ -18,20 +18,33 @@
     <div>
       <el-tag
         v-for="item in tagList"
-        :key="item"
+        :key="item.title"
         style="margin-right: 10px; margin-bottom: 10px"
         class="mx-1"
         type="info"
+        :closable="item.closable"
         effect="plain"
+        @close="handleClose(item)"
       >
-        {{ item }}
+        {{ item.title }}
       </el-tag>
     </div>
 
-    <el-button class="detail-tag" link>
-      <img style="width: 12px; margin-right: 9px;" src="/icons/垃圾桶.svg" alt="" />
+    <el-button class="detail-tag" link v-if="isRemove" @click="handleRemoveBtn">
+      <img
+        style="width: 12px; margin-right: 9px"
+        src="/icons/垃圾桶.svg"
+        alt=""
+      />
       <span>删除标签</span>
     </el-button>
+    <div v-if="!isRemove">
+      <el-button class="remove-tag" link @click="handleAllRemove">
+        全部删除
+      </el-button>
+      <el-button class="remove-tag" link @click="handleOk">确定</el-button>
+      <el-button class="remove-tag" link @click="handleCancel">取消</el-button>
+    </div>
   </div>
 </template>
 
@@ -42,9 +55,51 @@ const input = ref('')
 
 const tagList = ref(['小提琴', '编辑器', '版本', '必填', '钢琴'])
 
+const handleTagList = () => {
+  tagList.value = tagList.value.map((item) => {
+    return {
+      title: item,
+      closable: false,
+    }
+  })
+}
+
+handleTagList()
+
 const addTag = () => {
-  tagList.value.push(input.value)
+  tagList.value.push({
+    title: input.value,
+    closable: false,
+  })
   input.value = ''
+}
+
+const isRemove = ref(true)
+
+const handleRemoveBtn = () => {
+  isRemove.value = false
+  tagList.value.forEach((item) => {
+    item.closable = true
+  })
+}
+
+const handleClose = (record) => {
+  tagList.value.splice(record.item, 1)
+}
+
+// 全部删除
+const handleAllRemove = () => {
+  tagList.value = []
+}
+
+// 确定
+const handleOk = () => {
+  isRemove.value = true
+}
+
+// 取消
+const handleCancel = () => {
+  isRemove.value = true
 }
 </script>
 
@@ -88,5 +143,14 @@ const addTag = () => {
   font-weight: 400;
   display: flex;
   align-items: center;
+}
+
+.remove-tag {
+  margin-top: 19px;
+  font-family: PingFangSC-Regular;
+  font-size: 12px;
+  color: #de3a05 !important;
+  letter-spacing: 0;
+  font-weight: 400;
 }
 </style>

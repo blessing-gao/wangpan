@@ -6,7 +6,6 @@ import path from 'path'
 // 修改为使用 defineConfig 并将 mode 作为参数传入
 export default defineConfig(({ command, mode }) => {
   let env = loadEnv(mode, process.cwd())
-
   return {
     plugins: [
       vue(),
@@ -20,6 +19,7 @@ export default defineConfig(({ command, mode }) => {
       },
     },
     server: {
+      port: 3000,
       proxy: {
         [env.VITE_APP_BASE_API]: {
           target: env.VITE_SERVE, // 获取数据的服务器地址设置

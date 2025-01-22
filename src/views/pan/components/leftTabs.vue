@@ -16,10 +16,16 @@
             <span class="custom-tree-node">
               <template v-if="data.children">
                 <!-- 一级节点，插入图片 -->
-                <img style="margin-right: 12px; width: 14px;" src="/icons/编组 32.svg" />
+                <img
+                  style="margin-right: 12px; width: 14px"
+                  src="/icons/编组 32.svg"
+                />
               </template>
               <template v-else>
-                <img style="margin-right: 12px; width: 12px;" src="/icons/文件 (2).svg" />
+                <img
+                  style="margin-right: 12px; width: 12px"
+                  src="/icons/文件 (2).svg"
+                />
               </template>
               <span>{{ node.label }}</span>
             </span>
@@ -38,13 +44,22 @@
           <template #default="{ node, data }">
             <span class="custom-tree-node">
               <template v-if="data.label == '最近使用'">
-                <img style="margin-right: 12px; width: 12px;" src="/icons/矩形.svg" />
+                <img
+                  style="margin-right: 12px; width: 12px"
+                  src="/icons/矩形.svg"
+                />
               </template>
               <template v-if="data.label == '常用文件'">
-                <img style="margin-right: 12px; width: 12px;" src="/icons/常用文件.svg" />
+                <img
+                  style="margin-right: 12px; width: 12px"
+                  src="/icons/常用文件.svg"
+                />
               </template>
               <template v-if="data.label == '回收站'">
-                <img style="margin-right: 12px; width: 12px;" src="/icons/垃圾桶.svg" />
+                <img
+                  style="margin-right: 12px; width: 12px"
+                  src="/icons/垃圾桶.svg"
+                />
               </template>
               <span>{{ node.label }}</span>
             </span>
@@ -79,7 +94,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, getCurrentInstance, onMounted } from 'vue'
+import * as panApi from '@/api/pan.js'
+
+const { proxy } = getCurrentInstance()
 
 const selectedBgColor = '#f9f3ee' // 可以动态修改这个值
 
@@ -87,31 +105,39 @@ const defaultProps = {
   children: 'children',
   label: 'label',
 }
-const data = ref([
-  {
-    label: '个人资源',
-    children: [
-      {
-        label: 'Level two 1-1',
-      },
-    ],
-  },
-  {
-    label: '文件名称',
-    children: [
-      {
-        label: '二级菜单',
-      },
-      {
-        label: '二级菜单',
-      },
-    ],
-  },
-])
+const data = ref()
+
+const emits = defineEmits(['handleNodeClick'])
 
 const handleNodeClick = (data) => {
   console.log(data)
+  emits('handleNodeClick', data)
 }
+
+const getLeftTabs = () => {
+  let params = {}
+  panApi
+    .contentsList(params)
+    .then((res) => {
+      data.value = [
+        {
+          label: '个人资源',
+          children: [],
+        },
+        {
+          label: '文件名称',
+          children: [],
+        },
+      ]
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+}
+
+onMounted(() => {
+  getLeftTabs()
+})
 
 const otherList = ref([
   {

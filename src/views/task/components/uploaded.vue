@@ -26,9 +26,9 @@
         </div>
         <div class="table-top">
           <div class="top-one">我上传的</div>
-          <el-radio-group v-model="checkRadio">
+          <el-radio-group v-model="checkRadio" @change="handleChangeRadio">
             <el-radio-button :value="1" class="custom-radio">
-              <template #default>上传中（{{ uplaoding }}）</template>
+              <template #default>上传中（{{ uploading }}）</template>
             </el-radio-button>
             <el-radio-button :value="2" class="custom-radio">
               <template #default>已完成（{{ completed }}）</template>
@@ -37,15 +37,22 @@
         </div>
         <div class="progress-box">
           <div class="progress-title">当前进度</div>
-          <el-progress :stroke-width="8" color="#DE3A05" :percentage="80" style="width: 85%">
+          <el-progress
+            :stroke-width="8"
+            color="#DE3A05"
+            :percentage="80"
+            style="width: 85%"
+          >
             <template #default>
               <div style="display: flex">
-                <div class="progress-speed">已完成80%</div>
-                <div class="progress-speed" style="color: #DE3A05;">1.02MB/S</div>
+                <div class="progress-speed">已完成{{ progress }}%</div>
+                <div class="progress-speed" style="color: #de3a05">
+                  {{ speed }}
+                </div>
               </div>
             </template>
           </el-progress>
-          <div>共2个</div>
+          <div>共{{ uploadSize }}个</div>
         </div>
       </template>
       <template #fileName="{ rows }">
@@ -77,12 +84,12 @@
             :percentage="getPercentage(rows)"
             color="#DE3A05"
           />
+          <div class="upload-status">
+            <div class="upload-status-speed">{{ rows.speed }}</div>
+            <div class="upload-status-time">剩余时间 {{ rows.time }}</div>
+          </div>
         </div>
         <div v-else>已完成</div>
-        <div class="upload-status">
-          <div class="upload-status-speed">1.02MB/s</div>
-          <div class="upload-status-time">剩余时间 00:12:45</div>
-        </div>
       </template>
       <template #action="{ rows }">
         <div class="action-btn">
@@ -96,22 +103,104 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, getCurrentInstance, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { uploadColumns } from './Columns'
 import vTableCustom from '@/components/TableCustom/index.vue'
+import * as taskApi from '@/api/task.js'
+
+const router = useRouter()
+
+const { proxy } = getCurrentInstance()
 
 const loading = ref(false)
 
-const tableData = ref([
-  {
-    fileName: '测试1',
-    nowSize: '4.18',
-    allSize: '5.44',
-  },
-])
+const tableData = ref([])
+
+const uploadSize = ref(0)
+const progress = ref(0)
+const speed = ref('')
+
+const getUpload = async () => {
+  let params = {}
+  await taskApi
+    .getUpladData(params)
+    .then((res) => {
+      uploading.value = 0
+      completed.value = 0
+      uploadSize.value = 0
+      progress.value = 0.8 * 100
+      speed.value = '1.02MB/s'
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+    .finally(() => {})
+}
+
+const getUploadingData = () => {
+  loading.value = true
+  let params = {}
+  taskApi
+    .getUploadIngList(params)
+    .then((res) => {
+      tableData.value = [
+        {
+          fileName: '测试1',
+          nowSize: '4.18',
+          allSize: '5.44',
+        },
+      ]
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getUploadedData = () => {
+  loading.value = true
+  let params = {}
+  taskApi
+    .getUploadedList(params)
+    .then((res) => {
+      tableData.value = [
+        {
+          fileName: '测试2',
+          nowSize: '4.18',
+          allSize: '5.44',
+        },
+      ]
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+onMounted(async () => {
+  await getUpload()
+  getUploadingData()
+})
+
+// 切换tab
+const handleChangeRadio = () => {
+  console.log(checkRadio.value)
+
+  if (checkRadio.value == '1') {
+    getUploadingData()
+  } else {
+    getUploadedData()
+  }
+}
+
 const rowKey = ref('id')
 
-const uplaoding = ref(0)
+const uploading = ref(0)
 const completed = ref(0)
 
 const selectedRows = ref([])
@@ -147,7 +236,13 @@ const handleRowMouseLeave = (column) => {
 }
 
 const handleCellDblclick = (column) => {
-  console.log(column)
+  // console.log(column)
+  router.push({
+    name: 'VideoDetail',
+    query: {
+      id: '123456',
+    },
+  })
 }
 
 const checkRadio = ref(1)
