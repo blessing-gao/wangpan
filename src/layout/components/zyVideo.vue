@@ -35,7 +35,14 @@
           <el-tab-pane label="标签" name="first">
             <videoTags />
           </el-tab-pane>
-          <el-tab-pane label="总结" name="second">总结</el-tab-pane>
+          <el-tab-pane label="总结" name="second">
+            <div class="summarize">
+              <el-button plain @click="handleClickSummarize">
+                <img src="/assets/编组 4.png" alt="" />
+              </el-button>
+            </div>
+            <summarize ref="summarizeRefs" />
+          </el-tab-pane>
           <el-tab-pane label="评论" name="third">评论</el-tab-pane>
           <el-tab-pane label="动态" name="fourth">动态</el-tab-pane>
         </el-tabs>
@@ -49,6 +56,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import preivewVideo from '../../components/preivewVideo.vue'
 import videoTags from '../../components/videoTags.vue'
+import summarize from '../../components/summarize.vue'
 
 const router = useRouter()
 
@@ -62,6 +70,12 @@ const handleClick = (value) => {
 
 const handleBack = () => {
   router.back()
+}
+
+const summarizeRefs = ref(null)
+
+const handleClickSummarize = () => {
+  summarizeRefs.value.handleEdit()
 }
 </script>
 
@@ -154,5 +168,10 @@ const handleBack = () => {
   letter-spacing: 0;
   line-height: 22px;
   font-weight: 500;
+}
+
+:deep(.summarize .el-button) {
+  border: 0;
+  padding: 0 !important;
 }
 </style>
