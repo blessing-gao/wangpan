@@ -10,13 +10,13 @@
         </el-aside>
         <el-main>
           <router-view v-slot="{ Component, route }">
-            <transition name="fade-transform" mode="out-in">
+            <keep-alive>
               <component
                 v-if="!route.meta.link"
                 :is="Component"
                 :key="route.path"
               />
-            </transition>
+            </keep-alive>
           </router-view>
         </el-main>
       </el-container>
