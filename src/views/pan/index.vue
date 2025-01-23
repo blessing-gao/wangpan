@@ -52,7 +52,12 @@
               <el-button v-if="isLevelText" link>二级文件名称</el-button>
             </div>
             <div class="table-top-right">
-              <el-select class="m-2" placeholder="Select" style="width: 120px">
+              <el-select
+                class="m-2"
+                placeholder="请选择状态"
+                style="width: 120px"
+                v-model="status"
+              >
                 <el-option
                   v-for="item in options"
                   :key="item.value"
@@ -82,25 +87,26 @@
             </div>
             <div class="file-name_right">
               <img
-                style="cursor: pointer"
-                v-show="rows.isHovered"
-                src="/icons/more_horiz.svg"
+                class="file-name_right-img"
+                v-show="!rows.isHovered"
+                src="/icons/FolderDown.svg"
               />
               <img
-                style="cursor: pointer"
+                class="file-name_right-img"
                 v-show="rows.isHovered"
+                src="/icons/FolderDown-hover.svg"
+              />
+              <img
+                class="file-name_right-img"
+                v-show="!rows.isHovered"
                 src="/icons/常用文件.svg"
               />
-              <img
-                style="cursor: pointer"
+              <!-- 少星型图标 -->
+              <!-- <img
+                class="file-name_right-img"
                 v-show="rows.isHovered"
-                src="/icons/Menu 04.svg"
-              />
-              <img
-                style="cursor: pointer"
-                v-show="rows.isHovered"
-                src="/icons/more_horiz.svg"
-              />
+                src="/icons/常用文件.svg"
+              /> -->
               <el-popover
                 placement="bottom"
                 :popper-style="{
@@ -112,8 +118,7 @@
               >
                 <template #reference>
                   <img
-                    style="cursor: pointer"
-                    v-show="rows.isHovered"
+                    class="file-name_right-img"
                     src="/icons/more_horiz.svg"
                   />
                 </template>
@@ -160,6 +165,8 @@ const loading = ref(false)
 
 const tableData = ref([])
 
+const status = ref(null)
+
 const getTableData = () => {
   loading.value = true
   let params = {}
@@ -168,10 +175,18 @@ const getTableData = () => {
     .then((res) => {
       tableData.value = [
         {
+          id: '1',
           fileName: '测试1',
           createTime: '测试1',
           modifiedTime: '测试1',
           type: '测试1',
+        },
+        {
+          id: '2',
+          fileName: '测试2',
+          createTime: '测试2',
+          modifiedTime: '测试2',
+          type: '测试2',
         },
       ]
     })
@@ -214,7 +229,12 @@ const handleRowMouseEnter = (column) => {
 }
 
 const handleRowMouseLeave = (column) => {
-  column['isHovered'] = false
+  console.log(selectedRows.value, column)
+  if (selectedRows.value.indexOf(column.fileName) != -1) {
+    column['isHovered'] = true
+  } else {
+    column['isHovered'] = false
+  }
 }
 
 // 是否显示二级文件名称
@@ -332,5 +352,17 @@ const handleNodeClick = (data) => {
     background: rgba(255, 215, 202, 0.5);
     color: #de3a05;
   }
+}
+
+:deep(.el-checkbox__input.is-indeterminate .el-checkbox__inner) {
+  background: #de3a05;
+  border-radius: 2px;
+  border-color: #de3a05;
+}
+
+.file-name_right-img {
+  cursor: pointer;
+  width: 18px;
+  margin-left: 16px;
 }
 </style>

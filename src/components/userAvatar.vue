@@ -22,7 +22,10 @@
         <div class="file-number">
           <div class="file-number-title">文件总数</div>
           <div class="file-number-number">
-            <img style="width: 16px; margin-right: 7px" src="/icons/编组 32.svg">
+            <img
+              style="width: 16px; margin-right: 7px"
+              src="/icons/编组 32.svg"
+            />
             <span>112个</span>
           </div>
         </div>
@@ -60,7 +63,7 @@
           />
           <span>修改密码</span>
         </div>
-        <div class="btn-style">
+        <div class="btn-style" @click="loginOut">
           <img
             style="width: 16px; margin-right: 16px"
             src="/icons/退出登录.svg"
@@ -75,6 +78,8 @@
 <script setup>
 import { ref } from 'vue'
 import useUserStore from '@/store/modules/user'
+import { useRouter } from 'vue-router'
+
 const userStore = useUserStore()
 const circleUrl = ref(userStore.checkUser.avatar)
 
@@ -84,6 +89,15 @@ const usedSize = ref('251.04GB')
 const allSize = ref('3.67 TB')
 const proportion = ref('20%')
 const percentage = ref(20)
+
+const router = useRouter()
+
+const loginOut = async () => {
+  await userStore.userLogout()
+  router.push({
+    path: `/login`,
+  })
+}
 </script>
 
 <style lang="scss" scoped>

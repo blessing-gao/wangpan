@@ -146,6 +146,7 @@ const handleChange = (value) => {
 
 :deep(.search_input .el-input__inner) {
   height: 36px;
+  cursor: pointer;
 }
 
 .search_input {
@@ -206,6 +207,7 @@ const handleChange = (value) => {
     height: 28px;
     width: 28px;
     margin-right: 18px;
+    cursor: pointer;
   }
   .right_ai_icon {
     display: flex;

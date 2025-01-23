@@ -25,7 +25,10 @@
       </el-page-header>
     </div>
     <div class="video-detail-content">
-      <preivewVideo :previewBoolean="true" :content="{id: 123456}" />
+      <!-- 视频观看 -->
+      <preivewVideo :previewBoolean="true" :content="{ id: 123456 }" />
+      <!-- PPT，PDF观看 -->
+      <!-- <previewPpt :content="{ id: 123456 }" /> -->
       <div class="video-detail-content-right">
         <el-tabs
           v-model="activeName"
@@ -55,6 +58,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import preivewVideo from '../../components/preivewVideo.vue'
+import previewPpt from '../../components/previewPpt.vue'
 import videoTags from '../../components/videoTags.vue'
 import summarize from '../../components/summarize.vue'
 

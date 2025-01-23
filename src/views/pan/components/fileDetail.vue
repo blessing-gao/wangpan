@@ -10,7 +10,9 @@
         <template #header>
           <div class="card-header">
             <span>详细信息</span>
-            <el-icon style="cursor: pointer;" @click="handleClose"><Close size="16" /></el-icon>
+            <el-icon style="cursor: pointer" @click="handleClose">
+              <Close size="16" />
+            </el-icon>
           </div>
         </template>
         <div class="title">
@@ -85,7 +87,7 @@ const handleEdit = (rows) => {
 }
 
 const handleClose = () => {
-    centerDialogVisible.value = false
+  centerDialogVisible.value = false
 }
 
 defineExpose({
@@ -128,5 +130,4 @@ defineExpose({
 .item {
   margin-bottom: 18px;
 }
-
 </style>

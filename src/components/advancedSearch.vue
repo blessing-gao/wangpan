@@ -6,6 +6,7 @@
       style="margin-top: 0; padding: 10px 0 0 24px"
       :modal="false"
       :close-on-click-modal="false"
+      :destroy-on-close="true"
       @close="handleClose"
     >
       <template #header>
@@ -31,7 +32,7 @@
       >
         <el-tab-pane label="全部" name="first">
           <div class="left">
-            <leftContent />
+            <leftContent :ref="contentRefs.first" />
           </div>
           <div class="right">
             <rightContent />
@@ -39,7 +40,7 @@
         </el-tab-pane>
         <el-tab-pane label="相册" name="second">
           <div class="left">
-            <leftContent />
+            <leftContent :ref="contentRefs.second" />
           </div>
           <div class="right">
             <rightContent />
@@ -47,7 +48,7 @@
         </el-tab-pane>
         <el-tab-pane label="视频" name="third">
           <div class="left">
-            <leftContent />
+            <leftContent :ref="contentRefs.third" />
           </div>
           <div class="right">
             <rightContent />
@@ -55,15 +56,15 @@
         </el-tab-pane>
         <el-tab-pane label="音频" name="fourth">
           <div class="left">
-            <leftContent />
+            <leftContent :ref="contentRefs.fourth" />
           </div>
           <div class="right">
             <rightContent />
           </div>
         </el-tab-pane>
-        <el-tab-pane label="文档" name="fourth1">
+        <el-tab-pane label="文档" name="five">
           <div class="left">
-            <leftContent />
+            <leftContent :ref="contentRefs.five" />
           </div>
           <div class="right">
             <rightContent />
@@ -75,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance } from 'vue'
+import { ref, getCurrentInstance, nextTick } from 'vue'
 
 import leftContent from './leftContent.vue'
 import rightContent from './rightContent.vue'
@@ -84,18 +85,42 @@ const { proxy } = getCurrentInstance()
 
 const dialogTableVisible = ref(false)
 
-const handleEdit = () => {
+const handleEdit = async () => {
   dialogTableVisible.value = true
+  // 确保在出现高级搜索弹窗后，dom元素更新完成
+  await nextTick()
+  const activeRef = contentRefs[activeName.value]
+  if (activeRef.value) {
+    activeRef.value.getHistoryData()
+  }
 }
 
 const activeName = ref('first')
 
-const handleClick = () => {}
+const contentRefs = {
+  first: ref(null),
+  second: ref(null),
+  third: ref(null),
+  fourth: ref(null),
+  five: ref(null),
+}
+
+// 切换tab
+const handleClick = async () => {
+  const activeRef = contentRefs[activeName.value]
+  if (activeRef.value) {
+    activeRef.value.getHistoryData()
+  }
+}
 
 const searchInput = ref('')
 
+// 搜索
 const handleSearch = () => {
-  proxy.$modal.msg('搜索')
+  const activeRef = contentRefs[activeName.value]
+  if (activeRef.value) {
+    activeRef.value.getHistoryData()
+  }
 }
 
 const handleClose = () => {

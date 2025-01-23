@@ -21,6 +21,7 @@
         class="history-content-list"
         v-for="(item, index) in historyList"
         :key="index"
+        @click="jumpDetail(item)"
       >
         <div style="margin-right: 16px">
           <img style="width: 24px" :src="getTypeIconSrc(item.type)" />
@@ -38,31 +39,76 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import * as searchApi from '@/api/search.js'
 
 const isSelected = ref(1)
 
 const selectContainer = (value) => {
   isSelected.value = value
+  getHistoryData()
 }
 
-const historyList = ref([
-  {
-    title: '2024.11.23浙江音乐学院校小提琴演出现场照片.jpg',
-    type: 'picture',
-    user: '张小伞',
-    notes: '你在6小时前打开过',
-  },
-  {
-    title: '2024.11.23浙江音乐学院校小提琴演出现场音频片段.mp3',
-    type: 'audio',
-    user: '张小伞',
-    notes: '你最近打开时间 2024.12.12 17:30',
-  },
-])
+const historyList = ref([])
+
+const getHistoryData = (data) => {
+  historyList.value = []
+  let params = {}
+  searchApi
+    .getBrowsingHistory(params)
+    .then((res) => {
+      if (data) {
+        historyList.value = [
+          {
+            title: '2024.11.23浙江音乐学院校小提琴演出现场照片1.jpg',
+            type: 'picture',
+            user: '张小伞',
+            notes: '你在6小时前打开过',
+          },
+        ]
+      } else {
+        historyList.value = [
+          {
+            title: '2024.11.23浙江音乐学院校小提琴演出现场照片2.jpg',
+            type: 'picture',
+            user: '张小伞',
+            notes: '你在6小时前打开过',
+          },
+          {
+            title: '2024.11.23浙江音乐学院校小提琴演出现场音频片段.mp3',
+            type: 'audio',
+            user: '张小伞',
+            notes: '你最近打开时间 2024.12.12 17:30',
+          },
+        ]
+      }
+
+      console.log(historyList.value)
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+}
 
 const getTypeIconSrc = (type) => {
   return `/icons/${type}.svg`
 }
+
+const router = useRouter()
+// 跳转详情
+const jumpDetail = (item) => {
+  router.push({
+    name: 'VideoDetail',
+    query: {
+      id: '123456',
+    },
+  })
+}
+
+// 确保在切换tab时可以被调用到接口信息
+defineExpose({
+  getHistoryData,
+})
 </script>
 
 <style lang="scss" scoped>
@@ -93,6 +139,7 @@ const getTypeIconSrc = (type) => {
 .history-content-list {
   display: flex;
   margin-bottom: 16px;
+  cursor: pointer;
 }
 
 .history-content-title {
