@@ -14,3 +14,21 @@ export const getBrowsingHistory = (params) => {
     params,
   })
 }
+
+/**
+ * 上传搜索
+ * @requestParam params
+ * @requestBody data
+ * @returns {AxiosPromise}
+ */
+export const uploadSearch = (params, data) => {
+  return request({
+    url: '/api/classification',
+    method: 'post',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    params,
+    data,
+  })
+}

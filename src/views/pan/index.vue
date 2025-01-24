@@ -28,11 +28,35 @@
       >
         <template #toolbarBtn>
           <div v-if="selectedRows.length == 0">
-            <el-button
-              style="background: #de3a05; border-radius: 4px; color: #fff"
+            <el-popover
+              placement="bottom-start"
+              :width="108"
+              style="padding: 8px 0"
+              trigger="hover"
             >
-              上传
-            </el-button>
+              <template #reference>
+                <el-button
+                  style="background: #de3a05; border-radius: 4px; color: #fff"
+                >
+                  上传
+                </el-button>
+              </template>
+              <div class="organization-content" @click="uploadFolder">
+                <img
+                  src="/icons/文件管理.svg"
+                  style="margin-right: 12px; width: 16px"
+                />
+                上传文件夹
+              </div>
+              <div class="organization-content" @click="uploadFiles">
+                <img
+                  src="/icons/文件.svg"
+                  style="margin-right: 12px; width: 16px"
+                />
+                上传文件
+              </div>
+            </el-popover>
+
             <el-button>新建文件夹</el-button>
           </div>
           <div v-else class="isCheckedNumber-style">
@@ -124,8 +148,8 @@
                 </template>
                 <div class="popover-content">
                   <div>重命名</div>
-                  <div>删除</div>
-                  <div>上传文件</div>
+                  <div @click="handleDelete">删除</div>
+                  <div @click="uploadFiles">上传文件</div>
                   <div @click="handleDetail(rows)">详细信息</div>
                 </div>
               </el-popover>
@@ -135,6 +159,7 @@
       </vTableCustom>
     </div>
     <fileDetail ref="fileDetailRefs" />
+    <uploadFile ref="uploadFileRefs" />
   </div>
 </template>
 
@@ -146,6 +171,8 @@ import vTableCustom from '@/components/TableCustom/index.vue'
 import fileDetail from './components/fileDetail.vue'
 import { columns } from './components/Columns.js'
 import * as panApi from '@/api/pan.js'
+// import uploadSearch from '@/components/uploadSearch.vue'
+import uploadFile from './components/uploadFile.vue'
 
 const { proxy } = getCurrentInstance()
 const router = useRouter()
@@ -258,6 +285,31 @@ const handleDetail = (rows) => {
 const handleNodeClick = (data) => {
   getTableData()
 }
+
+const uploadFileRefs = ref(null)
+
+// 上传文件夹
+const uploadFolder = () => {
+  uploadFileRefs.value.handleEdit(params)
+}
+
+// 上传文件
+const uploadFiles = () => {
+  uploadFileRefs.value.handleEdit(params)
+}
+
+const handleDelete = () => {
+  let params = {}
+  panApi
+    .deleteFile(params)
+    .then((res) => {
+      console.log(res)
+      getTableData()
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -364,5 +416,26 @@ const handleNodeClick = (data) => {
   cursor: pointer;
   width: 18px;
   margin-left: 16px;
+}
+
+.organization-content {
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-family: PingFangSC-Regular;
+  font-size: 14px;
+  color: #666666;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.organization-content:hover {
+  color: #de3a05;
+  background: rgba(255, 215, 202, 0.5);
+}
+
+:deep(.el-popper.is-light, .el-popper.is-light > .el-popper__arrow:before) {
+  padding: 8px 0 !important;
 }
 </style>

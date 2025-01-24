@@ -80,7 +80,13 @@ const { proxy } = getCurrentInstance()
 const uploadSearchRef = ref(null)
 
 const clickXiangji = () => {
-  uploadSearchRef.value.handleEdit()
+  // 配置上传的信息
+  let params = {
+    multiple: false,
+    autoUpload: true,
+    type: 'search'
+  }
+  uploadSearchRef.value.handleEdit(params)
 }
 
 const inputSearchRefs = ref(null)

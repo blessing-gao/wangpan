@@ -28,3 +28,40 @@ export const getTableList = (params) => {
     params,
   })
 }
+
+/**
+ * 上传文件夹
+ * @requestParam params
+ * @requestBody data
+ * @returns {AxiosPromise}
+ */
+export const uploadFolder = (params, data) => {
+  return request({
+    url: '/api/recent',
+    method: 'post',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    params,
+    data,
+  })
+}
+
+/**
+ * 上传文件夹
+ * @requestParam params
+ * @requestBody data
+ * @returns {AxiosPromise}
+ */
+export const uploadFile = (params, data) => {
+  return request({
+    url: '/api/recent',
+    method: 'post',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    params,
+    data,
+  })
+}
+
