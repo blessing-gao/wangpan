@@ -62,7 +62,7 @@ import { ref, nextTick, onMounted } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import * as panApi from '@/api/pan.js'
 
-const dialogTableVisible = ref(true)
+const dialogTableVisible = ref(false)
 const fileList = ref([]) // 用于存储上传的文件列表
 
 const handleEdit = () => {
@@ -87,8 +87,6 @@ const handleDrop = (e) => {
   const files = []
 
   items.forEach((item) => {
-    console.log(item)
-
     if (item.kind === 'file') {
       const entry = item.webkitGetAsEntry()
       if (entry.isDirectory) {
@@ -180,6 +178,7 @@ onMounted(async () => {
 
 const handleClose = () => {
   fileList.value = []
+  dialogTableVisible.value = false
 }
 
 defineExpose({
