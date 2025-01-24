@@ -154,12 +154,13 @@ const handleFiles = (files) => {
 // 上传文件到服务器
 const uploadFiles = () => {
   if (fileList.value.length === 0) return // 如果没有文件，不进行上传
+  console.log(fileList.value)
 
   const formData = new FormData()
-  formData.append('files', fileList.value)
-  //   fileList.value.forEach((file) => {
-  //     formData.append('file[]', file)
-  //   })
+  // formData.append('files', fileList.value)
+  fileList.value.forEach((file) => {
+    formData.append('file[]', file)
+  })
 
   let params = {}
   panApi
