@@ -290,12 +290,12 @@ const uploadFileRefs = ref(null)
 
 // 上传文件夹
 const uploadFolder = () => {
-  uploadFileRefs.value.handleEdit(params)
+  uploadFileRefs.value.handleEdit()
 }
 
 // 上传文件
 const uploadFiles = () => {
-  uploadFileRefs.value.handleEdit(params)
+  uploadFileRefs.value.handleEdit()
 }
 
 const handleDelete = () => {
