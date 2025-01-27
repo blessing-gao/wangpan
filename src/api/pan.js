@@ -9,7 +9,7 @@ import request from '@/utils/request.js'
  */
 export const contentsList = (params) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'get',
     params,
   })
@@ -23,7 +23,7 @@ export const contentsList = (params) => {
  */
 export const getTableList = (params) => {
   return request({
-    url: '/api/recent',
+    url: '/recent',
     method: 'get',
     params,
   })
@@ -37,7 +37,7 @@ export const getTableList = (params) => {
  */
 export const uploadFolder = (params, data) => {
   return request({
-    url: '/api/recent',
+    url: '/recent',
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -55,7 +55,7 @@ export const uploadFolder = (params, data) => {
  */
 export const uploadFile = (params, data) => {
   return request({
-    url: '/api/recent',
+    url: '/recent',
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data',

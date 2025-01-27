@@ -6,6 +6,7 @@
     type="application/x-mpegURL"
     v-bind="playerOptions"
   />
+
 </template>
 
 <script setup>
@@ -22,8 +23,7 @@ const props = defineProps({
     default: () => {},
   },
   previewBoolean: {
-    default: Boolean,
-    default: true,
+    default:  true,
   },
 })
 
@@ -57,19 +57,19 @@ let playerOptions = reactive({
 
 const videoRefs = ref()
 const getVideo = async () => {
-  // playerOptions.src =
+  playerOptions.src = '/preview/gjq/test.mp4';
   //   import.meta.env.VITE_STATIC_PREFIX +
   //   '/static/video/1759038606728617986/视频/视频.m3u8'
-  await detailApi
-    .detailOptions(props.content.id)
-    .then((res) => {
-      if (res.code === 200) {
-        // playerOptions.src = process.env.VUE_APP_STATIC_PREFIX + res.data
-      }
-    })
-    .catch((err) => {
-      console.error(err)
-    })
+  // await detailApi
+  //   .detailOptions(props.content.id)
+  //   .then((res) => {
+  //     if (res.code === 200) {
+  //       // playerOptions.src = process.env.VUE_APP_STATIC_PREFIX + res.data
+  //     }
+  //   })
+  //   .catch((err) => {
+  //     console.error(err)
+  //   })
 }
 
 onMounted(() => {

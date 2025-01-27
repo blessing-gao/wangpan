@@ -9,7 +9,7 @@ import request from '@/utils/request.js'
  */
 export const getUpladData = (params) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'get',
     params,
   })
@@ -23,7 +23,7 @@ export const getUpladData = (params) => {
  */
 export const getUploadIngList = (params) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'get',
     params,
   })
@@ -37,7 +37,7 @@ export const getUploadIngList = (params) => {
  */
 export const getUploadedList = (params) => {
   return request({
-    url: '/api/recent',
+    url: '/recent',
     method: 'get',
     params,
   })
@@ -51,7 +51,7 @@ export const getUploadedList = (params) => {
  */
 export const getDownloadData = (params) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'get',
     params,
   })
@@ -65,7 +65,7 @@ export const getDownloadData = (params) => {
  */
 export const getDownloadingData = (params) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'get',
     params,
   })
@@ -79,7 +79,7 @@ export const getDownloadingData = (params) => {
  */
 export const getDownloadedData = (params) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'get',
     params,
   })

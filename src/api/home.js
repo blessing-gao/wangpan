@@ -9,7 +9,7 @@ import request from '@/utils/request.js'
  */
 export const channelList = (params) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'get',
     params,
   })
@@ -23,7 +23,7 @@ export const channelList = (params) => {
  */
 export const getHistoryList = (params) => {
   return request({
-    url: '/api/recent',
+    url: '/recent',
     method: 'get',
     params,
   })
@@ -37,7 +37,7 @@ export const getHistoryList = (params) => {
  */
 export const getUploadList = (params) => {
   return request({
-    url: '/api/recent-upload',
+    url: '/recent-upload',
     method: 'get',
     params,
   })

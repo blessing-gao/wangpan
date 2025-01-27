@@ -59,7 +59,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import preivewVideo from '../../components/preivewVideo.vue'
 import previewPpt from '../../components/previewPpt.vue'
-import videoTags from '../../components/videoTags.vue'
+import videoTags from '../../components/fileTags.vue'
 import summarize from '../../components/summarize.vue'
 
 const router = useRouter()

@@ -9,7 +9,7 @@ import request from '@/utils/request.js'
  */
 export const getBrowsingHistory = (params) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'get',
     params,
   })
@@ -23,7 +23,7 @@ export const getBrowsingHistory = (params) => {
  */
 export const uploadSearch = (params, data) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data',

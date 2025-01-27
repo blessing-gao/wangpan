@@ -99,16 +99,16 @@
           </div>
         </template>
 
-        <template #fileName="{ rows }">
+        <template #operation="{ rows }">
           <div class="file-name">
-            <div class="file-name_left">
-              <img
-                style="width: 24px; margin-right: 10px"
-                src="/icons/文件管理.svg"
-              />
-              <span style="margin-right: 10px">{{ rows.fileName }}</span>
-              <el-tag class="ml-2" type="warning" size="small">标签</el-tag>
-            </div>
+<!--            <div class="file-name_left">-->
+<!--              <img-->
+<!--                style="width: 24px; margin-right: 10px"-->
+<!--                src="/icons/文件管理.svg"-->
+<!--              />-->
+<!--              <span style="margin-right: 10px">{{ rows.fileName }}</span>-->
+<!--              <el-tag class="ml-2" type="warning" size="small">标签</el-tag>-->
+<!--            </div>-->
             <div class="file-name_right">
               <img
                 class="file-name_right-img"
@@ -156,6 +156,7 @@
             </div>
           </div>
         </template>
+
       </vTableCustom>
     </div>
     <fileDetail ref="fileDetailRefs" />
@@ -173,18 +174,19 @@ import { columns } from './components/Columns.js'
 import * as panApi from '@/api/pan.js'
 // import uploadSearch from '@/components/uploadSearch.vue'
 import uploadFile from './components/uploadFile.vue'
+import * as fileApi from '@/api/file.js';
 
 const { proxy } = getCurrentInstance()
 const router = useRouter()
 
 const options = [
   {
-    value: 'Option1',
-    label: 'Option1',
+    value: 'Option111111',
+    label: 'Option111111',
   },
   {
-    value: 'Option2',
-    label: 'Option2',
+    value: 'Option222222',
+    label: 'Option222222',
   },
 ]
 
@@ -196,26 +198,27 @@ const status = ref(null)
 
 const getTableData = () => {
   loading.value = true
-  let params = {}
-  panApi
-    .getTableList(params)
+  // 定义请求参数
+  const params = {
+    bucketName: 'gjq', // 存储桶名称
+    isRecursive: false,      // 是否递归
+    onlyFolders: false,      // 是否只展示文件夹
+  };
+  fileApi
+    .fileList(params)
     .then((res) => {
-      tableData.value = [
-        {
-          id: '1',
-          fileName: '测试1',
-          createTime: '测试1',
-          modifiedTime: '测试1',
-          type: '测试1',
-        },
-        {
-          id: '2',
-          fileName: '测试2',
-          createTime: '测试2',
-          modifiedTime: '测试2',
-          type: '测试2',
-        },
-      ]
+      if (res.code === 200 && res.success) {
+        tableData.value = res.model.map((fileName, index) => ({
+          id: (index + 1).toString(), // 生成唯一的 id
+          fileName: fileName, // 文件名称
+          lastTime: '未知', // 最近修改时间，需要根据实际数据填充
+          modifier: '未知', // 修改人，需要根据实际数据填充
+          size: '未知', // 文件大小，需要根据实际数据填充
+          type: fileName.endsWith('/') ? '文件夹' : '文件', // 文件类型
+        }));
+      } else {
+        console.error('请求失败:', res.errorMessage);
+      }
     })
     .catch((err) => {
       proxy.$modal.msgError(err.message)

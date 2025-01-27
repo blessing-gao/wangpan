@@ -95,7 +95,7 @@
 
 <script setup>
 import { ref, getCurrentInstance, onMounted } from 'vue'
-import * as panApi from '@/api/pan.js'
+import * as fileApi from '@/api/file.js'
 
 const { proxy } = getCurrentInstance()
 
@@ -115,24 +115,45 @@ const handleNodeClick = (data) => {
 }
 
 const getLeftTabs = () => {
-  let params = {}
-  panApi
-    .contentsList(params)
-    .then((res) => {
-      data.value = [
-        {
-          label: '个人资源',
-          children: [],
-        },
-        {
-          label: '文件名称',
-          children: [],
-        },
-      ]
-    })
-    .catch((err) => {
-      proxy.$modal.msgError(err.message)
-    })
+  // 定义请求参数
+  const params = {
+    bucketName: 'gjq',
+    isRecursive: false,
+    onlyFolders: true
+  };
+
+  fileApi.fileList(params)
+      .then((res) => {
+        console.log('接口响应:', res);
+        if (res.code === 200 && res.success) {
+          // 动态生成文件夹树结构
+          data.value = [
+            {
+              label: '个人资源',
+              children: res.model.map(folderName => ({
+                label: folderName,      // 文件夹名称 (例如 "浙音网盘pc端-jpg")
+                isFolder: true,         // 标记为文件夹
+                children: []            // 预留子节点用于未来可能的嵌套
+              })),
+              isFolder: true
+            }
+          ];
+        } else {
+          console.error('请求失败:', res.errorMessage || '未知错误');
+          // 保持默认空结构或显示错误状态
+          data.value = [
+            { label: '个人资源', children: [], isFolder: true },
+            { label: '文件名称', children: [], isFolder: false }
+          ];
+        }
+      })
+      .catch((error) => {
+        console.error('请求异常:', error);
+        data.value = [
+          { label: '个人资源', children: [], isFolder: true },
+          { label: '文件名称', children: [], isFolder: false }
+        ];
+      });
 }
 
 onMounted(() => {

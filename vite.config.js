@@ -21,6 +21,16 @@ export default defineConfig(({ command, mode }) => {
     server: {
       port: 3000,
       proxy: {
+        '/api/file': {
+          target: 'http://localhost:8081', // MinIO 的服务地址
+          changeOrigin: true, // 代理跨域
+          rewrite: (path) => path.replace(/^\/api/, ''), // 可选，根据需要调整路径
+        },
+        '/preview': {
+          target: 'http://shenben.club:9000', // MinIO 的服务地址
+          changeOrigin: true, // 代理跨域
+          rewrite: (path) => path.replace(/^\/preview/, ''), // 可选，根据需要调整路径
+        },
         [env.VITE_APP_BASE_API]: {
           target: env.VITE_SERVE, // 获取数据的服务器地址设置
           changeOrigin: true, // 需要代理跨域
