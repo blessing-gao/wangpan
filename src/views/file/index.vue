@@ -175,6 +175,7 @@ import * as panApi from '@/api/pan.js'
 // import uploadSearch from '@/components/uploadSearch.vue'
 import uploadFile from './components/uploadFile.vue'
 import * as fileApi from '@/api/file.js';
+import '@/styles/components/fileIndex.css';  // 引入普通的 CSS 文件
 
 const { proxy } = getCurrentInstance()
 const router = useRouter()
@@ -208,7 +209,7 @@ const getTableData = () => {
     .fileList(params)
     .then((res) => {
       if (res.code === 200 && res.success) {
-        tableData.value = res.model.map((fileName, index) => ({
+        tableData.value = res.data.map((fileName, index) => ({
           id: (index + 1).toString(), // 生成唯一的 id
           fileName: fileName, // 文件名称
           lastTime: '未知', // 最近修改时间，需要根据实际数据填充
@@ -337,130 +338,3 @@ const handleDelete = () => {
 }
 </script>
 
-<style lang="scss" scoped>
-:deep(.selected-row) {
-  td {
-    background-color: rgba(243, 232, 222, 0.5) !important;
-  }
-}
-
-.file-name {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  .file-name_left {
-    display: flex;
-    align-items: center;
-  }
-}
-
-:deep(.el-table__row:hover) {
-  td {
-    background-color: rgba(243, 232, 222, 0.5) !important;
-  }
-}
-
-:deep(.el-table__row) {
-  height: 54px;
-}
-
-:deep(.el-button) {
-  font-family: PingFangSC-Regular;
-  font-size: 14px;
-  color: #333333;
-  letter-spacing: 0;
-  font-weight: 400;
-}
-
-.table-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 22px;
-  .table-top-title {
-    font-family: PingFangSC-Regular;
-    font-size: 14px;
-    color: #000000;
-    letter-spacing: 0;
-    font-weight: 400;
-    display: flex;
-  }
-  .table-top-right {
-    display: flex;
-    align-items: center;
-    :deep(.el-button, .el-button.is-round) {
-      padding: 9px;
-    }
-  }
-}
-
-:deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-  background: #de3a05;
-  border-radius: 2px;
-  border-color: #de3a05;
-}
-
-:deep(.custom-checkbox .el-checkbox__input:hover) {
-  border-color: #de3a05 !important;
-}
-:deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
-  font-family: PingFangSC-Medium;
-  font-size: 12px;
-  color: #666666;
-  letter-spacing: 0;
-  line-height: 22px;
-  font-weight: 500;
-}
-
-.isCheckedNumber-style {
-  display: flex;
-  align-items: center;
-}
-
-.popover-content {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  div {
-    padding: 6px 0 6px 13px;
-    cursor: pointer;
-  }
-  div:hover {
-    background: rgba(255, 215, 202, 0.5);
-    color: #de3a05;
-  }
-}
-
-:deep(.el-checkbox__input.is-indeterminate .el-checkbox__inner) {
-  background: #de3a05;
-  border-radius: 2px;
-  border-color: #de3a05;
-}
-
-.file-name_right-img {
-  cursor: pointer;
-  width: 18px;
-  margin-left: 16px;
-}
-
-.organization-content {
-  padding: 6px 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  font-family: PingFangSC-Regular;
-  font-size: 14px;
-  color: #666666;
-  letter-spacing: 0;
-  font-weight: 400;
-}
-
-.organization-content:hover {
-  color: #de3a05;
-  background: rgba(255, 215, 202, 0.5);
-}
-
-:deep(.el-popper.is-light, .el-popper.is-light > .el-popper__arrow:before) {
-  padding: 8px 0 !important;
-}
-</style>

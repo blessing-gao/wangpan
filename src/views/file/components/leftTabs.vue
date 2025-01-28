@@ -127,10 +127,16 @@ const getLeftTabs = () => {
         console.log('接口响应:', res);
         if (res.code === 200 && res.success) {
           // 动态生成文件夹树结构
-          data.value = [
+          data.value = res.data.map(folderName => ({
+            label: folderName,      // 文件夹名称 (例如 "浙音网盘pc端-jpg")
+            isFolder: true,         // 标记为文件夹
+            children: []            // 预留子节点用于未来可能的嵌套
+          }));
+        } else {
+          console.error('请求失败:', res.errorMessage || '未知错误');data.value = [
             {
               label: '个人资源',
-              children: res.model.map(folderName => ({
+              children: res.data.map(folderName => ({
                 label: folderName,      // 文件夹名称 (例如 "浙音网盘pc端-jpg")
                 isFolder: true,         // 标记为文件夹
                 children: []            // 预留子节点用于未来可能的嵌套
@@ -138,8 +144,6 @@ const getLeftTabs = () => {
               isFolder: true
             }
           ];
-        } else {
-          console.error('请求失败:', res.errorMessage || '未知错误');
           // 保持默认空结构或显示错误状态
           data.value = [
             { label: '个人资源', children: [], isFolder: true },

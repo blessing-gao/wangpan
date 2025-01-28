@@ -1,5 +1,5 @@
 import Layout from '@/layout/index.vue'
-import zyVideo from '@/layout/components/zyVideo.vue'
+import zyVideo from '@/layout/components/fileDetail.vue'
 const constantRoutes = [
   {
     path: '/',
@@ -22,15 +22,18 @@ const constantRoutes = [
           import(/* webpackChunkName: "dashboard" */ '../views/home/index.vue'),
       },
       {
-        path: '/pan',
-        name: 'pan',
+        path: '/file',
+        name: 'file',
         meta: {
           icon: '网盘',
           title: '网盘',
           keepAlive: true
         },
         component: () =>
-          import(/* webpackChunkName: "dashboard" */ '../views/pan/index.vue'),
+          import(/* webpackChunkName: "dashboard" */ '../views/file/index.vue'),
+        children: [
+
+        ]
       },
       {
         path: '/middle-platform',
@@ -59,7 +62,7 @@ const constantRoutes = [
     ],
   },
   {
-    path: '/video-detail', // 视频详情页的路由路径
+    path: '/detail', // 视频详情页的路由路径
     name: 'VideoDetail',
     component: zyVideo,
     meta: {

@@ -68,3 +68,27 @@ export const createFolder = (params, data = {}) => {
         data,
     });
 };
+
+
+/**
+ * 获取文件信息
+ * @param {Object} params 参数，包括bucketName和objectName
+ * @returns {AxiosPromise} 返回的axios请求结果
+ */
+export const getFileInfo = (params) => {
+    return request({
+        url: api_prex + '/fileInfo',  // 后端接口路径
+        method: 'get',  // 使用GET请求
+        params: params,  // 传递查询参数
+    })
+        .then(response => {
+            // 成功时处理返回数据
+            console.log('文件信息：', response.data);
+            return response.data;
+        })
+        .catch(error => {
+            // 错误时处理
+            console.error('获取文件信息失败：', error);
+            throw error;
+        });
+};
