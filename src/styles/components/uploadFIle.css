@@ -1,0 +1,45 @@
+/* FileUploader.css */
+.file-box {
+    width: 100%;
+    height: 288px;
+    border: 1px dashed #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 16px;
+    color: #888;
+    cursor: pointer;
+    background: linear-gradient(to bottom, #ffeff0 0%, #ffffff 100%);
+}
+
+.file-box p {
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+ul li {
+    margin-bottom: 5px;
+}
+
+.file-style {
+    max-height: 200px;
+    overflow: auto;
+}
+
+.file-style-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+:deep(.file-style-content .el-button) {
+    padding: 0;
+    border: none;
+    background-color: #ffffff !important;
+}

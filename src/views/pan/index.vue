@@ -57,7 +57,7 @@
               </div>
             </el-popover>
 
-            <el-button>新建文件夹</el-button>
+            <el-button  @click="createDict">新建文件夹</el-button>
           </div>
           <div v-else class="isCheckedNumber-style">
             <el-checkbox
@@ -228,8 +228,30 @@ const getTableData = () => {
     })
 }
 
+const createFolder = async () => {
+  if (!bucketName.value || !folderName.value) {
+    alert('请输入存储桶名称和文件夹名称');
+    return;
+  }
+  const params = {
+    bucketName: bucketName.value,
+    folderName: folderName.value,
+  };
+
+  try {
+    const response = await createFolder(params);
+    console.log('创建成功:', response.data);
+    alert(`文件夹创建成功: ${folderName.value}`);
+  } catch (error) {
+    console.error('创建失败:', error);
+    alert(`文件夹创建失败: ${error.response?.data?.message || error.message}`);
+  }
+};
+
+
 onMounted(() => {
   getTableData()
+  createFolder()
 })
 
 const rowKey = ref('id')
@@ -293,12 +315,12 @@ const uploadFileRefs = ref(null)
 
 // 上传文件夹
 const uploadFolder = () => {
-  uploadFileRefs.value.handleEdit()
+  uploadFileRefs.value.handleEdit('folder')
 }
 
 // 上传文件
 const uploadFiles = () => {
-  uploadFileRefs.value.handleEdit()
+  uploadFileRefs.value.handleEdit('file')
 }
 
 const handleDelete = () => {
