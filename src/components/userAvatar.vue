@@ -19,34 +19,34 @@
         </div>
       </div>
       <div class="file-style">
-        <div class="file-number">
-          <div class="file-number-title">文件总数</div>
-          <div class="file-number-number">
-            <img
-              style="width: 16px; margin-right: 7px"
-              src="/icons/编组 32.svg"
-            />
-            <span>112个</span>
-          </div>
-        </div>
-        <div class="use-size">
-          <div class="use-size-left">
-            <div class="used-size">{{ usedSize }}</div>
-            /
-            <div class="all-size">{{ allSize }}</div>
-          </div>
-          <div class="proportion">
-            {{ proportion }}
-          </div>
-        </div>
-        <div>
-          <el-progress
-            :stroke-width="4"
-            :show-text="false"
-            :percentage="percentage"
-            color="#C38F5D"
-          />
-        </div>
+<!--        <div class="file-number">-->
+<!--          <div class="file-number-title">文件总数</div>-->
+<!--          <div class="file-number-number">-->
+<!--            <img-->
+<!--              style="width: 16px; margin-right: 7px"-->
+<!--              src="/icons/编组 32.svg"-->
+<!--            />-->
+<!--            <span>112个</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="use-size">-->
+<!--          <div class="use-size-left">-->
+<!--            <div class="used-size">{{ usedSize }}</div>-->
+<!--            /-->
+<!--            <div class="all-size">{{ allSize }}</div>-->
+<!--          </div>-->
+<!--          <div class="proportion">-->
+<!--            {{ proportion }}-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div>-->
+<!--          <el-progress-->
+<!--            :stroke-width="4"-->
+<!--            :show-text="false"-->
+<!--            :percentage="percentage"-->
+<!--            color="#C38F5D"-->
+<!--          />-->
+<!--        </div>-->
       </div>
       <div class="footer-btn">
         <div class="btn-style" style="margin-bottom: 24px">
@@ -86,7 +86,7 @@ const circleUrl = ref(userStore.checkUser.avatar)
 const userName = ref(userStore.checkUser.username)
 
 const usedSize = ref('251.04GB')
-const allSize = ref('3.67 TB')
+const allSize = ref(' 3.67 TB')
 const proportion = ref('20%')
 const percentage = ref(20)
 
@@ -117,7 +117,7 @@ const loginOut = async () => {
 .file-style {
   width: 89%;
   margin-top: 17px;
-  background: rgba(243, 232, 222, 0.5);
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 8px;
   padding: 10px 16px 14px 14px;
   margin-bottom: 24px;

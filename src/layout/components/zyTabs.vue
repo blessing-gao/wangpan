@@ -99,7 +99,7 @@ const getIconSrc = (routeName) => {
 }
 
 .menu-item-title {
-  //   font-size: 14px; /* 设置标题文字的大小 */
+  font-size: 12px; /* 设置标题文字的大小 */
   line-height: 1.5; /* 设置标题的行高，避免过于紧凑 */
 }
 

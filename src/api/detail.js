@@ -25,7 +25,7 @@ export const getTagData = (params) => {
  */
 export const addTag = (data) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'post',
     data,
   })
@@ -39,7 +39,7 @@ export const addTag = (data) => {
  */
 export const removeTag = (data) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'delete',
     data,
   })
@@ -53,7 +53,7 @@ export const removeTag = (data) => {
  */
 export const detailOptions = (data) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'delete',
     data,
   })

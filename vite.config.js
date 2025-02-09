@@ -92,6 +92,16 @@ export default defineConfig(({ mode }) => {
         'Access-Control-Allow-Origin': '*'
       },
       proxy: {
+        '/api/file': {
+          target: 'http://localhost:8081', // MinIO 的服务地址
+          changeOrigin: true, // 代理跨域
+          rewrite: (path) => path.replace(/^\/api/, ''), // 可选，根据需要调整路径
+        },
+        '/preview': {
+          target: 'http://shenben.club:9000', // MinIO 的服务地址
+          changeOrigin: true, // 代理跨域
+          rewrite: (path) => path.replace(/^\/preview/, ''), // 可选，根据需要调整路径
+        },
         [env.VITE_BASE_PREV]: {
           target: env.VITE_BASE_URL,
           changeOrigin: true,

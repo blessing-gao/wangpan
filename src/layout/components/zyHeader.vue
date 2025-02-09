@@ -58,9 +58,9 @@
       <div class="right_header_icon">
         <userAvatar />
       </div>
-      <div class="right_ai_icon">
-        <img src="/assets/编组 11.png" class="menu-item-icon" />
-      </div>
+<!--      <div class="right_ai_icon">-->
+<!--        <img src="/assets/编组 11.png" class="menu-item-icon" />-->
+<!--      </div>-->
     </div>
   </div>
   <uploadSearch ref="uploadSearchRef" />

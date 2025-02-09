@@ -125,14 +125,14 @@ export default {
 .login_container {
   width: 100%;
   height: 100vh;
-  background: url('@/assets/images/background.jpg') no-repeat;
+  //background: url('@/assets/images/background.jpg') no-repeat;
   background-size: cover;
 
   .login_form {
     position: relative;
     width: 80%;
     top: 30vh;
-    background: url('@/assets/images/login_form.png') no-repeat;
+    //background: url('@/assets/images/login_form.png') no-repeat;
     background-size: cover;
     padding: 40px;
 

@@ -9,7 +9,7 @@ import request from '@/utils/request.js'
  */
 export const organizationData = (params) => {
   return request({
-    url: '/api/classification',
+    url: '/classification',
     method: 'get',
     params,
   })
@@ -23,7 +23,7 @@ export const organizationData = (params) => {
  */
 export const changeOrganization = (data) => {
   return request({
-    url: '/api/recent',
+    url: '/recent',
     method: 'post',
     data,
   })
