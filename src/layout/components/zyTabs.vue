@@ -51,15 +51,15 @@ const getIconClass = (path) => {
 
 const getIconSrc = (routeName) => {
   if (routeName === 'home') {
-    return route.path === '/home' ? '/icons/home-active.svg' : '/icons/home.svg'
+    return route.path === '/home' ? '/knowledge/icons/home-active.svg' : '/knowledge/icons/home.svg'
   } else if (routeName === 'pan') {
-    return route.path === '/pan' ? '/icons/pan-active.svg' : '/icons/pan.svg'
+    return route.path === '/pan' ? '/knowledge/icons/pan-active.svg' : '/knowledge/icons/pan.svg'
   } else if (routeName === 'middle-platform') {
     return route.path === '/middle-platform'
-      ? '/icons/middle-platform-active.svg'
-      : '/icons/middle-platform.svg'
+      ? '/knowledge/icons/middle-platform-active.svg'
+      : '/knowledge/icons/middle-platform.svg'
   } else if (routeName === 'task') {
-    return route.path === '/task' ? '/icons/task-active.svg' : '/icons/task.svg'
+    return route.path === '/task' ? '/knowledge/icons/task-active.svg' : '/knowledge/icons/task.svg'
   }
 }
 </script>

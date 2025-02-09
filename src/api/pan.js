@@ -1,15 +1,29 @@
 // 统一管理项目用户相关的接口
 import request from '@/utils/request.js'
+const path = import.meta.env.VITE_BASE_PREV
 
 /**
- * 获取目录
+ * 根据项目ID获取spaceId
  * @requestParam params
  * @requestBody data
  * @returns {AxiosPromise}
  */
-export const contentsList = (params) => {
+export const getSpaceIdByProdId = (id) => {
   return request({
-    url: '/api/classification',
+    url: `${path}/space/project/${id}`,
+    method: 'get',
+  })
+}
+
+/**
+ * 获取文件
+ * @requestParam params
+ * @requestBody data
+ * @returns {AxiosPromise}
+ */
+export const contentsList = (spaceId, directoryId, params) => {
+  return request({
+    url: `${path}/document/page/${spaceId}/${directoryId}`,
     method: 'get',
     params,
   })
@@ -65,3 +79,16 @@ export const uploadFile = (params, data) => {
   })
 }
 
+/**
+ * 文件下载
+ * @requestParam params
+ * @requestBody data
+ * @returns {AxiosPromise}
+ */
+export const downloadFile = (id) => {
+  return request({
+    url: `${path}/document/download/${id}`,
+    method: 'get',
+    responseType: 'blob',
+  })
+}
