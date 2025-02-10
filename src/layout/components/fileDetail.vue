@@ -26,17 +26,18 @@
     </div>
     <div class="file-detail-content">
       <!-- 根据文件类型选择预览组件 -->
-      <div v-if="file_type === 'video'">
+      <div v-if="file_type === 'video'" style="width: 100%; height: 100%;">
         <previewVideo :previewBoolean="true" :content="{ path: file_path }" />
       </div>
-      <div v-else-if="file_type === 'pdf'">
+      <div v-else-if="file_type === 'pdf'" style="width: 100%; height: 100%;">
         <previewPDF :content="{ path: file_path }" />
       </div>
-      <div v-else-if="file_type === 'image'">
+      <div v-else-if="file_type === 'image'" style="width: 100%; height: 100%;">
         <previewImage :content="{ path: file_path }" />
       </div>
-      <div v-else>
-        <p>无法预览此文件类型</p>
+      <div v-else style="width: 100%; height: 100%;">
+        <!-- <p>无法预览此文件类型</p> -->
+        <previewPDF :content="{ path: file_path }" />
       </div>
       <div class="file-detail-content-right">
         <el-tabs
@@ -84,8 +85,10 @@ const summarizeRefs = ref(null)
 
 // 获取URL中的id参数
 const urlParams = new URLSearchParams(window.location.search)
-const id = urlParams.get('id')  // 获取id参数
 
+
+const id = urlParams.get('id')  // 获取id参数
+console.log(1111, id);
 // 根据id请求文件信息
 const fetchFileInfo = async () => {
   if (id) {

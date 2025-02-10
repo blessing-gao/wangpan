@@ -47,7 +47,7 @@
                 />
                 上传文件夹
               </div>
-              <div class="organization-content" @click="uploadFiles">
+              <div class="organization-content" @click="handleUploadFile">
                 <img
                   src="/icons/文件.svg"
                   style="margin-right: 12px; width: 16px"
@@ -56,7 +56,7 @@
               </div>
             </el-popover>
 
-            <el-button  @click="createDict">新建文件夹</el-button>
+            <el-button @click="createDict">新建文件夹</el-button>
           </div>
           <div v-else class="isCheckedNumber-style">
             <el-checkbox
@@ -118,63 +118,54 @@
               <span style="margin-right: 10px">{{ rows.name }}</span>
               <el-tag class="ml-2" type="warning" size="small">标签</el-tag>
             </div>
-            <div class="file-name_right">
-              <img
-                class="file-name_right-img"
-                v-show="!rows.isHovered"
-                src="/icons/FolderDown.svg"
-              />
-              <img
-                class="file-name_right-img"
-                v-show="rows.isHovered"
-                src="/icons/FolderDown-hover.svg"
-              />
-              <img
-                class="file-name_right-img"
-                v-show="!rows.isHovered"
-                src="/icons/常用文件.svg"
-              />
-              <!-- 少星型图标 -->
-              <!-- <img
-                class="file-name_right-img"
-                v-show="rows.isHovered"
-                src="/icons/常用文件.svg"
-              /> -->
-              <el-popover
-                placement="bottom"
-                :popper-style="{
-                  boxSizing: 'border-box',
-                  padding: '8px 0px',
-                }"
-                :width="88"
-                trigger="hover"
-              >
-                <template #reference>
-                  <img
-                    class="file-name_right-img"
-                    src="/icons/more_horiz.svg"
-                  />
-                </template>
-                <div class="popover-content">
-                  <div>重命名</div>
-                  <div @click="handleDelete">删除</div>
-                  <div @click="uploadFiles">上传文件</div>
-                  <div @click="handleDetail(rows)">详细信息</div>
-                </div>
-              </el-popover>
-            </div>
           </div>
         </template>
 
+        <template #operation="{ rows }">
+          <div class="file-name_right">
+            <!-- v-show="!rows.isHovered" -->
+            <!-- v-show="rows.isHovered" -->
+            <img class="file-name_right-img" src="/icons/FolderDown.svg" />
+            <img
+              class="file-name_right-img"
+              src="/icons/FolderDown-hover.svg"
+            />
+            <img class="file-name_right-img" src="/icons/常用文件.svg" />
+
+            <fileOperateMenu
+              class="file-name_right-img"
+              :file="rows"
+              @onCommand="handleFileOperate"
+            >
+              <img src="/icons/more_horiz.svg" />
+            </fileOperateMenu>
+          </div>
+        </template>
       </vTableCustom>
     </div>
     <fileDetail ref="fileDetailRefs" />
-    <uploadFile ref="uploadFileRefs" />
+    <uploadFileVue
+      ref="uploadFileRefs"
+      :maxSize="docMaxSize"
+      :visible="uploadDialogVisible"
+      :demand="uploadDemandFile"
+      @ok="uploadFiles"
+      @close="handleClose"
+    />
+    <mdDialog ref="mdDialogRefs" @handleShowUpload="handleShowUpload" />
+    <moveDialog
+      ref="moveDialogRefs"
+      :visible="moveDialogVisible"
+      :spaceId="spaceId"
+      :file="curretnOperateFolderOrFile"
+      @ok="handleMoveFolderOrFile"
+      @onClose="handleClose"
+    />
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, getCurrentInstance } from 'vue'
+import { onMounted, ref, getCurrentInstance, reactive } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 import leftTabs from './components/leftTabs.vue'
@@ -182,9 +173,11 @@ import vTableCustom from '@/components/TableCustom/index.vue'
 import fileDetail from './components/fileDetail.vue'
 import { columns } from './components/Columns.js'
 import * as panApi from '@/api/pan.js'
-// import uploadSearch from '@/components/uploadSearch.vue'
-import uploadFile from './components/uploadFile.vue'
+import uploadFileVue from './components/uploadFile.vue'
 import { fileTypeIcon, collaboraOnlineExts, compressedExts } from '@/enum'
+import fileOperateMenu from './components/fileOperateMenu.vue'
+import mdDialog from './components/mdDialog.vue'
+import moveDialog from './components/moveDialog.vue'
 
 const { proxy } = getCurrentInstance()
 const route = useRoute()
@@ -207,12 +200,21 @@ const tableData = ref([])
 
 const status = ref(null)
 
+const docMaxSize = ref('0')
+const uploadDialogVisible = ref(false)
+const moveDialogVisible = ref(false)
+
 // 获取spaceId
 const spaceId = ref('')
 const getSpaceId = async () => {
   const proId = route.query.proId
   const result = await panApi.getSpaceIdByProdId(proId)
   spaceId.value = result.data
+}
+
+const getMaxSize = async () => {
+  const result = await panApi.getDocMaxSize()
+  docMaxSize.value = result.data
 }
 
 const fileId = ref(0)
@@ -240,6 +242,7 @@ const getTableData = () => {
 
 onMounted(async () => {
   await getSpaceId()
+  await getMaxSize()
   getTableData()
 })
 
@@ -289,6 +292,16 @@ const isCompressedFile = (file) => {
   return false
 }
 
+const translateFileList = (preKey, list) => {
+  list.forEach((item) => {
+    item.path = `${preKey}/${item.name}`
+  })
+  return list
+}
+
+// 当前选中查看的文件夹或文件
+const currentFolderOrFile = ref(null)
+
 const hanldeRowClick = (column) => {
   isLevelText.value = true
   if (column.fileType === 0) {
@@ -305,11 +318,8 @@ const hanldeRowClick = (column) => {
         },
       })
     } else if (['md'].includes(fileExt) || file.fileType === 2) {
-      // this.currentFolderOrFile = file
-      // this.$refs.fileTree.setCurrentKey(file.id)
-      // this.currentFile = file
-      // this.showMdPreview = true
-      // this.showDocPreview = false
+      currentFile.value = file
+      currentFolderOrFile.value = file
     } else {
       if (isCompressedFile(file.name)) {
         ElMessageBox.alert('不支持查看压缩文件', '提示', {
@@ -355,6 +365,8 @@ const handleDetail = (rows) => {
   fileDetailRefs.value.handleEdit(rows)
 }
 
+const createDict = () => {}
+
 const handleNodeClick = (data, node) => {
   if (data.fileType === 0) {
     fileId.value = data.id
@@ -374,12 +386,12 @@ const uploadFileRefs = ref(null)
 
 // 上传文件夹
 const uploadFolder = () => {
-  uploadFileRefs.value.handleEdit('folder')
+  // uploadFileRefs.value.handleEdit('folder')
 }
 
 // 上传文件
-const uploadFiles = () => {
-  uploadFileRefs.value.handleEdit('file')
+const handleUploadFile = () => {
+  // uploadFileRefs.value.handleEdit('file')
 }
 
 const handleDelete = () => {
@@ -394,7 +406,220 @@ const handleDelete = () => {
       console.log(err)
     })
 }
+
+const mdDialogRefs = ref(null)
+// 当前点击更多操作时选中的文件对象
+const curretnOperateFolderOrFile = reactive({})
+
+// file tree 和 file table中点击更多对应的操作
+const handleFileOperate = (type, operate, file) => {
+  console.log(type, operate, file)
+  if (type === 'create') {
+    // this.addFileAction(operate, file)
+  } else if (type === 'upload') {
+    if (operate === 'mdFile') {
+      mdDialogRefs.value.handleEdit(currentFolderOrFile.value)
+    } else {
+      handleShowUpload(operate, file)
+    }
+  } else {
+    curretnOperateFolderOrFile.value = file
+    if (operate === 'edit') {
+      // this.folderOrFileClick(file)
+    }
+    if (operate === 'rename') {
+      // this.handleShowRename(file)
+    }
+    if (operate === 'remove') {
+      // this.showDeleteDialog(file)
+    }
+    if (operate === 'move') {
+      moveDialogVisible.value = true
+    }
+    if (operate === 'download') {
+      // this.downloadFiles(file.id)
+    }
+  }
+}
+
+// 创建或上传文件(夹)的父文件夹对象
+const currentParentFolder = ref(null)
+
+const uploadParams = reactive({
+  spaceId: '',
+  fileType: 1,
+  directoryId: 0,
+  uniqueKey: '',
+})
+
+// 收否上传需求文档
+const uploadDemandFile = ref(false)
+//是否上传md Notion文档
+const importMdNotion = ref(false)
+//是否上传md 文档
+const importMdFile = ref(false)
+const importMdDialogVisible = ref(false)
+const currentFile = ref(null)
+
+// 点击显示上传文件弹窗
+const handleShowUpload = (type, file, demand) => {
+  if (file) {
+    currentParentFolder.value = file
+    uploadParams.directoryId = file.id
+    uploadParams.uniqueKey = file.uniqueKey
+  } else {
+    currentParentFolder.value = null
+    uploadParams.directoryId = 0
+    uploadParams.uniqueKey = ''
+  }
+  uploadDemandFile.value = demand ? demand : false
+  importMdNotion.value = ['mdNotion', 'mdFile'].includes(type)
+  importMdFile.value = type === 'mdFile'
+  uploadDialogVisible.value = true
+}
+
+const handleClose = () => {
+  uploadDialogVisible.value = false
+  importMdDialogVisible.value = false
+  moveDialogVisible.value = false
+}
+
+// 是否支持编辑文档
+const supportEditDoc = ref(false)
+
+// 上传文件
+const uploadFiles = async (fileList) => {
+  let formData = new FormData()
+  formData.append('demand', uploadDemandFile.value)
+  formData.append('spaceId', spaceId.value)
+  formData.append('directoryId', uploadParams.directoryId)
+  formData.append('fileType', importMdNotion.value ? 2 : uploadParams.fileType)
+  console.log(importMdFile.value)
+
+  if (importMdFile.value) {
+    // for (const { raw } of fileList) {
+    //   const schema = new Schema() //创建新模式
+    //   schema.register(AffineSchemas) //注册系统默认模块
+    //   const workspace = new Workspace({ id: 'foo', schema }) //创建新工作区
+    //   const page = await createPage(workspace)
+    //   const rootId = page.root?.id
+    //   const file = raw
+    //   if (!file) continue
+    //   const text = await file.text()
+    //   const contentParser = new ContentParser(page)
+    //   await contentParser.importMarkdown(text, rootId)
+    //   const blob = await ZipTransformer.exportPages(workspace, [page])
+    //   let _file = new File([blob], file.name.replace('.md', '.zip'), {
+    //     type: blob.type,
+    //   })
+    //   formData.append('files', _file)
+    // }
+  } else {
+    fileList.forEach((file) => {
+      formData.append('files', file.raw)
+    })
+  }
+
+  panApi.uploadFile(formData).then((res) => {
+    if (res.code === 0) {
+      uploadDialogVisible.value = false
+      importMdDialogVisible.value = false
+      proxy.$modal.msgSuccess('上传成功')
+
+      const exts = collaboraOnlineExts.map((item) => item.ext)
+      const fileExt = res.data.name.split('.').pop().toLowerCase()
+      if (exts.includes(fileExt)) {
+        const action = collaboraOnlineExts.find(
+          (item) => item.ext === fileExt,
+        ).action
+        supportEditDoc.value = action === 'edit'
+        currentFile.value = res.data
+        currentFolderOrFile.value = res.data
+      } else if (['md'].includes(fileExt) || res.data.fileType === 2) {
+        currentFile.value = res.data
+        currentFolderOrFile.value = res.data
+      } else {
+        currentFolderOrFile.value = currentFolderOrFile.value
+        proxy.$modal.msgWarning('暂不支持预览该文件格式')
+      }
+    } else {
+      proxy.$modal.msgWarning(res.msg)
+    }
+  })
+}
+
+// 移动文件夹或文件
+const handleMoveFolderOrFile = (targetFolder) => {
+  console.log(curretnOperateFolderOrFile.value)
+  // 移动文件夹
+  if (curretnOperateFolderOrFile.value.fileType === 0) {
+    const params = {
+      ...curretnOperateFolderOrFile.value,
+      parentId: targetFolder.id,
+      spaceId: spaceId.value,
+    }
+    console.log(params);
+    
+    // updateFolder(params).then((res) => {
+    //   if (res.code === 0) {
+    //     this.$message.success('移动成功！')
+    //     this.moveDialogVisible = false
+    //     this.$refs.fileTree.remove(this.curretnOperateFolderOrFile.id)
+    //     this.expandAndFocusFolder(targetFolder)
+    //     this.curretnOperateFolderOrFile = null
+    //   } else {
+    //     this.$message.warn(res.msg)
+    //     this.moveDialogVisible = false
+    //   }
+    // })
+  } else {
+    const params = {
+      ...curretnOperateFolderOrFile.value,
+      directoryId: targetFolder.id,
+      spaceId: spaceId.value,
+      fileType: curretnOperateFolderOrFile.value.fileType === 2 ? 2 : 1,
+    }
+    console.log(params);
+    
+    // // 移动文件
+    // updateFile(params).then((res) => {
+    //   if (res.code === 0) {
+    //     this.$message.success('移动成功！')
+    //     this.moveDialogVisible = false
+    //     this.$refs.fileTree.remove(this.curretnOperateFolderOrFile.id)
+    //     this.expandAndFocusFolder(targetFolder)
+    //     this.showDocPreview = false
+    //     this.showMdPreview = false
+    //     this.editDoc = false
+    //     this.currentFile = null
+    //     this.curretnOperateFolderOrFile = null
+    //   } else {
+    //     this.$message.warn(res.msg)
+    //     this.moveDialogVisible = false
+    //   }
+    // })
+  }
+}
 </script>
 <style lang="scss" scoped>
-@import '../../styles/components/fileIndex.css'
+@import '../../styles/components/fileIndex.css';
+
+.more-operate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  outline: none;
+  opacity: 0;
+
+  &.show {
+    opacity: 1;
+  }
+
+  &:hover {
+    background-color: #fcfcfc;
+  }
+}
 </style>

@@ -62,19 +62,18 @@ export const uploadFolder = (params, data) => {
 }
 
 /**
- * 上传文件夹
+ * 上传文档
  * @requestParam params
  * @requestBody data
  * @returns {AxiosPromise}
  */
-export const uploadFile = (params, data) => {
+export const uploadFile = (data) => {
   return request({
-    url: '/recent',
+    url: `${path}/document/upload`,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data',
     },
-    params,
     data,
   })
 }
@@ -92,3 +91,16 @@ export const downloadFile = (id) => {
     responseType: 'blob',
   })
 }
+
+// 文档 - 获取文档上传最大限制
+export const getDocMaxSize = () => {
+  return request({
+    url: `${path}/document/maxSize`,
+    method: 'get',
+  })
+}
+
+// 文档 - 上传文档
+// export const uploadFile = (formData, config) => {
+//   return request.post(`${path}/document/upload`, formData, config)
+// }

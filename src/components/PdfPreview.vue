@@ -1,16 +1,16 @@
 <template>
   <div class="pdf-preview">
     <iframe
-        :src="iframeUrl"
-        frameborder="0"
-        width="100%"
-        height="100%"
+      :src="iframeUrl"
+      frameborder="0"
+      width="100%"
+      height="100%"
     ></iframe>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted } from 'vue'
 
 // 通过 props 获取内容路径
 const props = defineProps({
@@ -18,19 +18,20 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-});
+})
 
-const iframeUrl = ref(null);
+const iframeUrl = ref(null)
 
 // 通过模拟请求或直接设定文件路径
 const loadPdf = () => {
   // 假设content.path为pdf文件的URL
-  iframeUrl.value = props.content.path;  // 在这里填入实际的路径或获取链接
-};
+  // iframeUrl.value = props.content.path;  // 在这里填入实际的路径或获取链接
+  iframeUrl.value = 'http://www.shenben.club:9000/gjq/course-01.pdf'
+}
 
 onMounted(() => {
-  loadPdf(); // 页面加载后设置文件路径
-});
+  loadPdf() // 页面加载后设置文件路径
+})
 </script>
 
 <style scoped>

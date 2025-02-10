@@ -5,14 +5,14 @@ export const columns = [
     align: 'left',
   },
   {
-    prop: 'lastTime',
+    prop: 'updateTime',
     label: '最近修改时间',
     align: 'left',
     width: '200',
     sortable: true,
   },
   {
-    prop: 'modifier',
+    prop: 'updateBy',
     label: '修改人',
     align: 'left',
     width: '200',
@@ -35,7 +35,7 @@ export const columns = [
     prop: "operation",
     label: "操作",
     width: 200,
-    align: "right",
+    align: "left",
     slotName: "operation",
   },
 ]

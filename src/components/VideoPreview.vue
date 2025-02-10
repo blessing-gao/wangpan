@@ -1,14 +1,14 @@
 <template>
   <video
-      id="media"
-      ref="videoRefs"
-      class="video-player"
-      controls
-      :src="videoSrc"
-      :autoplay="playerOptions.autoPlay"
-      :loop="playerOptions.loop"
-      :muted="playerOptions.muted"
-      :volume="playerOptions.volume"
+    id="media"
+    ref="videoRefs"
+    class="video-player"
+    controls
+    :src="videoSrc"
+    :autoplay="playerOptions.autoPlay"
+    :loop="playerOptions.loop"
+    :muted="playerOptions.muted"
+    :volume="playerOptions.volume"
   ></video>
 </template>
 
@@ -39,9 +39,11 @@ const videoSrc = ref('') // 视频源地址
 
 // 获取视频地址
 const getVideo = () => {
-  if (props.content?.path) {
-    videoSrc.value = props.content.path // 使用 content.path 作为视频源地址
-  }
+  // if (props.content?.path) {
+  //   // videoSrc.value = props.content.path // 使用 content.path 作为视频源地址
+  //   videoSrc.value = 'http://www.shenben.club:9000/gjq/test.mp4'
+  // }
+  videoSrc.value = 'http://www.shenben.club:9000/gjq/test.mp4'
 }
 
 onMounted(() => {

@@ -36,8 +36,6 @@ request.interceptors.response.use(
     if (data.code === 0) {
       return data
     } else {
-      console.log(data);
-      
       ElMessage.warning(data.msg || '接口调用失败，请联系管理员')
       return Promise.reject()
     }

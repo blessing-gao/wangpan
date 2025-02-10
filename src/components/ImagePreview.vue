@@ -1,10 +1,10 @@
 <template>
   <div class="image-preview">
     <el-image
-        style="width: 100%; height: 100%; object-fit: contain;"
-        :src="content.path"
-        fit="contain"
-        lazy
+      style="width: 100%; height: 100%; object-fit: contain"
+      :src="content.path"
+      fit="contain"
+      lazy
     />
   </div>
 </template>
@@ -13,8 +13,8 @@
 defineProps({
   content: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
 </script>
 

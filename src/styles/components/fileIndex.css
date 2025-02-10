@@ -8,6 +8,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     .file-name_left {
         display: flex;
         align-items: center;
@@ -37,6 +38,7 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 22px;
+
     .table-top-title {
         font-family: PingFangSC-Regular;
         font-size: 14px;
@@ -45,9 +47,11 @@
         font-weight: 400;
         display: flex;
     }
+
     .table-top-right {
         display: flex;
         align-items: center;
+
         :deep(.el-button, .el-button.is-round) {
             padding: 9px;
         }
@@ -63,6 +67,7 @@
 :deep(.custom-checkbox .el-checkbox__input:hover) {
     border-color: #de3a05 !important;
 }
+
 :deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
     font-family: PingFangSC-Medium;
     font-size: 12px;
@@ -81,10 +86,12 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+
     div {
         padding: 6px 0 6px 13px;
         cursor: pointer;
     }
+
     div:hover {
         background: rgba(255, 215, 202, 0.5);
         color: #de3a05;
@@ -101,6 +108,10 @@
     cursor: pointer;
     width: 18px;
     margin-left: 16px;
+}
+
+.file-name_right-img:first-child {
+    margin-left: 0;
 }
 
 .organization-content {
