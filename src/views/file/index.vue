@@ -125,12 +125,6 @@
                 v-show="!rows.isHovered"
                 src="/icons/常用文件.svg"
               />
-              <!-- 少星型图标 -->
-              <!-- <img
-                class="file-name_right-img"
-                v-show="rows.isHovered"
-                src="/icons/常用文件.svg"
-              /> -->
               <el-popover
                 placement="bottom"
                 :popper-style="{
@@ -175,7 +169,7 @@ import * as panApi from '@/api/pan.js'
 // import uploadSearch from '@/components/uploadSearch.vue'
 import uploadFile from './components/uploadFile.vue'
 import * as fileApi from '@/api/file.js';
-import '@/styles/components/fileIndex.css';  // 引入普通的 CSS 文件
+
 
 const { proxy } = getCurrentInstance()
 const router = useRouter()
@@ -196,6 +190,7 @@ const loading = ref(false)
 const tableData = ref([])
 
 const status = ref(null)
+const bucketName = ref('')
 
 const getTableData = () => {
   loading.value = true
@@ -249,10 +244,14 @@ const createFolder = async () => {
   }
 };
 
+const createDict = () => {
+
+}
+
 
 onMounted(() => {
   getTableData()
-  createFolder()
+  // createFolder()
 })
 
 const rowKey = ref('id')
@@ -337,4 +336,7 @@ const handleDelete = () => {
     })
 }
 </script>
-
+<style lang="scss" scoped>
+// import '@/styles/components/fileIndex.css';  // 引入普通的 CSS 文件
+@import '../../styles/components/fileIndex.css'
+</style>

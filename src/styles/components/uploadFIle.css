@@ -22,10 +22,10 @@ ul {
     padding: 0;
     list-style-type: none;
 }
-
+/* 
 ul li {
     margin-bottom: 5px;
-}
+} */
 
 .file-style {
     max-height: 200px;
