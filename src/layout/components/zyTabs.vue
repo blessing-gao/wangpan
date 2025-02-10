@@ -52,8 +52,8 @@ const getIconClass = (path) => {
 const getIconSrc = (routeName) => {
   if (routeName === 'home') {
     return route.path === '/home' ? '/icons/home-active.svg' : '/icons/home.svg'
-  } else if (routeName === 'file') {
-    return route.path === '/file' ? '/icons/pan-active.svg' : '/icons/pan.svg'
+  } else if (routeName === 'pan') {
+    return route.path === '/pan' ? '/icons/pan-active.svg' : '/icons/pan.svg'
   } else if (routeName === 'middle-platform') {
     return route.path === '/middle-platform'
       ? '/icons/middle-platform-active.svg'
