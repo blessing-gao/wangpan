@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { defineComponent, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const routes = computed(() => {
@@ -52,8 +52,8 @@ const getIconClass = (path) => {
 const getIconSrc = (routeName) => {
   if (routeName === 'home') {
     return route.path === '/home' ? '/knowledge/icons/home-active.svg' : '/knowledge/icons/home.svg'
-  } else if (routeName === 'pan') {
-    return route.path === '/pan' ? '/knowledge/icons/pan-active.svg' : '/knowledge/icons/pan.svg'
+  } else if (routeName === 'file') {
+    return route.path === '/file' ? '/knowledge/icons/pan-active.svg' : '/knowledge/icons/pan.svg'
   } else if (routeName === 'middle-platform') {
     return route.path === '/middle-platform'
       ? '/knowledge/icons/middle-platform-active.svg'

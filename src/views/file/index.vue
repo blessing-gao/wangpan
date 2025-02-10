@@ -396,4 +396,6 @@ const handleDelete = () => {
     })
 }
 </script>
-
+<style lang="scss" scoped>
+@import '../../styles/components/fileIndex.css'
+</style>

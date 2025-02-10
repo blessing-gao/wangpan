@@ -23,9 +23,9 @@ ul {
     list-style-type: none;
 }
 
-ul li {
+/* ul li {
     margin-bottom: 5px;
-}
+} */
 
 .file-style {
     max-height: 200px;
