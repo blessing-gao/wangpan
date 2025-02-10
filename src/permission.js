@@ -15,7 +15,7 @@ router.beforeEach(async (to, from, next) => {
   document.title = `${setting.title} - ${to.meta.title}`
   nprogress.start()
   //获取token,去判断用户登录、还是未登录
-  const token = userStore.token
+  const token = userStore.token || 'Admin'
   // const username = userStore.username
   const username = '1'
   //用户登录判断

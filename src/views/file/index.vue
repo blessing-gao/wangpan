@@ -241,7 +241,6 @@ const getTableData = () => {
 onMounted(async () => {
   await getSpaceId()
   getTableData()
-  createFolder()
 })
 
 const rowKey = ref('id')
