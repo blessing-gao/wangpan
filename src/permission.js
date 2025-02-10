@@ -16,13 +16,15 @@ router.beforeEach(async (to, from, next) => {
   nprogress.start()
   //获取token,去判断用户登录、还是未登录
   const token = userStore.token
-  const username = userStore.username
+  // const username = userStore.username
+  const username = '1'
   //用户登录判断
   if (token) {
     //登录成功,访问login,不能访问,指向首页
     if (to.path == '/login') {
       next({ path: '/' })
     } else {
+
       //登录成功访问其余六个路由(登录排除)
       //有用户信息
       if (username) {

@@ -24,7 +24,6 @@
         @handleSelectionChange="handleSelectionChange"
         @handleRowMouseEnter="handleRowMouseEnter"
         @handleRowMouseLeave="handleRowMouseLeave"
-        @handleCellDblclick="handleCellDblclick"
       >
         <template #toolbarBtn>
           <div v-if="selectedRows.length == 0">
@@ -72,8 +71,8 @@
           </div>
           <div class="table-top">
             <div class="table-top-title">
-              <el-button link @click="clickFile">文件名称</el-button>
-              <el-button v-if="isLevelText" link>二级文件名称</el-button>
+              <el-button link @click="clickFile">根目录</el-button>
+              <el-button v-if="isLevelText" link>{{}}</el-button>
             </div>
             <div class="table-top-right">
               <el-select
@@ -99,16 +98,26 @@
           </div>
         </template>
 
-        <template #operation="{ rows }">
-          <div class="file-name">
-<!--            <div class="file-name_left">-->
-<!--              <img-->
-<!--                style="width: 24px; margin-right: 10px"-->
-<!--                src="/icons/文件管理.svg"-->
-<!--              />-->
-<!--              <span style="margin-right: 10px">{{ rows.fileName }}</span>-->
-<!--              <el-tag class="ml-2" type="warning" size="small">标签</el-tag>-->
-<!--            </div>-->
+        <template #fileName="{ rows }">
+          <div class="file-name" @click="hanldeRowClick(rows)">
+            <div class="file-name_left">
+              <!-- <img
+                style="width: 24px; margin-right: 10px"
+                src="/icons/文件管理.svg"
+              /> -->
+              <img
+                style="width: 24px; margin-right: 10px"
+                :src="
+                  fileTypeIcon(
+                    rows.fileType === 2
+                      ? rows.name.replace('zip', 'md')
+                      : rows.name,
+                  )
+                "
+              />
+              <span style="margin-right: 10px">{{ rows.name }}</span>
+              <el-tag class="ml-2" type="warning" size="small">标签</el-tag>
+            </div>
             <div class="file-name_right">
               <img
                 class="file-name_right-img"
@@ -166,7 +175,8 @@
 
 <script setup>
 import { onMounted, ref, getCurrentInstance } from 'vue'
-import { useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
+import { useRoute, useRouter } from 'vue-router'
 import leftTabs from './components/leftTabs.vue'
 import vTableCustom from '@/components/TableCustom/index.vue'
 import fileDetail from './components/fileDetail.vue'
@@ -174,10 +184,10 @@ import { columns } from './components/Columns.js'
 import * as panApi from '@/api/pan.js'
 // import uploadSearch from '@/components/uploadSearch.vue'
 import uploadFile from './components/uploadFile.vue'
-import * as fileApi from '@/api/file.js';
-import '@/styles/components/fileIndex.css';  // 引入普通的 CSS 文件
+import { fileTypeIcon, collaboraOnlineExts, compressedExts } from '@/enum'
 
 const { proxy } = getCurrentInstance()
+const route = useRoute()
 const router = useRouter()
 
 const options = [
@@ -197,29 +207,28 @@ const tableData = ref([])
 
 const status = ref(null)
 
+// 获取spaceId
+const spaceId = ref('')
+const getSpaceId = async () => {
+  const proId = route.query.proId
+  const result = await panApi.getSpaceIdByProdId(proId)
+  spaceId.value = result.data
+}
+
+const fileId = ref(0)
+
 const getTableData = () => {
   loading.value = true
-  // 定义请求参数
-  const params = {
-    bucketName: 'gjq', // 存储桶名称
-    isRecursive: false,      // 是否递归
-    onlyFolders: false,      // 是否只展示文件夹
-  };
-  fileApi
-    .fileList(params)
+  let params = {
+    current: 1,
+    size: 500,
+    status: 1,
+    name: '',
+  }
+  panApi
+    .contentsList(spaceId.value, fileId.value, params)
     .then((res) => {
-      if (res.code === 200 && res.success) {
-        tableData.value = res.data.map((fileName, index) => ({
-          id: (index + 1).toString(), // 生成唯一的 id
-          fileName: fileName, // 文件名称
-          lastTime: '未知', // 最近修改时间，需要根据实际数据填充
-          modifier: '未知', // 修改人，需要根据实际数据填充
-          size: '未知', // 文件大小，需要根据实际数据填充
-          type: fileName.endsWith('/') ? '文件夹' : '文件', // 文件类型
-        }));
-      } else {
-        console.error('请求失败:', res.errorMessage);
-      }
+      tableData.value = res.data
     })
     .catch((err) => {
       proxy.$modal.msgError(err.message)
@@ -229,28 +238,8 @@ const getTableData = () => {
     })
 }
 
-const createFolder = async () => {
-  if (!bucketName.value || !folderName.value) {
-    alert('请输入存储桶名称和文件夹名称');
-    return;
-  }
-  const params = {
-    bucketName: bucketName.value,
-    folderName: folderName.value,
-  };
-
-  try {
-    const response = await createFolder(params);
-    console.log('创建成功:', response.data);
-    alert(`文件夹创建成功: ${folderName.value}`);
-  } catch (error) {
-    console.error('创建失败:', error);
-    alert(`文件夹创建失败: ${error.response?.data?.message || error.message}`);
-  }
-};
-
-
-onMounted(() => {
+onMounted(async () => {
+  await getSpaceId()
   getTableData()
   createFolder()
 })
@@ -282,7 +271,7 @@ const handleRowMouseEnter = (column) => {
 }
 
 const handleRowMouseLeave = (column) => {
-  console.log(selectedRows.value, column)
+  // console.log(selectedRows.value, column)
   if (selectedRows.value.indexOf(column.fileName) != -1) {
     column['isHovered'] = true
   } else {
@@ -293,12 +282,71 @@ const handleRowMouseLeave = (column) => {
 // 是否显示二级文件名称
 const isLevelText = ref(false)
 
-const handleCellDblclick = (column) => {
+const isCompressedFile = (file) => {
+  const ext = file.split('.').pop().toLowerCase()
+  if (compressedExts.includes(ext)) {
+    return true
+  }
+  return false
+}
+
+const hanldeRowClick = (column) => {
   isLevelText.value = true
+  if (column.fileType === 0) {
+    fileId.value = column.id
+    getTableData()
+  } else {
+    const exts = collaboraOnlineExts.map((item) => item.ext)
+    const fileExt = column.name.split('.').pop().toLowerCase()
+    if (exts.includes(fileExt)) {
+      router.push({
+        name: 'VideoDetail',
+        query: {
+          id: column.id,
+        },
+      })
+    } else if (['md'].includes(fileExt) || file.fileType === 2) {
+      // this.currentFolderOrFile = file
+      // this.$refs.fileTree.setCurrentKey(file.id)
+      // this.currentFile = file
+      // this.showMdPreview = true
+      // this.showDocPreview = false
+    } else {
+      if (isCompressedFile(file.name)) {
+        ElMessageBox.alert('不支持查看压缩文件', '提示', {
+          confirmButtonText: '下载',
+          autofocus: false,
+          type: 'warning',
+        }).then(() => {
+          downloadFiles(file.id)
+        })
+      } else {
+        proxy.$modal.msgWarning('暂不支持预览该文件格式')
+      }
+    }
+  }
+}
+
+// 下载文档
+const downloadFiles = (id) => {
+  panApi.downloadFile(id).then((res) => {
+    let blob = new Blob([res.data])
+    let _fileNames = res.headers['content-disposition']
+      .split(';')[1]
+      .split('=')[1]
+      .split('.')
+    _fileNames[0] = decodeURI(_fileNames[0])
+    let link = document.createElement('a')
+    link.href = window.URL.createObjectURL(blob)
+    link.download = _fileNames.join('.')
+    link.click()
+    window.URL.revokeObjectURL(link.href)
+  })
 }
 
 const clickFile = () => {
   isLevelText.value = false
+  fileId.value = 0
   getTableData()
 }
 
@@ -308,8 +356,19 @@ const handleDetail = (rows) => {
   fileDetailRefs.value.handleEdit(rows)
 }
 
-const handleNodeClick = (data) => {
-  getTableData()
+const handleNodeClick = (data, node) => {
+  if (data.fileType === 0) {
+    fileId.value = data.id
+    getTableData()
+  } else {
+    // 如果不是文件类型，需要跳转预览
+
+    const exts = collaboraOnlineExts.map((item) => item.ext)
+    const fileExt = data.name.split('.').pop().toLowerCase()
+    if (exts.includes(fileExt)) {
+      console.log(111)
+    }
+  }
 }
 
 const uploadFileRefs = ref(null)

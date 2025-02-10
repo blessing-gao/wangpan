@@ -5,29 +5,26 @@
       <div class="left-top">
         <div class="all-file">全部文件</div>
         <el-tree
-          :data="data"
+          :data="fileData"
           :props="defaultProps"
           accordion
           highlight-current
           :style="{ '--selected-bg-color': selectedBgColor }"
           @node-click="handleNodeClick"
         >
-          <template #default="{ node, data }">
+          <template #default="{ data }">
             <span class="custom-tree-node">
-              <template v-if="data.children">
-                <!-- 一级节点，插入图片 -->
-                <img
-                  style="margin-right: 12px; width: 14px"
-                  src="/icons/编组 32.svg"
-                />
-              </template>
-              <template v-else>
-                <img
-                  style="margin-right: 12px; width: 12px"
-                  src="/icons/文件 (2).svg"
-                />
-              </template>
-              <span>{{ node.label }}</span>
+              <img
+                style="margin-right: 12px; width: 14px"
+                :src="
+                  fileTypeIcon(
+                    data.fileType === 2
+                      ? data.name.replace('zip', 'md')
+                      : data.name,
+                  )
+                "
+              />
+              <span>{{ data.name }}</span>
             </span>
           </template>
         </el-tree>
@@ -95,7 +92,11 @@
 
 <script setup>
 import { ref, getCurrentInstance, onMounted } from 'vue'
-import * as fileApi from '@/api/file.js'
+import * as panApi from '@/api/pan.js'
+import { useRoute } from 'vue-router'
+import { fileTypeIcon } from '@/enum'
+
+const route = useRoute()
 
 const { proxy } = getCurrentInstance()
 
@@ -105,62 +106,53 @@ const defaultProps = {
   children: 'children',
   label: 'label',
 }
-const data = ref()
+const fileData = ref([])
 
 const emits = defineEmits(['handleNodeClick'])
 
-const handleNodeClick = (data) => {
-  console.log(data)
-  emits('handleNodeClick', data)
+const handleNodeClick = (data, node) => {
+  if (data.fileType === 0) {
+    // 点击文件节点，获取数据并展开
+    fileId.value = data.id
+    getLeftTabs(data)
+    node.expanded = true
+  }
+  emits('handleNodeClick', data, node)
 }
 
-const getLeftTabs = () => {
-  // 定义请求参数
-  const params = {
-    bucketName: 'gjq',
-    isRecursive: false,
-    onlyFolders: true
-  };
-
-  fileApi.fileList(params)
-      .then((res) => {
-        console.log('接口响应:', res);
-        if (res.code === 200 && res.success) {
-          // 动态生成文件夹树结构
-          data.value = res.data.map(folderName => ({
-            label: folderName,      // 文件夹名称 (例如 "浙音网盘pc端-jpg")
-            isFolder: true,         // 标记为文件夹
-            children: []            // 预留子节点用于未来可能的嵌套
-          }));
-        } else {
-          console.error('请求失败:', res.errorMessage || '未知错误');data.value = [
-            {
-              label: '个人资源',
-              children: res.data.map(folderName => ({
-                label: folderName,      // 文件夹名称 (例如 "浙音网盘pc端-jpg")
-                isFolder: true,         // 标记为文件夹
-                children: []            // 预留子节点用于未来可能的嵌套
-              })),
-              isFolder: true
-            }
-          ];
-          // 保持默认空结构或显示错误状态
-          data.value = [
-            { label: '个人资源', children: [], isFolder: true },
-            { label: '文件名称', children: [], isFolder: false }
-          ];
-        }
-      })
-      .catch((error) => {
-        console.error('请求异常:', error);
-        data.value = [
-          { label: '个人资源', children: [], isFolder: true },
-          { label: '文件名称', children: [], isFolder: false }
-        ];
-      });
+// 获取spaceId
+const spaceId = ref('')
+const getSpaceId = async () => {
+  const proId = route.query.proId
+  const result = await panApi.getSpaceIdByProdId(proId)
+  spaceId.value = result.data
 }
 
-onMounted(() => {
+// 获取左侧的
+const fileId = ref(0)
+const getLeftTabs = async (data) => {
+  let params = {
+    current: 1,
+    size: 500,
+    status: 1,
+    name: '',
+  }
+  await panApi
+    .contentsList(spaceId.value, fileId.value, params)
+    .then((res) => {
+      if (fileData.value.length == 0) {
+        fileData.value = res.data
+      } else {
+        data.children = res.data
+      }
+    })
+    .catch((err) => {
+      proxy.$modal.msgError(err.message)
+    })
+}
+
+onMounted(async () => {
+  await getSpaceId()
   getLeftTabs()
 })
 
@@ -213,6 +205,12 @@ const percentage = ref(20)
 .custom-tree-node {
   display: flex;
   align-items: centere;
+  span {
+    max-width: 166px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .all-file {

@@ -1,46 +1,49 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { GET_TOKEN } from '@/utils/auth'
 //创建axios实例
 let request = axios.create({
-  baseURL: import.meta.env.VITE_APP_BASE_API,
-  timeout: 5000,
+  timeout: 60000,
+  withCredentials: true
 })
 //请求拦截器
-request.interceptors.request.use((config) => {
-  config.headers['token'] = GET_TOKEN()
-  return config
-})
+request.interceptors.request.use(
+  (config) => {
+    // 配置请求头
+    config.headers = {
+      Authorization: localStorage.getItem('userToken')
+        ? localStorage.getItem('userToken')
+        : '',
+      'Amp-Organ-Id':
+        config?.headers?.['Amp-Organ-Id'] ||
+        (localStorage.getItem('subTreeParams')
+          ? JSON.parse(localStorage.getItem('subTreeParams')).organId
+          : localStorage.getItem('curOrg')
+            ? JSON.parse(localStorage.getItem('curOrg') || '{}').organId
+            : ''),
+      'Amp-App-Code':
+        JSON.parse(localStorage.getItem('activedApp'))?.code || '',
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  },
+)
 //响应拦截器
 request.interceptors.response.use(
   (response) => {
-    return response.data
+    const { data } = response
+    if (data.code === 0) {
+      return data
+    } else {
+      console.log(data);
+      
+      ElMessage.warning(data.msg || '接口调用失败，请联系管理员')
+      return Promise.reject()
+    }
   },
   (error) => {
-    //处理网络错误
-    let msg = ''
-    let status = error.response.status
-    switch (status) {
-      case 401:
-        msg = 'token过期'
-        break
-      case 403:
-        msg = '无权访问'
-        break
-      case 404:
-        msg = '请求地址错误'
-        break
-      case 500:
-        msg = '服务器出现问题'
-        break
-      default:
-        msg = '无网络'
-    }
-    ElMessage({
-      type: 'error',
-      message: msg,
-    })
-    return Promise.reject(error)
-  },
+    ElMessage.warning(error)
+  }
 )
 export default request

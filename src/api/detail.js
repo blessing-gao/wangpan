@@ -1,5 +1,6 @@
 // 统一管理项目用户相关的接口
 import request from '@/utils/request.js'
+const path = import.meta.env.VITE_BASE_PREV
 
 /**
  * 获取标签
@@ -8,8 +9,9 @@ import request from '@/utils/request.js'
  * @returns {AxiosPromise}
  */
 export const getTagData = (params) => {
+  console.log(111, path)
   return request({
-    url: '/classification',
+    url: `${path}/favourite/file`,
     method: 'get',
     params,
   })

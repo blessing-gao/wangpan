@@ -11,7 +11,6 @@
           ref="loginForms"
         >
           <h1>Hello</h1>
-          <h2>欢迎来到商品管理系统</h2>
           <el-form-item prop="username">
             <el-input
               :prefix-icon="User"

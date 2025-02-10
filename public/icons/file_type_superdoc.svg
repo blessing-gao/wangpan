@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 16</title>
+    <defs>
+        <rect id="path-1" x="1" y="7.98113208" width="14" height="14" rx="3"></rect>
+        <filter x="-39.3%" y="-25.0%" width="178.6%" height="178.6%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.325753592 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <path d="M9.96226415,5.88679245 C9.96226415,7.18954586 8.94339601,7.69811321 7.69810885,7.69811321 L3.16981568,7.69811321 C1.92452852,7.69811321 0.843719639,7.20138841 0.843719639,5.88679245 C0.843719639,5.03407416 1.34716962,4.60075472 2.04905811,4.17439557 C2.03773803,4.09149773 2.03773803,4.00859076 2.03773803,3.92568379 C2.03773803,2.25579311 3.32829678,0.905660377 4.92453255,0.905660377 C6.49811072,0.905660377 7.77735812,2.22026546 7.81132708,3.86648017 C9.01131648,3.93753546 9.96226415,4.61955757 9.96226415,5.88679245 Z" id="path-3"></path>
+        <filter x="-76.8%" y="-73.6%" width="253.5%" height="306.1%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.121879097 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="全局检索/知识库" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="文件检索" transform="translate(-809.000000, -668.000000)">
+            <g id="编组-16" transform="translate(809.000000, 668.000000)">
+                <g id="编组-16备份" transform="translate(7.792453, 3.000000)">
+                    <path d="M3,0 L18.2830189,0 C19.9398731,-7.48448398e-16 21.2830189,1.34314575 21.2830189,3 L21.2830189,21 C21.2830189,22.6568542 19.9398731,24 18.2830189,24 L3,24 C1.34314575,24 -1.1293615e-15,22.6568542 0,21 L0,3 C-6.46995335e-16,1.34314575 1.34314575,-1.39730022e-16 3,0 Z" id="矩形" fill="#226EE7"></path>
+                    <g id="编组-17" transform="translate(0.000000, 4.075472)">
+                        <rect id="矩形" fill="#047BF7" x="1.60877601e-15" y="0" width="15.3962264" height="4.52830189"></rect>
+                        <rect id="矩形" fill="#0AAAF9" x="15.3962264" y="0" width="5.88679245" height="4.52830189"></rect>
+                        <rect id="矩形" fill="#0269D4" x="1.60877601e-15" y="4.52830189" width="15.3962264" height="9.05660377"></rect>
+                        <rect id="矩形" fill="#0A91F9" x="15.3962264" y="4.52830189" width="5.88679245" height="9.05660377"></rect>
+                        <rect id="矩形" fill="#0057B0" x="0" y="13.5849057" width="15.3962264" height="3.62264151"></rect>
+                        <rect id="矩形" fill="#077CE5" x="15.3962264" y="13.5849057" width="5.88679245" height="3.62264151"></rect>
+                    </g>
+                </g>
+                <g id="矩形">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                    <use fill="#226EE7" fill-rule="evenodd" xlink:href="#path-1"></use>
+                </g>
+                <g id="云" transform="translate(2.358491, 10.245283)" fill-rule="nonzero">
+                    <rect id="矩形" fill="#000000" opacity="0" x="0" y="0" width="10.8679245" height="9.05660377"></rect>
+                    <path d="M7.24528302,3.16981132 C7.2440556,3.65474292 7.50271188,4.10336482 7.92353493,4.346186 C8.34435797,4.58900718 8.8631892,4.58900718 9.28401224,4.346186 C9.70483529,4.10336482 9.96349157,3.65474292 9.96226415,3.16981132 C9.96349157,2.68487972 9.70483529,2.23625782 9.28401224,1.99343664 C8.8631892,1.75061546 8.34435797,1.75061546 7.92353493,1.99343664 C7.50271188,2.23625782 7.2440556,2.68487972 7.24528302,3.16981132 L7.24528302,3.16981132 Z" id="路径" fill="#0AAAF9"></path>
+                    <g id="路径">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                        <use fill="#F9FDFF" xlink:href="#path-3"></use>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

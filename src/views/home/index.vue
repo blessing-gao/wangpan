@@ -118,13 +118,13 @@ onMounted(async () => {
 
 const getIconSrc = (name) => {
   if (name === '相册') {
-    return '/icons/项目.svg' // 本地图标路径
+    return '/knowledge/icons/项目.svg' // 本地图标路径
   } else if (name === '视频') {
-    return '/icons/编组 3.svg' // 本地图标路径
+    return '/knowledge/icons/编组 3.svg' // 本地图标路径
   } else if (name === '音乐') {
-    return '/icons/编组 4.svg' // 本地图标路径
+    return '/knowledge/icons/编组 4.svg' // 本地图标路径
   } else if (name === '文档') {
-    return '/icons/编组 5.svg' // 本地图标路径
+    return '/knowledge/icons/编组 5.svg' // 本地图标路径
   }
 }
 
@@ -169,52 +169,6 @@ const getHistoryList = async () => {
       proxy.$modal.msgError(err.message)
     })
 }
-
-// const uploadList = ref([
-//   {
-//     title: '浙江mmexport1711162590173.jpg等多个文件',
-//     type: 'zip',
-//     user: '李丽',
-//     time: '1小时前',
-//   },
-//   {
-//     title: '浙江音乐学院校小提琴乐队学院报名表及乐队片段分谱',
-//     type: 'word',
-//     user: '李丽',
-//     time: '今天 12:56',
-//   },
-//   {
-//     title: '小提琴教学第1课',
-//     type: 'class',
-//     user: '李丽',
-//     time: '2天前 14:30',
-//   },
-//   {
-//     title: '浙江音乐学院室内小提琴演奏',
-//     type: 'music',
-//     user: '李丽',
-//     time: '3天前 15:20',
-//   },
-//   {
-//     title: '浙江音乐学院校小提琴乐队表等多个文件',
-//     type: 'medium',
-//     user: '李丽',
-//     time: '2024.12.11 12:34',
-//   },
-//   {
-//     title: '浙江音乐学院校小提琴乐队学院报名表及乐队片段分谱课件',
-//     type: 'ppt',
-//     user: '李丽',
-//     time: '2024.12.12 11:32',
-//   },
-//   {
-//     title: '浙江音乐学院室内小提琴演奏',
-//     type: 'music',
-//     user: '李丽',
-//     time: '2024.12.11 12:34 ',
-//   },
-// ])
-
 const uploadList = ref([])
 
 const getUploadList = async () => {
