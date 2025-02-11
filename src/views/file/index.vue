@@ -421,22 +421,26 @@ const handleFileOperate = (type, operate, file) => {
 
 // 下载文档
 const downloadFiles = (id) => {
-  panApi.downloadFile(id).then((res) => {
-    let blob = new Blob([res.data])
-    let _fileNames = res.headers['content-disposition']
-      .split(';')[1]
-      .split('=')[1]
-      .split('.')
-    _fileNames[0] = decodeURI(_fileNames[0])
-    let link = document.createElement('a')
-    link.href = window.URL.createObjectURL(blob)
-    link.download = _fileNames.join('.')
-    link.click()
-    window.URL.revokeObjectURL(link.href)
-  }).catch(err=>{
-    console.log(err);
-    
-  })
+  panApi
+    .downloadFile(id)
+    .then((res) => {
+      let blob = new Blob([res.data])
+      let _fileNames = res.headers['content-disposition']
+        .split(';')[1]
+        .split('=')[1]
+        .trim()
+        .replace(/"/g, '')
+        .split('.')
+      _fileNames[0] = decodeURI(_fileNames[0])
+      let link = document.createElement('a')
+      link.href = window.URL.createObjectURL(blob)
+      link.download = _fileNames.join('.')
+      link.click()
+      window.URL.revokeObjectURL(link.href)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
 }
 
 const docDialogRefs = ref(null)
