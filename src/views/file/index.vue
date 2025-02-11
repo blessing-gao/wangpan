@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100%; display: flex">
-    <leftTabs @handleNodeClick="handleNodeClick" />
+    <leftTabs ref="leftTabsRefs" @handleNodeClick="handleNodeClick" />
     <!-- 详细表格信息 -->
     <!-- :pageSize="formInline.pageSize"
       :currentPage="formInline.currentPage"
@@ -161,6 +161,12 @@
       @ok="handleMoveFolderOrFile"
       @onClose="handleClose"
     />
+    <folderDialog
+      ref="folderDialogRefs"
+      :spaceId="spaceId"
+      @onclose="folderClose"
+    />
+    <docDialog ref="docDialogRefs" :spaceId="spaceId" @onClose="folderClose" />
   </div>
 </template>
 
@@ -178,6 +184,8 @@ import { fileTypeIcon, collaboraOnlineExts, compressedExts } from '@/enum'
 import fileOperateMenu from './components/fileOperateMenu.vue'
 import mdDialog from './components/mdDialog.vue'
 import moveDialog from './components/moveDialog.vue'
+import folderDialog from './components/folderDialog.vue'
+import docDialog from './components/docDialog.vue'
 
 const { proxy } = getCurrentInstance()
 const route = useRoute()
@@ -243,6 +251,7 @@ const getTableData = () => {
 onMounted(async () => {
   await getSpaceId()
   await getMaxSize()
+  leftTabsRefs.value.getLeftTabs(spaceId.value)
   getTableData()
 })
 
@@ -292,13 +301,6 @@ const isCompressedFile = (file) => {
   return false
 }
 
-const translateFileList = (preKey, list) => {
-  list.forEach((item) => {
-    item.path = `${preKey}/${item.name}`
-  })
-  return list
-}
-
 // 当前选中查看的文件夹或文件
 const currentFolderOrFile = ref(null)
 
@@ -336,23 +338,6 @@ const hanldeRowClick = (column) => {
   }
 }
 
-// 下载文档
-const downloadFiles = (id) => {
-  panApi.downloadFile(id).then((res) => {
-    let blob = new Blob([res.data])
-    let _fileNames = res.headers['content-disposition']
-      .split(';')[1]
-      .split('=')[1]
-      .split('.')
-    _fileNames[0] = decodeURI(_fileNames[0])
-    let link = document.createElement('a')
-    link.href = window.URL.createObjectURL(blob)
-    link.download = _fileNames.join('.')
-    link.click()
-    window.URL.revokeObjectURL(link.href)
-  })
-}
-
 const clickFile = () => {
   isLevelText.value = false
   fileId.value = 0
@@ -365,7 +350,10 @@ const handleDetail = (rows) => {
   fileDetailRefs.value.handleEdit(rows)
 }
 
-const createDict = () => {}
+const folderDialogRefs = ref(null)
+const createDict = () => {
+  folderDialogRefs.value.handleEdit('create')
+}
 
 const handleNodeClick = (data, node) => {
   if (data.fileType === 0) {
@@ -392,19 +380,7 @@ const uploadFolder = () => {
 // 上传文件
 const handleUploadFile = () => {
   // uploadFileRefs.value.handleEdit('file')
-}
-
-const handleDelete = () => {
-  let params = {}
-  panApi
-    .deleteFile(params)
-    .then((res) => {
-      console.log(res)
-      getTableData()
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+  uploadDialogVisible.value = true
 }
 
 const mdDialogRefs = ref(null)
@@ -413,9 +389,10 @@ const curretnOperateFolderOrFile = reactive({})
 
 // file tree 和 file table中点击更多对应的操作
 const handleFileOperate = (type, operate, file) => {
-  console.log(type, operate, file)
   if (type === 'create') {
-    // this.addFileAction(operate, file)
+    if (operate == 'folder') {
+      folderDialogRefs.value.handleEdit('create', file)
+    }
   } else if (type === 'upload') {
     if (operate === 'mdFile') {
       mdDialogRefs.value.handleEdit(currentFolderOrFile.value)
@@ -428,18 +405,117 @@ const handleFileOperate = (type, operate, file) => {
       // this.folderOrFileClick(file)
     }
     if (operate === 'rename') {
-      // this.handleShowRename(file)
+      handleShowRename(file)
     }
     if (operate === 'remove') {
-      // this.showDeleteDialog(file)
+      showDeleteDialog(file)
     }
     if (operate === 'move') {
       moveDialogVisible.value = true
     }
     if (operate === 'download') {
-      // this.downloadFiles(file.id)
+      downloadFiles(file.id)
     }
   }
+}
+
+// 下载文档
+const downloadFiles = (id) => {
+  panApi.downloadFile(id).then((res) => {
+    let blob = new Blob([res.data])
+    let _fileNames = res.headers['content-disposition']
+      .split(';')[1]
+      .split('=')[1]
+      .split('.')
+    _fileNames[0] = decodeURI(_fileNames[0])
+    let link = document.createElement('a')
+    link.href = window.URL.createObjectURL(blob)
+    link.download = _fileNames.join('.')
+    link.click()
+    window.URL.revokeObjectURL(link.href)
+  }).catch(err=>{
+    console.log(err);
+    
+  })
+}
+
+const docDialogRefs = ref(null)
+
+// 点击显示对应的重命名Dialog
+const handleShowRename = (file) => {
+  curretnOperateFolderOrFile.value = file
+  console.log(file)
+  if (file.fileType === 0) {
+    folderDialogRefs.value.handleEdit('update', file)
+    // this.folderDialogVisible = true
+    // this.folderForm.name = ''
+  } else if (file.fileType === 2) {
+    // this.suffixDocType = 'md'
+    // this.docDialogVisible = true
+    // this.docForm.name = ''
+  } else {
+    let suffixDocType = file.name.substring(file.name.lastIndexOf('.') + 1)
+    docDialogRefs.value.handleEdit(file, suffixDocType)
+
+    // this.docDialogVisible = true
+    // this.docForm.name = ''
+  }
+}
+
+// 显示删除文件弹窗确认框
+const showDeleteDialog = (file) => {
+  const name = file.fileType === 2 ? file.name.replace('zip', 'md') : file.name
+  ElMessageBox.confirm(
+    `确认删除文件${file.fileType === 0 ? '夹' : ''}${name}`,
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    },
+  ).then(() => {
+    // 删除文件夹或者文件
+    if (file.fileType === 0) {
+      panApi
+        .deleteFolder(file.id)
+        .then((res) => {
+          if (res.code == 0) {
+            proxy.$modal.msgSuccess('删除成功')
+            if (file.parentId == 0) {
+              fileId.value = 0
+            } else {
+              fileId.value = file.parentId
+            }
+            getTableData()
+            leftTabsRefs.value.getLeftTabs(spaceId.value)
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    } else {
+      const params = {
+        documentId: file.id,
+      }
+      panApi
+        .deleteFile(params)
+        .then((res) => {
+          if (res.code == 0) {
+            proxy.$modal.msgSuccess('删除成功')
+            if (file.parentId == 0) {
+              fileId.value = 0
+            } else {
+              fileId.value = file.parentId
+            }
+            getTableData()
+            leftTabsRefs.value.getLeftTabs(spaceId.value)
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    }
+  })
 }
 
 // 创建或上传文件(夹)的父文件夹对象
@@ -482,10 +558,9 @@ const handleClose = () => {
   uploadDialogVisible.value = false
   importMdDialogVisible.value = false
   moveDialogVisible.value = false
+  getTableData()
+  leftTabsRefs.value.getLeftTabs(spaceId.value)
 }
-
-// 是否支持编辑文档
-const supportEditDoc = ref(false)
 
 // 上传文件
 const uploadFiles = async (fileList) => {
@@ -525,32 +600,20 @@ const uploadFiles = async (fileList) => {
       uploadDialogVisible.value = false
       importMdDialogVisible.value = false
       proxy.$modal.msgSuccess('上传成功')
-
-      const exts = collaboraOnlineExts.map((item) => item.ext)
-      const fileExt = res.data.name.split('.').pop().toLowerCase()
-      if (exts.includes(fileExt)) {
-        const action = collaboraOnlineExts.find(
-          (item) => item.ext === fileExt,
-        ).action
-        supportEditDoc.value = action === 'edit'
-        currentFile.value = res.data
-        currentFolderOrFile.value = res.data
-      } else if (['md'].includes(fileExt) || res.data.fileType === 2) {
-        currentFile.value = res.data
-        currentFolderOrFile.value = res.data
-      } else {
-        currentFolderOrFile.value = currentFolderOrFile.value
-        proxy.$modal.msgWarning('暂不支持预览该文件格式')
-      }
+      fileId.value = 0
+      getTableData()
+      // 还需要调用左侧tab的查询接口
+      leftTabsRefs.value.getLeftTabs(spaceId.value)
     } else {
       proxy.$modal.msgWarning(res.msg)
     }
   })
 }
 
+const leftTabsRefs = ref(null)
+
 // 移动文件夹或文件
 const handleMoveFolderOrFile = (targetFolder) => {
-  console.log(curretnOperateFolderOrFile.value)
   // 移动文件夹
   if (curretnOperateFolderOrFile.value.fileType === 0) {
     const params = {
@@ -558,20 +621,23 @@ const handleMoveFolderOrFile = (targetFolder) => {
       parentId: targetFolder.id,
       spaceId: spaceId.value,
     }
-    console.log(params);
-    
-    // updateFolder(params).then((res) => {
-    //   if (res.code === 0) {
-    //     this.$message.success('移动成功！')
-    //     this.moveDialogVisible = false
-    //     this.$refs.fileTree.remove(this.curretnOperateFolderOrFile.id)
-    //     this.expandAndFocusFolder(targetFolder)
-    //     this.curretnOperateFolderOrFile = null
-    //   } else {
-    //     this.$message.warn(res.msg)
-    //     this.moveDialogVisible = false
-    //   }
-    // })
+    panApi
+      .updateFolder(params)
+      .then((res) => {
+        console.log(res)
+        if (res.code == 0) {
+          proxy.$modal.msgSuccess('移动成功')
+          getTableData()
+          // 还需要调用左侧tab的查询接口
+          leftTabsRefs.value.getLeftTabs(spaceId.value)
+        }
+      })
+      .catch((err) => {
+        proxy.$modal.msgWarning(err.response.data.msg)
+      })
+      .finally(() => {
+        moveDialogVisible.value = false
+      })
   } else {
     const params = {
       ...curretnOperateFolderOrFile.value,
@@ -579,26 +645,35 @@ const handleMoveFolderOrFile = (targetFolder) => {
       spaceId: spaceId.value,
       fileType: curretnOperateFolderOrFile.value.fileType === 2 ? 2 : 1,
     }
-    console.log(params);
-    
-    // // 移动文件
-    // updateFile(params).then((res) => {
-    //   if (res.code === 0) {
-    //     this.$message.success('移动成功！')
-    //     this.moveDialogVisible = false
-    //     this.$refs.fileTree.remove(this.curretnOperateFolderOrFile.id)
-    //     this.expandAndFocusFolder(targetFolder)
-    //     this.showDocPreview = false
-    //     this.showMdPreview = false
-    //     this.editDoc = false
-    //     this.currentFile = null
-    //     this.curretnOperateFolderOrFile = null
-    //   } else {
-    //     this.$message.warn(res.msg)
-    //     this.moveDialogVisible = false
-    //   }
-    // })
+    panApi
+      .updateFile(params)
+      .then((res) => {
+        console.log(res)
+        if (res.code == 0) {
+          proxy.$modal.msgSuccess('移动成功')
+          getTableData()
+          // 还需要调用左侧tab的查询接口
+          leftTabsRefs.value.getLeftTabs(spaceId.value)
+        }
+      })
+      .catch((err) => {
+        proxy.$modal.msgWarning(err.response.data.msg)
+      })
+      .finally(() => {
+        moveDialogVisible.value = false
+        currentFile.value = null
+        curretnOperateFolderOrFile.value = null
+      })
   }
+}
+
+const folderClose = (folderId, types) => {
+  if (types == 'create') {
+    fileId.value = folderId
+  }
+  getTableData()
+  // 还需要调用左侧tab的查询接口
+  leftTabsRefs.value.getLeftTabs(spaceId.value)
 }
 </script>
 <style lang="scss" scoped>

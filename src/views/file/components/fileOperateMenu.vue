@@ -29,9 +29,12 @@
               </div>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="file">文件</el-dropdown-item>
-                  <el-dropdown-item command="mdFile">超级文档</el-dropdown-item>
-                  <el-dropdown-item command="folder">文件夹</el-dropdown-item>
+                  <el-dropdown-item command="file">
+                    <img src="/icons/文件.svg" style="margin-right: 12px" />
+                    文件
+                  </el-dropdown-item>
+                  <!-- <el-dropdown-item command="mdFile">超级文档</el-dropdown-item> -->
+                  <!-- <el-dropdown-item command="folder">文件夹</el-dropdown-item> -->
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -45,6 +48,7 @@
           </el-dropdown-item>
           <el-dropdown-item
             command="download"
+            v-if="file.fileType !== 0 && ifSupportFileExts()"
             @click="handleCommand('download')"
           >
             下载

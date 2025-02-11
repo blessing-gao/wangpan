@@ -4,7 +4,7 @@
     :model-value="visible"
     width="540px"
     destroy-on-close
-    @close="$emit('onClose')"
+    @close="handleClose"
   >
     <el-form
       ref="formRef"
@@ -87,20 +87,24 @@ const loadFiles = (node, resolve) => {
     if (props.spaceId) {
       panApi.contentsList(props.spaceId, 0, fileParams).then((res) => {
         let folderList = res.data.filter((item) => item.fileType === 0)
-        if (props.file.fileType === 0) {
-          folderList = folderList.filter((item) => item.id !== props.file.id)
+        console.log(props.file.value.fileType);
+        
+        if (props.file.value.fileType === 0) {
+          folderList = folderList.filter((item) => item.id !== props.file.value.id)
         }
         const fileList = translateFileList('', folderList)
         return resolve(fileList)
       })
     }
   } else {
+    console.log(2222);
+    
     let file = node.data
     if (file.fileType === 0) {
       panApi.contentsList(props.spaceId, file.id, fileParams).then((res) => {
         let folderList = res.data.filter((item) => item.fileType === 0)
-        if (props.file.fileType === 0) {
-          folderList = folderList.filter((item) => item.id !== props.file.id)
+        if (props.file.value.fileType === 0) {
+          folderList = folderList.filter((item) => item.id !== props.file.value.id)
         }
         const fileList = translateFileList(file.uniqueKey, folderList)
         return resolve(fileList)

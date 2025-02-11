@@ -11,28 +11,24 @@
         <el-dropdown-menu>
           <el-dropdown-item command="folder">
             <!-- <svg-icon name="color-file_type_folder" class="mr-2" /> -->
+             <img src="/icons/文件管理.svg" style="margin-right: 12px;" >
             文件夹
           </el-dropdown-item>
-          <el-dropdown-item command="txt" divided>
-            <!-- <svg-icon name="color-file_type_txt" class="mr-2" /> -->
+          <!-- <el-dropdown-item command="txt" divided>
             文本文件
           </el-dropdown-item>
           <el-dropdown-item command="docx">
-            <!-- <svg-icon name="color-file_type_word" class="mr-2" /> -->
             word
           </el-dropdown-item>
           <el-dropdown-item command="xlsx">
-            <!-- <svg-icon name="color-file_type_excel" class="mr-2" /> -->
             excel
           </el-dropdown-item>
           <el-dropdown-item command="pptx">
-            <!-- <svg-icon name="color-file_type_ppt" class="mr-2" /> -->
             ppt
           </el-dropdown-item>
           <el-dropdown-item command="md">
-            <!-- <svg-icon name="color-file_type_superdoc" class="mr-2" /> -->
             超级文档
-          </el-dropdown-item>
+          </el-dropdown-item> -->
         </el-dropdown-menu>
       </template>
     </el-dropdown>

@@ -2,7 +2,7 @@
   <el-dialog
     :model-value="visible"
     title="上传"
-    @close="$emit('onClose')"
+    @close="hanldeClose"
     destroy-on-close
   >
     <el-upload

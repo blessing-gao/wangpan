@@ -30,38 +30,6 @@ export const contentsList = (spaceId, directoryId, params) => {
 }
 
 /**
- * 获取目录下文件列表
- * @requestParam params
- * @requestBody data
- * @returns {AxiosPromise}
- */
-export const getTableList = (params) => {
-  return request({
-    url: '/recent',
-    method: 'get',
-    params,
-  })
-}
-
-/**
- * 上传文件夹
- * @requestParam params
- * @requestBody data
- * @returns {AxiosPromise}
- */
-export const uploadFolder = (params, data) => {
-  return request({
-    url: '/recent',
-    method: 'post',
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-    params,
-    data,
-  })
-}
-
-/**
  * 上传文档
  * @requestParam params
  * @requestBody data
@@ -88,7 +56,7 @@ export const downloadFile = (id) => {
   return request({
     url: `${path}/document/download/${id}`,
     method: 'get',
-    responseType: 'blob',
+    responseType: 'blob'
   })
 }
 
@@ -100,7 +68,55 @@ export const getDocMaxSize = () => {
   })
 }
 
-// 文档 - 上传文档
-// export const uploadFile = (formData, config) => {
-//   return request.post(`${path}/document/upload`, formData, config)
-// }
+// 文档 - 更新（重命名，移动）
+export const updateFile = (data) => {
+  return request({
+    url: `${path}/document/update`,
+    method: 'post',
+    data,
+  })
+}
+
+// 文件夹 - 更新
+export function updateFolder(data) {
+  return request({
+    url: `${path}/directory/update`,
+    method: 'post',
+    data,
+  })
+}
+
+// 文件夹 - 新增
+export function createFolder(data) {
+  return request({
+    url: `${path}/directory/create`,
+    method: 'post',
+    data,
+  })
+}
+
+// 文件夹 - 删除
+export function deleteFolder(id) {
+  return request({
+    url: `${path}/directory/delete/${id}`,
+    method: 'get',
+  })
+}
+
+// 文档 - 删除文件
+export function deleteFile(params) {
+  return request({
+    url: `${path}/document/delete`,
+    method: 'get',
+    params,
+  })
+}
+
+
+// 查询空间明细
+export function spaceDetail(id) {
+  return request({
+    url: `${path}/space/detail/${id}`,
+    method: 'get',
+  })
+}

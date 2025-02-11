@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus'
 //创建axios实例
 let request = axios.create({
   timeout: 60000,
-  withCredentials: true
+  withCredentials: true,
 })
 //请求拦截器
 request.interceptors.request.use(
@@ -33,6 +33,9 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   (response) => {
     const { data } = response
+    if (data instanceof Blob) {
+      return response
+    }
     if (data.code === 0) {
       return data
     } else {
@@ -41,7 +44,7 @@ request.interceptors.response.use(
     }
   },
   (error) => {
-    ElMessage.warning(error)
-  }
+    return Promise.reject(error)
+  },
 )
 export default request

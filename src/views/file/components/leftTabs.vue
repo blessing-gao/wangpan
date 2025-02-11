@@ -114,23 +114,72 @@ const handleNodeClick = (data, node) => {
   if (data.fileType === 0) {
     // 点击文件节点，获取数据并展开
     fileId.value = data.id
-    getLeftTabs(data)
+    getLeftTabs(leftSpaceId.value, data)
     node.expanded = true
   }
   emits('handleNodeClick', data, node)
 }
 
 // 获取spaceId
-const spaceId = ref('')
+const leftSpaceId = ref('')
 const getSpaceId = async () => {
   const proId = route.query.proId
   const result = await panApi.getSpaceIdByProdId(proId)
-  spaceId.value = result.data
+  leftSpaceId.value = result.data
+}
+
+const usedSize = ref('0')
+const allSize = ref('0')
+const proportion = ref('0%')
+const percentage = ref(0)
+
+const getSpaceDetail = () => {
+  panApi
+    .spaceDetail(leftSpaceId.value)
+    .then((res) => {
+      console.log(res.data)
+      if (res.data.quota == '-1') {
+        allSize.value = '∞'
+      } else {
+        allSize.value = formatSize(res.data.quota)
+        proportion.value =
+          (Number(res.data.size) / Number(res.data.quota)) * 100 + '%'
+        percentage.value =
+          (Number(res.data.size) / Number(res.data.quota)) * 100
+      }
+      usedSize.value = formatSize(res.data.size)
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
+
+const formatSize = (size) => {
+  // 1 KB = 1024 bytes, 1 MB = 1024 KB, 1 GB = 1024 MB
+  const KB = 1024
+  const MB = KB * 1024
+  const GB = MB * 1024
+
+  // 根据字节数大小决定转换的单位
+  if (size >= GB) {
+    // 如果大于等于 1GB，转换为 GB
+    return (size / GB).toFixed(2) + ' GB'
+  } else if (size >= MB) {
+    // 如果大于等于 1MB，转换为 MB
+    return (size / MB).toFixed(2) + ' MB'
+  } else if (size >= KB) {
+    // 如果大于等于 1KB，转换为 KB
+    return (size / KB).toFixed(2) + ' KB'
+  } else {
+    // 小于 1KB，显示为字节
+    return size + ' bytes'
+  }
 }
 
 // 获取左侧的
 const fileId = ref(0)
-const getLeftTabs = async (data) => {
+const getLeftTabs = async (spaceId, data) => {
+  leftSpaceId.value = spaceId
   let params = {
     current: 1,
     size: 500,
@@ -138,22 +187,24 @@ const getLeftTabs = async (data) => {
     name: '',
   }
   await panApi
-    .contentsList(spaceId.value, fileId.value, params)
+    .contentsList(spaceId, fileId.value, params)
     .then((res) => {
-      if (fileData.value.length == 0) {
+      if (fileId.value == 0 || fileData.value.length == 0) {
         fileData.value = res.data
       } else {
         data.children = res.data
       }
     })
     .catch((err) => {
+      console.log(2222, err)
       proxy.$modal.msgError(err.message)
     })
 }
 
 onMounted(async () => {
   await getSpaceId()
-  getLeftTabs()
+  getSpaceDetail()
+  getLeftTabs(leftSpaceId.value)
 })
 
 const otherList = ref([
@@ -168,10 +219,9 @@ const otherList = ref([
   },
 ])
 
-const usedSize = ref('251.04GB')
-const allSize = ref('3.67 TB')
-const proportion = ref('20%')
-const percentage = ref(20)
+defineExpose({
+  getLeftTabs,
+})
 </script>
 
 <style lang="scss" scoped>
