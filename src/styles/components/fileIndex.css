@@ -104,6 +104,10 @@
     border-color: #de3a05;
 }
 
+.file-name {
+    cursor: pointer;
+}
+
 .file-name_right-img {
     cursor: pointer;
     width: 18px;

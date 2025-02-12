@@ -33,7 +33,11 @@
       </el-form>
       <template #footer>
         <el-button @click="hanldeClose">取 消</el-button>
-        <el-button type="primary" @click="createOrUpdateFolder">
+        <el-button
+          style="background: #de3a05; border-radius: 4px; color: #fff; border: 0;"
+          type="primary"
+          @click="createOrUpdateFolder"
+        >
           确 定
         </el-button>
       </template>
@@ -100,7 +104,10 @@ const createOrUpdateFolder = () => {
             console.error(err)
           })
       } else {
-        params.parentId = currentParentFolder.value.parentId == 0 ? 0 : currentParentFolder.value.parentId
+        params.parentId =
+          currentParentFolder.value.parentId == 0
+            ? 0
+            : currentParentFolder.value.parentId
         params.uniqueKey = currentParentFolder.value.uniqueKey
         params.id = currentParentFolder.value.id
         console.log(params)
@@ -127,7 +134,11 @@ const emits = defineEmits(['onClose'])
 const hanldeClose = (types) => {
   folderDialogVisible.value = false
   folderForm.name = ''
-  emits('onclose', currentParentFolder.value ? currentParentFolder.value.id : 0, types)
+  emits(
+    'onclose',
+    currentParentFolder.value ? currentParentFolder.value.id : 0,
+    types,
+  )
   currentParentFolder.value = null
 }
 

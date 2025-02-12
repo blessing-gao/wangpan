@@ -123,7 +123,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace('/minio', '')
         },
         '/browser': {
-          target: 'http://127.0.0.1:9980',
+          target: 'http://82.156.83.108:9980',
           changeOrigin: true,
           ws: true,
           onProxyReq(proxyReq, req) {
@@ -134,7 +134,7 @@ export default defineConfig(({ mode }) => {
             }
           },
           headers: {
-            Host: '127.0.0.1:9980'
+            Host: '82.156.83.108:9980'
           }
         },
       }

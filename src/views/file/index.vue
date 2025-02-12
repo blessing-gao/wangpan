@@ -101,10 +101,6 @@
         <template #fileName="{ rows }">
           <div class="file-name" @click="hanldeRowClick(rows)">
             <div class="file-name_left">
-              <!-- <img
-                style="width: 24px; margin-right: 10px"
-                src="/icons/文件管理.svg"
-              /> -->
               <img
                 style="width: 24px; margin-right: 10px"
                 :src="
@@ -123,14 +119,12 @@
 
         <template #operation="{ rows }">
           <div class="file-name_right">
-            <!-- v-show="!rows.isHovered" -->
-            <!-- v-show="rows.isHovered" -->
-            <img class="file-name_right-img" src="/icons/FolderDown.svg" />
+            <!-- <img class="file-name_right-img" src="/icons/FolderDown.svg" />
             <img
               class="file-name_right-img"
               src="/icons/FolderDown-hover.svg"
             />
-            <img class="file-name_right-img" src="/icons/常用文件.svg" />
+            <img class="file-name_right-img" src="/icons/常用文件.svg" /> -->
 
             <fileOperateMenu
               class="file-name_right-img"
@@ -147,8 +141,9 @@
     <uploadFileVue
       ref="uploadFileRefs"
       :maxSize="docMaxSize"
-      :visible="uploadDialogVisible"
       :demand="uploadDemandFile"
+      :spaceId="spaceId"
+      :uploadParams="uploadParams"
       @ok="uploadFiles"
       @close="handleClose"
     />
@@ -263,7 +258,7 @@ const selectedRows = ref([])
 
 const handleSelectionChange = (selection) => {
   selectedRows.value = selection.map((item) => {
-    return item.fileName
+    return item.name
   })
   checkedNumber.value = `已选 ${selectedRows.value.length} 项`
 }
@@ -271,7 +266,7 @@ const handleSelectionChange = (selection) => {
 const rowClassName = ({ row }) => {
   let color = ''
   // 如果当前行在选中的行中，添加背景色
-  if (selectedRows.value.includes(row.fileName)) {
+  if (selectedRows.value.includes(row.name)) {
     color = 'selected-row'
   }
   return color
@@ -283,7 +278,7 @@ const handleRowMouseEnter = (column) => {
 
 const handleRowMouseLeave = (column) => {
   // console.log(selectedRows.value, column)
-  if (selectedRows.value.indexOf(column.fileName) != -1) {
+  if (selectedRows.value.indexOf(column.name) != -1) {
     column['isHovered'] = true
   } else {
     column['isHovered'] = false
@@ -361,11 +356,15 @@ const handleNodeClick = (data, node) => {
     getTableData()
   } else {
     // 如果不是文件类型，需要跳转预览
-
     const exts = collaboraOnlineExts.map((item) => item.ext)
     const fileExt = data.name.split('.').pop().toLowerCase()
     if (exts.includes(fileExt)) {
-      console.log(111)
+      router.push({
+        name: 'VideoDetail',
+        query: {
+          id: data.id,
+        },
+      })
     }
   }
 }
@@ -379,8 +378,7 @@ const uploadFolder = () => {
 
 // 上传文件
 const handleUploadFile = () => {
-  // uploadFileRefs.value.handleEdit('file')
-  uploadDialogVisible.value = true
+  uploadFileRefs.value.handleEdit('file')
 }
 
 const mdDialogRefs = ref(null)
@@ -403,6 +401,12 @@ const handleFileOperate = (type, operate, file) => {
     curretnOperateFolderOrFile.value = file
     if (operate === 'edit') {
       // this.folderOrFileClick(file)
+      router.push({
+        name: 'VideoDetail',
+        query: {
+          id: file.id,
+        },
+      })
     }
     if (operate === 'rename') {
       handleShowRename(file)
@@ -448,11 +452,8 @@ const docDialogRefs = ref(null)
 // 点击显示对应的重命名Dialog
 const handleShowRename = (file) => {
   curretnOperateFolderOrFile.value = file
-  console.log(file)
   if (file.fileType === 0) {
     folderDialogRefs.value.handleEdit('update', file)
-    // this.folderDialogVisible = true
-    // this.folderForm.name = ''
   } else if (file.fileType === 2) {
     // this.suffixDocType = 'md'
     // this.docDialogVisible = true
@@ -460,9 +461,6 @@ const handleShowRename = (file) => {
   } else {
     let suffixDocType = file.name.substring(file.name.lastIndexOf('.') + 1)
     docDialogRefs.value.handleEdit(file, suffixDocType)
-
-    // this.docDialogVisible = true
-    // this.docForm.name = ''
   }
 }
 
@@ -555,7 +553,7 @@ const handleShowUpload = (type, file, demand) => {
   uploadDemandFile.value = demand ? demand : false
   importMdNotion.value = ['mdNotion', 'mdFile'].includes(type)
   importMdFile.value = type === 'mdFile'
-  uploadDialogVisible.value = true
+  uploadFileRefs.value.handleEdit('file')
 }
 
 const handleClose = () => {
@@ -567,14 +565,7 @@ const handleClose = () => {
 }
 
 // 上传文件
-const uploadFiles = async (fileList) => {
-  let formData = new FormData()
-  formData.append('demand', uploadDemandFile.value)
-  formData.append('spaceId', spaceId.value)
-  formData.append('directoryId', uploadParams.directoryId)
-  formData.append('fileType', importMdNotion.value ? 2 : uploadParams.fileType)
-  console.log(importMdFile.value)
-
+const uploadFiles = async () => {
   if (importMdFile.value) {
     // for (const { raw } of fileList) {
     //   const schema = new Schema() //创建新模式
@@ -594,24 +585,17 @@ const uploadFiles = async (fileList) => {
     //   formData.append('files', _file)
     // }
   } else {
-    fileList.forEach((file) => {
-      formData.append('files', file.raw)
-    })
-  }
-
-  panApi.uploadFile(formData).then((res) => {
-    if (res.code === 0) {
-      uploadDialogVisible.value = false
-      importMdDialogVisible.value = false
-      proxy.$modal.msgSuccess('上传成功')
-      fileId.value = 0
-      getTableData()
-      // 还需要调用左侧tab的查询接口
-      leftTabsRefs.value.getLeftTabs(spaceId.value)
+    console.log(currentParentFolder.value)
+    if (currentParentFolder.value) {
+      fileId.value = currentParentFolder.value.id
     } else {
-      proxy.$modal.msgWarning(res.msg)
+      fileId.value = 0
     }
-  })
+
+    getTableData()
+    // 还需要调用左侧tab的查询接口
+    leftTabsRefs.value.getLeftTabs(spaceId.value)
+  }
 }
 
 const leftTabsRefs = ref(null)

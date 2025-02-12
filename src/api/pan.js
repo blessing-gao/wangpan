@@ -56,7 +56,7 @@ export const downloadFile = (id) => {
   return request({
     url: `${path}/document/download/${id}`,
     method: 'get',
-    responseType: 'blob'
+    responseType: 'blob',
   })
 }
 
@@ -112,11 +112,18 @@ export function deleteFile(params) {
   })
 }
 
-
 // 查询空间明细
 export function spaceDetail(id) {
   return request({
     url: `${path}/space/detail/${id}`,
+    method: 'get',
+  })
+}
+
+// 查询文件信息
+export function providerOptions(id) {
+  return request({
+    url: `${path}/provider/document/vo/${id}`,
     method: 'get',
   })
 }

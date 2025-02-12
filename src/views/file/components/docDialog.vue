@@ -32,7 +32,16 @@
       </el-form>
       <template #footer>
         <el-button @click="cancelDocDialog">取 消</el-button>
-        <el-button type="primary" @click.once="createOrUpdateDoc">
+        <el-button
+          style="
+            background: #de3a05;
+            border-radius: 4px;
+            color: #fff;
+            border: 0;
+          "
+          type="primary"
+          @click.once="createOrUpdateDoc"
+        >
           确 定
         </el-button>
       </template>

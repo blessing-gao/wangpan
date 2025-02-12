@@ -2,7 +2,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 //创建axios实例
 let request = axios.create({
-  timeout: 60000,
+  timeout: 600000,
   withCredentials: true,
 })
 //请求拦截器
