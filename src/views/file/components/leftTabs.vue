@@ -46,7 +46,7 @@
                   src="/icons/矩形.svg"
                 />
               </template>
-              <template v-if="data.label == '常用文件'">
+              <template v-if="data.label == '收藏文件'">
                 <img
                   style="margin-right: 12px; width: 12px"
                   src="/icons/常用文件.svg"
@@ -65,7 +65,7 @@
       </div>
       <div class="left-footer">
         <div class="file-number">
-          <div class="file-number-title">个人网盘中心</div>
+          <div class="file-number-title">{{ userName }}</div>
         </div>
         <div class="use-size">
           <div class="use-size-left">
@@ -92,6 +92,7 @@
 
 <script setup>
 import { ref, getCurrentInstance, onMounted } from 'vue'
+import { SET_PACEID, GET_PACEID } from '@/utils/auth'
 import * as panApi from '@/api/pan.js'
 import { useRoute } from 'vue-router'
 import { fileTypeIcon } from '@/enum'
@@ -120,10 +121,15 @@ const handleNodeClick = (data, node) => {
   emits('handleNodeClick', data, node)
 }
 
+const getProId = () => {
+  let proId = route.query.spaceId || GET_PACEID()
+  return proId || 233 // 如果proId为空则返回默认值233
+}
+
 // 获取spaceId
 const leftSpaceId = ref('')
 const getSpaceId = async () => {
-  const proId = route.query.proId
+  const proId = getProId()
   const result = await panApi.getSpaceIdByProdId(proId)
   leftSpaceId.value = result.data
 }
@@ -132,14 +138,14 @@ const usedSize = ref('0')
 const allSize = ref('0')
 const proportion = ref('0%')
 const percentage = ref(0)
-
+const userName = ref(null)
 const getSpaceDetail = () => {
   panApi
     .spaceDetail(leftSpaceId.value)
     .then((res) => {
       console.log(res.data)
       if (res.data.quota == '-1') {
-        allSize.value = '∞'
+        allSize.value = '无限制'
       } else {
         allSize.value = formatSize(res.data.quota)
         proportion.value =
@@ -148,6 +154,7 @@ const getSpaceDetail = () => {
           (Number(res.data.size) / Number(res.data.quota)) * 100
       }
       usedSize.value = formatSize(res.data.size)
+      userName.value = res.data.name
     })
     .catch((err) => {
       console.error(err)
@@ -212,7 +219,7 @@ const otherList = ref([
     label: '最近使用',
   },
   {
-    label: '常用文件',
+    label: '收藏文件',
   },
   {
     label: '回收站',
@@ -321,6 +328,9 @@ defineExpose({
     color: #333333;
     letter-spacing: 0;
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .file-number-number {
     font-family: PingFangSC-Medium;

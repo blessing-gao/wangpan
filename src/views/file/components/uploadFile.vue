@@ -42,6 +42,11 @@
             :key="index"
             class="file-style-content"
           >
+            <template
+              v-if="currentParentFolder && currentParentFolder.parentId != 0"
+            >
+              {{ currentParentFolder.uniqueKey }}
+            </template>
             {{ file.name }}
             <el-button @click="removeFile(index)" style="margin-left: 10px">
               <el-icon><Close /></el-icon>
@@ -99,11 +104,14 @@ const props = defineProps({
 const dialogTableVisible = ref(false)
 const fileList = ref([]) // 用于存储上传的文件列表
 const isUploadFile = ref(true) // 上传模式标志，true 为文件，false 为文件夹
-
+const currentParentFolder = ref(null)
 // 打开组件并指定上传模式
-const handleEdit = (uploadMode = 'file') => {
+const handleEdit = (uploadMode = 'file', parentFolder) => {
   isUploadFile.value = uploadMode === 'file'
   dialogTableVisible.value = true
+  currentParentFolder.value = parentFolder
+  console.log(currentParentFolder.value);
+  
 }
 
 // 处理拖拽进入事件

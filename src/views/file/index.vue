@@ -77,7 +77,7 @@
             <div class="table-top-right">
               <el-select
                 class="m-2"
-                placeholder="请选择状态"
+                placeholder="请选择类型"
                 style="width: 120px"
                 v-model="status"
               >
@@ -167,6 +167,7 @@
 
 <script setup>
 import { onMounted, ref, getCurrentInstance, reactive } from 'vue'
+import { SET_PACEID, GET_PACEID } from '@/utils/auth'
 import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 import leftTabs from './components/leftTabs.vue'
@@ -207,13 +208,21 @@ const docMaxSize = ref('0')
 const uploadDialogVisible = ref(false)
 const moveDialogVisible = ref(false)
 
+const getProId = () => {
+  let proId = route.query.spaceId || GET_PACEID();
+  return proId || 233;  // 如果proId为空则返回默认值233
+};
+
 // 获取spaceId
 const spaceId = ref('')
 const getSpaceId = async () => {
-  const proId = route.query.proId
+  const proId = getProId();
   const result = await panApi.getSpaceIdByProdId(proId)
   spaceId.value = result.data
 }
+
+// 获取spaceId列表
+const getSpaceIdList = () => {}
 
 const getMaxSize = async () => {
   const result = await panApi.getDocMaxSize()
@@ -389,6 +398,8 @@ const curretnOperateFolderOrFile = reactive({})
 const handleFileOperate = (type, operate, file) => {
   if (type === 'create') {
     if (operate == 'folder') {
+      console.log(111)
+
       folderDialogRefs.value.handleEdit('create', file)
     }
   } else if (type === 'upload') {
@@ -453,6 +464,8 @@ const docDialogRefs = ref(null)
 const handleShowRename = (file) => {
   curretnOperateFolderOrFile.value = file
   if (file.fileType === 0) {
+    console.log(222)
+
     folderDialogRefs.value.handleEdit('update', file)
   } else if (file.fileType === 2) {
     // this.suffixDocType = 'md'
@@ -553,12 +566,12 @@ const handleShowUpload = (type, file, demand) => {
   uploadDemandFile.value = demand ? demand : false
   importMdNotion.value = ['mdNotion', 'mdFile'].includes(type)
   importMdFile.value = type === 'mdFile'
-  uploadFileRefs.value.handleEdit('file')
+  uploadFileRefs.value.handleEdit('file', currentParentFolder.value)
 }
 
 const handleClose = () => {
   uploadDialogVisible.value = false
-  importMdDialogVisible.value = false
+  importMdDialogVisible.value = falseF
   moveDialogVisible.value = false
   getTableData()
   leftTabsRefs.value.getLeftTabs(spaceId.value)
@@ -585,7 +598,6 @@ const uploadFiles = async () => {
     //   formData.append('files', _file)
     // }
   } else {
-    console.log(currentParentFolder.value)
     if (currentParentFolder.value) {
       fileId.value = currentParentFolder.value.id
     } else {

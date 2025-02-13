@@ -18,7 +18,9 @@
           <div>
             <el-button plain>分享</el-button>
             <el-button plain>编辑</el-button>
-            <el-button plain>下载</el-button>
+            <el-button plain :loading="downloading" @click="downloadFiles">
+              下载
+            </el-button>
             <el-button plain>上传新版本</el-button>
           </div>
         </template>
@@ -26,7 +28,15 @@
     </div>
     <div class="file-detail-content">
       <!-- 根据文件类型选择预览组件 -->
-      <div v-if="file_type === 'video'" style="width: 100%; height: 100%; display: flex; justify-content: center;">
+      <div
+        v-if="file_type === 'video'"
+        style="
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+        "
+      >
         <previewVideo :previewBoolean="true" :content="{ path: file_path }" />
       </div>
       <div v-else-if="file_type === 'pdf'" style="width: 100%; height: 100%">
@@ -34,6 +44,17 @@
       </div>
       <div v-else-if="file_type === 'image'" style="width: 100%; height: 100%">
         <previewImage :content="{ path: file_path }" />
+      </div>
+      <div
+        v-else-if="file_type === 'audio'"
+        style="
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+        "
+      >
+        <audioPreview :audioSrc="file_path" />
       </div>
       <div v-else class="error-content">
         <p>无法预览此文件类型</p>
@@ -72,6 +93,7 @@ import previewImage from '../../components/ImagePreview.vue'
 import previewPDF from '../../components/PdfPreview.vue'
 import fileTags from '../../components/fileTags.vue'
 import summarize from '../../components/summarize.vue'
+import audioPreview from '../../components/audioPreview.vue'
 import '@/styles/components/fileDetail.css' // 引入普通的 CSS 文件
 
 const router = useRouter()
@@ -86,7 +108,6 @@ const summarizeRefs = ref(null)
 const urlParams = new URLSearchParams(window.location.search)
 
 const id = urlParams.get('id') // 获取id参数
-console.log(1111, id)
 // 根据id请求文件信息
 const fetchFileInfo = async () => {
   if (id) {
@@ -113,6 +134,8 @@ const determineFileType = (contentType) => {
     return 'pdf'
   } else if (contentType.includes('png') || contentType.includes('jpg')) {
     return 'image'
+  } else if (contentType.includes('mp3')) {
+    return 'audio'
   } else {
     return '' // 如果是其他类型文件，返回空字符串
   }
@@ -133,6 +156,35 @@ const handleBack = () => {
 
 const handleClickSummarize = () => {
   summarizeRefs.value.handleEdit()
+}
+
+const downloading = ref(false)
+
+const downloadFiles = () => {
+  downloading.value = true
+  panApi
+    .downloadFile(id)
+    .then((res) => {
+      let blob = new Blob([res.data])
+      let _fileNames = res.headers['content-disposition']
+        .split(';')[1]
+        .split('=')[1]
+        .trim()
+        .replace(/"/g, '')
+        .split('.')
+      _fileNames[0] = decodeURI(_fileNames[0])
+      let link = document.createElement('a')
+      link.href = window.URL.createObjectURL(blob)
+      link.download = _fileNames.join('.')
+      link.click()
+      window.URL.revokeObjectURL(link.href)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+    .finally(() => {
+      downloading.value = false
+    })
 }
 </script>
 <style lang="scss" scoped>

@@ -14,3 +14,13 @@ export function GET_TOKEN() {
 export function REMOVE_TOKEN() {
   localStorage.removeItem('userToken')
 }
+
+// 将 spaceId 存储到 localStorage 中
+export function SET_PACEID(proId) {
+  localStorage.setItem('spaceId', proId)
+}
+
+// 从 localStorage 获取 proId
+export function GET_PACEID() {
+  return localStorage.getItem('spaceId')
+}

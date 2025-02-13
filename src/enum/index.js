@@ -135,6 +135,10 @@ export const collaboraOnlineExts = [
     action: 'view'
   },
   {
+    ext: 'mp3',
+    action: 'view'
+  },
+  {
     ext: 'odm',
     action: 'edit'
   },
