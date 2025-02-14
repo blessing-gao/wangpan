@@ -209,14 +209,15 @@ const uploadDialogVisible = ref(false)
 const moveDialogVisible = ref(false)
 
 const getProId = () => {
-  let proId = route.query.spaceId || GET_PACEID();
-  return proId || 233;  // 如果proId为空则返回默认值233
-};
+  let proId = route.query.spaceId || GET_PACEID()
+  return proId || 233 // 如果proId为空则返回默认值233
+}
 
 // 获取spaceId
 const spaceId = ref('')
 const getSpaceId = async () => {
-  const proId = getProId();
+  const proId = getProId()
+  SET_PACEID(proId)
   const result = await panApi.getSpaceIdByProdId(proId)
   spaceId.value = result.data
 }
@@ -571,7 +572,7 @@ const handleShowUpload = (type, file, demand) => {
 
 const handleClose = () => {
   uploadDialogVisible.value = false
-  importMdDialogVisible.value = falseF
+  importMdDialogVisible.value = false
   moveDialogVisible.value = false
   getTableData()
   leftTabsRefs.value.getLeftTabs(spaceId.value)

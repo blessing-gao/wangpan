@@ -16,7 +16,7 @@
         </template>
         <template #extra>
           <div>
-            <el-button plain>分享</el-button>
+            <el-button plain @click="handleShare">分享</el-button>
             <el-button plain>编辑</el-button>
             <el-button plain :loading="downloading" @click="downloadFiles">
               下载
@@ -65,10 +65,13 @@
           class="demo-tabs tabs-content"
           @tab-click="handleClick"
         >
-          <el-tab-pane label="标签" name="first">
+          <el-tab-pane label="详情" name="first">
+            <documentDetail ref="documentDetailRefs" :documentId="id" />
+          </el-tab-pane>
+          <el-tab-pane label="标签" name="second">
             <fileTags />
           </el-tab-pane>
-          <el-tab-pane label="总结" name="second">
+          <el-tab-pane label="总结" name="third">
             <div class="summarize">
               <el-button plain @click="handleClickSummarize">
                 <img src="/assets/编组 4.png" alt="" />
@@ -76,11 +79,12 @@
             </div>
             <summarize ref="summarizeRefs" />
           </el-tab-pane>
-          <el-tab-pane label="评论" name="third">评论</el-tab-pane>
-          <el-tab-pane label="动态" name="fourth">动态</el-tab-pane>
+          <el-tab-pane label="评论" name="fourth">评论</el-tab-pane>
+          <el-tab-pane label="动态" name="five">动态</el-tab-pane>
         </el-tabs>
       </div>
     </div>
+    <shareDialog ref="shareDialogRefs" :id="id" />
   </div>
 </template>
 
@@ -94,6 +98,8 @@ import previewPDF from '../../components/PdfPreview.vue'
 import fileTags from '../../components/fileTags.vue'
 import summarize from '../../components/summarize.vue'
 import audioPreview from '../../components/audioPreview.vue'
+import documentDetail from '../../components/documentDetail.vue'
+import shareDialog from '../../components/shareDialog.vue'
 import '@/styles/components/fileDetail.css' // 引入普通的 CSS 文件
 
 const router = useRouter()
@@ -146,8 +152,19 @@ onMounted(() => {
   fetchFileInfo()
 })
 
+const documentDetailRefs = ref(null)
+
 const handleClick = (value) => {
-  console.log(value.props.label)
+  if (value.props.label == '详情') {
+    // documentDetailRefs.value.getFileDetail()
+  } else if (value.props.label == '评论') {
+    const params = {
+      documentId: id,
+    }
+    panApi.commentOptions(params).then((res) => {
+      console.log(res)
+    })
+  }
 }
 
 const handleBack = () => {
@@ -185,6 +202,12 @@ const downloadFiles = () => {
     .finally(() => {
       downloading.value = false
     })
+}
+
+const shareDialogRefs = ref(null)
+
+const handleShare = () => {
+  shareDialogRefs.value.handleEdit()
 }
 </script>
 <style lang="scss" scoped>

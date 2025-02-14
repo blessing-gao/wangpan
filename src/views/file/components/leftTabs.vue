@@ -10,6 +10,7 @@
           accordion
           highlight-current
           :style="{ '--selected-bg-color': selectedBgColor }"
+          :loading="loading"
           @node-click="handleNodeClick"
         >
           <template #default="{ data }">
@@ -102,7 +103,7 @@ const route = useRoute()
 const { proxy } = getCurrentInstance()
 
 const selectedBgColor = '#f9f3ee' // 可以动态修改这个值
-
+const loading = ref(true)
 const defaultProps = {
   children: 'children',
   label: 'label',
@@ -130,6 +131,7 @@ const getProId = () => {
 const leftSpaceId = ref('')
 const getSpaceId = async () => {
   const proId = getProId()
+  SET_PACEID(proId)
   const result = await panApi.getSpaceIdByProdId(proId)
   leftSpaceId.value = result.data
 }
@@ -149,9 +151,11 @@ const getSpaceDetail = () => {
       } else {
         allSize.value = formatSize(res.data.quota)
         proportion.value =
-          (Number(res.data.size) / Number(res.data.quota)) * 100 + '%'
-        percentage.value =
-          (Number(res.data.size) / Number(res.data.quota)) * 100
+          ((Number(res.data.size) / Number(res.data.quota)) * 100).toFixed(2) +
+          '%'
+        percentage.value = Number(
+          ((Number(res.data.size) / Number(res.data.quota)) * 100).toFixed(2),
+        )
       }
       usedSize.value = formatSize(res.data.size)
       userName.value = res.data.name
@@ -166,9 +170,13 @@ const formatSize = (size) => {
   const KB = 1024
   const MB = KB * 1024
   const GB = MB * 1024
+  const TB = GB * 1024
 
   // 根据字节数大小决定转换的单位
-  if (size >= GB) {
+  if (size >= TB) {
+    // 如果大于等于 1GB，转换为 GB
+    return (size / TB).toFixed(2) + ' TB'
+  } else if (size >= GB) {
     // 如果大于等于 1GB，转换为 GB
     return (size / GB).toFixed(2) + ' GB'
   } else if (size >= MB) {
@@ -211,6 +219,7 @@ const getLeftTabs = async (spaceId, data) => {
 onMounted(async () => {
   await getSpaceId()
   getSpaceDetail()
+  // 这里之所以调用是因为如果修改了之后，无法重新显示内容
   getLeftTabs(leftSpaceId.value)
 })
 

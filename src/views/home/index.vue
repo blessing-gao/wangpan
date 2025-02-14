@@ -4,7 +4,12 @@
       <div>
         <div class="title1">文件分类</div>
         <div class="">
-          <el-row :gutter="12">
+          <el-row :gutter="12" v-if="classifyList.length == 0">
+            <el-col :span="6" v-for="(item, index) in 4" :key="index">
+              <el-card shadow="never" style="cursor: pointer"></el-card>
+            </el-col>
+          </el-row>
+          <el-row :gutter="12" v-if="classifyList.length != 0">
             <el-col
               :span="6"
               v-for="(item, index) in classifyList"
@@ -29,19 +34,30 @@
       <div style="width: 100%">
         <div class="title1 history-title">最近查看</div>
         <div>
-          <div
-            v-for="(item, index) in historyList"
-            :key="index"
-            class="history-content"
-            @click="handleClick(item)"
-          >
-            <div class="history-img">
-              <img :src="item.image" :alt="item.name" />
+          <div v-if="historyList.length == 0">
+            <div
+              v-for="(item, index) in 4"
+              :key="index"
+              class="history-content"
+            >
+              <div class="history-img"></div>
             </div>
-            <div class="history-detail">
-              <div class="history-detail-title">{{ item.name }}</div>
-              <div class="history-detail-synopsis">{{ item.remark }}</div>
-              <div class="history-detail-time">{{ item.lastViewed }}</div>
+          </div>
+          <div v-if="historyList.length != 0">
+            <div
+              v-for="(item, index) in historyList"
+              :key="index"
+              class="history-content"
+              @click="handleClick(item)"
+            >
+              <div class="history-img">
+                <img :src="item.image" :alt="item.name" />
+              </div>
+              <div class="history-detail">
+                <div class="history-detail-title">{{ item.name }}</div>
+                <div class="history-detail-synopsis">{{ item.remark }}</div>
+                <div class="history-detail-time">{{ item.lastViewed }}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -51,22 +67,41 @@
       <div class="title1">最近上传</div>
       <img style="height: 76px" src="/assets/Mask group.png" />
       <div class="upload-content">
-        <div
-          v-for="(item, index) in uploadList"
-          :key="index"
-          class="upload-content-list"
-          @click="handleClick(item)"
-        >
-          <div>
-            <img
-              style="width: 32px; margin-right: 16px"
-              :src="getUploadIconSrc(item.type)"
-            />
+        <div v-if="uploadList.length == 0">
+          <div
+            v-for="(item, index) in 4"
+            :key="index"
+            class="upload-content-list"
+            @click="handleClick(item)"
+          >
+            <div
+              style="
+                width: 32px;
+                height: 32px;
+                margin-right: 16px;
+                background-color: #d9d9d9;
+              "
+            ></div>
           </div>
-          <div>
-            <div class="upload-content-title">{{ item.name }}</div>
-            <div class="upload-content-user">
-              {{ item.uploader }} 上传于 {{ item.lastModified }}
+        </div>
+        <div v-if="uploadList.length != 0">
+          <div
+            v-for="(item, index) in uploadList"
+            :key="index"
+            class="upload-content-list"
+            @click="handleClick(item)"
+          >
+            <div>
+              <img
+                style="width: 32px; margin-right: 16px"
+                :src="getUploadIconSrc(item.type)"
+              />
+            </div>
+            <div>
+              <div class="upload-content-title">{{ item.name }}</div>
+              <div class="upload-content-user">
+                {{ item.uploader }} 上传于 {{ item.lastModified }}
+              </div>
             </div>
           </div>
         </div>
@@ -82,7 +117,7 @@ import { useRouter } from 'vue-router'
 
 const { proxy } = getCurrentInstance()
 
-const classifyList = ref()
+const classifyList = ref([])
 
 const getClassification = async () => {
   let params = {

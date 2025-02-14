@@ -11,7 +11,7 @@
         <el-dropdown-menu>
           <el-dropdown-item command="folder">
             <!-- <svg-icon name="color-file_type_folder" class="mr-2" /> -->
-             <img src="/icons/文件管理.svg" style="margin-right: 12px;" >
+            <img src="/icons/文件管理.svg" style="margin-right: 12px" />
             文件夹
           </el-dropdown-item>
           <!-- <el-dropdown-item command="txt" divided>
@@ -59,6 +59,11 @@ const handleCommand = (key) => {
   .el-dropdown-menu__item:not(.is-disabled):focus,
   .el-dropdown-menu__item:not(.is-disabled):hover
 ) {
+  background-color: rgba(243, 232, 222, 0.5) !important;
+  color: #de3a05;
+}
+
+:deep(.el-dropdown-menu__item:focus, .el-dropdown-menu__item:hover) {
   background-color: rgba(243, 232, 222, 0.5) !important;
   color: #de3a05;
 }

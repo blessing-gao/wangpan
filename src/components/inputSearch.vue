@@ -116,10 +116,6 @@ const getHistoryData = () => {
     })
 }
 
-onMounted(() => {
-  getHistoryData()
-})
-
 const handleClose = () => {
   historyList.value = []
   searchInput.value = []

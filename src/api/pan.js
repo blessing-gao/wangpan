@@ -47,6 +47,23 @@ export const uploadFile = (data) => {
 }
 
 /**
+ * 编辑之后文档上传
+ * @requestParam params
+ * @requestBody data
+ * @returns {AxiosPromise}
+ */
+// export const uploadFile = (data) => {
+//   return request({
+//     url: `${path}/document/upload/${id}`,
+//     method: 'post',
+//     headers: {
+//       'Content-Type': 'multipart/form-data',
+//     },
+//     data,
+//   })
+// }
+
+/**
  * 文件下载
  * @requestParam params
  * @requestBody data
@@ -125,5 +142,23 @@ export function providerOptions(id) {
   return request({
     url: `${path}/provider/document/vo/${id}`,
     method: 'get',
+  })
+}
+
+// 获取分享外链
+export function getShareUrl(params) {
+  return request({
+    url: `${path}/document/share`,
+    method: 'get',
+    params,
+  })
+}
+
+// 获取文档评论
+export function commentOptions(params) {
+  return request({
+    url: `${path}/comment/list`,
+    method: 'get',
+    params,
   })
 }

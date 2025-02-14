@@ -98,7 +98,7 @@ const clickInput = () => {
 const organizationList = ref([])
 
 onMounted(()=>{
-  handleShow()
+  // handleShow()
 })
 
 const handleShow = () => {

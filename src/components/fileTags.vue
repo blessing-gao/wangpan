@@ -75,7 +75,7 @@ const handleTagList = () => {
 }
 
 onMounted(() => {
-  handleTagList()
+  // handleTagList()
 })
 
 const addTag = () => {

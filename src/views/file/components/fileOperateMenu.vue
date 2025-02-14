@@ -129,4 +129,12 @@ defineExpose({
   background-color: rgba(243, 232, 222, 0.5) !important;
   color: #de3a05;
 }
+
+:deep(
+  .el-dropdown-menu__item:focus,
+  .el-dropdown-menu__item:hover
+) {
+  background-color: rgba(243, 232, 222, 0.5) !important;
+  color: #de3a05;
+}
 </style>

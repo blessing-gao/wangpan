@@ -97,8 +97,6 @@ const loadFiles = (node, resolve) => {
       })
     }
   } else {
-    console.log(2222);
-    
     let file = node.data
     if (file.fileType === 0) {
       panApi.contentsList(props.spaceId, file.id, fileParams).then((res) => {
