@@ -121,7 +121,7 @@ const fetchFileInfo = async () => {
       panApi.providerOptions(id).then((res) => {
         console.log(res)
         file_name.value = res.data.name || '未知文件'
-        file_path.value = `http://82.156.83.108:9980/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
+        file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
         file_type.value = determineFileType(res.data.name)
       })
     } catch (error) {

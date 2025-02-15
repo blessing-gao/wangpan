@@ -22,6 +22,7 @@
     "npm": "^11.0.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.3.0",
+    "plyr": "^3.7.8",
     "uninstall": "^0.0.0",
     "vite-plugin-qiankun": "^1.0.15",
     "vue": "^3.5.13",

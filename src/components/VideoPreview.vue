@@ -1,220 +1,280 @@
 <template>
-  <div>
-    <video
-      id="media"
-      ref="videoRefs"
-      class="plyr"
-      controls
-      crossorigin="anonymous"
-      :autoplay="playerOptions.autoPlay"
-      :loop="playerOptions.loop"
-      :muted="playerOptions.muted"
-      :volume="playerOptions.volume"
-      @timeupdate="onTimeUpdate"
-    >
+  <div class="video-container">
+    <!-- 主视频播放器 -->
+    <video ref="videoPlayer" class="plyr" crossorigin="anonymous">
       <source :src="videoSrc" type="video/mp4" />
-      您的浏览器不支持视频标签。
+      您的浏览器不支持视频标签
     </video>
 
-    <!-- 控制按钮 - 选择小张或小李 -->
+    <!-- 隐藏的视频元素用于生成缩略图 -->
+    <video id="hidden-video" crossorigin="anonymous" style="display: none">
+      <source :src="videoSrc" type="video/mp4" />
+    </video>
+
+    <!-- 控制按钮 -->
     <div class="controls">
-      <button @click="choosePerson('小张')">选择小张</button>
-      <button @click="choosePerson('小李')">选择小李</button>
+      <button @click="selectPerson('小张')">选择小张</button>
+      <button @click="selectPerson('小李')">选择小李</button>
     </div>
 
-    <!-- 缩略图预览容器 -->
-    <div class="thumbnail-preview" v-show="isThumbnailVisible">
+    <!-- 缩略图预览 -->
+    <div class="thumbnail-preview" :style="thumbnailPosition">
       <img :src="thumbnailSrc" alt="缩略图" />
+      <div class="thumbnail-time">{{ hoverTime }}</div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import Plyr from 'plyr'
+import 'plyr/dist/plyr.css'
 
-const props = defineProps({
-  content: {
-    type: Object,
-    default: () => ({}),
-  },
-  previewBoolean: {
-    type: Boolean,
-    default: true,
-  },
-})
-
-// 播放器配置
-let playerOptions = reactive({
-  autoPlay: true, // 自动播放
-  loop: false, // 循环播放
-  muted: false, // 静音
-  volume: 0.3, // 默认音量大小
-})
-
-let player = null // Plyr 实例
-let videoDuration = 0 // 存储视频时长
-let currentPerson = '小张' // 默认选择小张
-let markers = [] // 当前人物的时间段标记
-
-// 定义小张和小李的时间段
+const videoSrc = ref('http://www.shenben.club:9000/gjq/test.mp4')
 const segments = {
-  小张: [
-    { start: 5, end: 6 },
-    { start: 10.5, end: 14 },
-    { start: 20.8, end: 30 },
-  ],
+  小张: [{ start: 5, end: 6 }],
   小李: [{ start: 30, end: 40 }],
 }
 
-const videoRefs = ref(null) // 视频 DOM 引用
-const videoSrc = ref('') // 视频源地址
-
-// 获取视频地址
-const getVideo = () => {
-  videoSrc.value = 'http://www.shenben.club:9000/gjq/test.mp4'
-}
-
-// 更新进度条上的标记
-const updateMarkers = () => {
-  markers = segments[currentPerson] // 获取当前人物的时间段
-  const progressBar = videoRefs.value.querySelector('.plyr__progress__container')
-  console.log(progressBar);
-  progressBar.innerHTML = '' // 清空之前的标记
-
-  markers.forEach((segment) => {
-    const startPercent = (segment.start / videoDuration) * 100
-    const endPercent = (segment.end / videoDuration) * 100
-
-    // 创建标记
-    const highlight = document.createElement('div')
-    highlight.classList.add('highlight')
-    highlight.style.left = `${startPercent}%`
-    highlight.style.width = `${endPercent - startPercent}%`
-
-    progressBar.appendChild(highlight)
-  })
-}
+const videoPlayer = ref(null)
+let player = null
+const currentPerson = ref('小张')
+const videoDuration = ref(0)
+const thumbnailSrc = ref('')
+const thumbnailPosition = ref({ display: 'none' })
+const progressBar = ref(null)
+const hoverTime = ref('00:00')
 
 onMounted(() => {
-  // 动态加载 Plyr.js
-  const script = document.createElement('script')
-  script.src = 'https://cdn.jsdelivr.net/npm/plyr@3.6.2/dist/plyr.js'
-  script.onload = () => {
-    player = new Plyr(videoRefs.value)
-    videoDuration = player.duration // 获取视频时长
-    updateMarkers()
-  }
-  document.body.appendChild(script)
+  player = new Plyr(videoPlayer.value, {
+    controls: [
+      'play-large',
+      'play',
+      'progress',
+      'current-time',
+      'mute',
+      'volume',
+      'settings',
+      'fullscreen',
+    ],
+    settings: ['quality', 'speed'],
+    autoplay: true,
+    volume: 0.3,
+  })
 
-  getVideo()
+  progressBar.value = document.querySelector('.plyr__progress')
+
+  player.on('loadedmetadata', () => {
+    videoDuration.value = player.duration
+    updateMarkers()
+  })
+  player.on('timeupdate', updateProgressIndicator)
+  setupProgressBarEvents()
 })
 
-// 监听播放时更新进度条
-const onTimeUpdate = () => {
-  const currentTime = player.currentTime
-  const progressBar = videoRefs.value.querySelector('.plyr__progress__container')
-  const progress = (currentTime / videoDuration) * 100
+onBeforeUnmount(() => {
+  if (player) player.destroy()
+})
 
-  // 更新进度条的当前进度
-  const playProgress = document.createElement('div')
-  playProgress.classList.add('blue-progress')
-  playProgress.style.left = `${progress}%`
-  playProgress.style.width = '2px'
-
-  // 清除上一个进度条的标记
-  const previousProgress = progressBar.querySelector('.blue-progress')
-  if (previousProgress) {
-    previousProgress.remove()
-  }
-
-  progressBar.appendChild(playProgress)
-}
-
-// 鼠标移动在进度条上时显示缩略图
-const progressBar = ref(null)
-let lastUpdateTime = 0 // 记录最后更新时间
-
-const onMouseMove = (e) => {
-  const mouseX = e.offsetX
-  const timeAtMouse = (mouseX / progressBar.value.offsetWidth) * videoDuration
-
-  // 延迟更新，避免频繁截图造成卡顿
-  if (Math.abs(timeAtMouse - lastUpdateTime) > 0.1) {
-    lastUpdateTime = timeAtMouse
-    requestAnimationFrame(() => getThumbnail(timeAtMouse))
+// 进度指示器更新
+const updateProgressIndicator = () => {
+  const progress = (player.currentTime / videoDuration.value) * 100
+  const indicator = document.querySelector('.progress-indicator')
+  if (indicator) {
+    indicator.style.left = `${progress}%`
+  } else {
+    const newIndicator = document.createElement('div')
+    newIndicator.className = 'progress-indicator'
+    newIndicator.style.left = `${progress}%`
+    progressBar.value.appendChild(newIndicator)
   }
 }
-const isThumbnailVisible = ref(false)
-const onMouseEnter = () => {
-  isThumbnailVisible.value = true // 显示缩略图
+
+const selectPerson = (person) => {
+  currentPerson.value = person
+  player.currentTime = segments[person][0].start
+  player.play()
+  updateMarkers()
 }
 
-const onMouseLeave = () => {
-  isThumbnailVisible.value = false // 隐藏缩略图
-}
+const updateMarkers = () => {
+  const markers = segments[currentPerson.value]
+  progressBar.value.innerHTML = ''
 
-const thumbnailSrc = ref(null)
+  markers.forEach((segment) => {
+    const startPercent = (segment.start / videoDuration.value) * 100
+    const endPercent = (segment.end / videoDuration.value) * 100
 
-// 使用canvas获取视频帧缩略图
-const getThumbnail = (time) => {
-  const canvas = document.createElement('canvas')
-  const context = canvas.getContext('2d')
-  const video = videoRefs.value
-  video.currentTime = time
-
-  video.addEventListener('seeked', () => {
-    // 当视频跳转到目标时间点后，绘制当前帧
-    canvas.width = 120 // 缩略图宽度
-    canvas.height = 80 // 缩略图高度
-    context.drawImage(video, 0, 0, canvas.width, canvas.height)
-
-    // 更新缩略图图片
-    thumbnailSrc.value = canvas.toDataURL()
+    const highlight = document.createElement('div')
+    highlight.className = 'highlight'
+    highlight.style.cssText = `left: ${startPercent}%; width: ${endPercent - startPercent}%`
+    progressBar.value.appendChild(highlight)
   })
 }
+
+const setupProgressBarEvents = () => {
+  let hiddenVideo = document.getElementById('hidden-video')
+
+  // 初始化隐藏视频
+  hiddenVideo.src = videoSrc.value
+  hiddenVideo.load()
+
+  const handleMouseMove = (e) => {
+    const rect = progressBar.value.getBoundingClientRect()
+    const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width), 1)
+    const time = percent * videoDuration.value
+
+    thumbnailPosition.value = {
+      display: 'block',
+      left: `${e.clientX - rect.left}px`, // 居中显示
+      top: `${rect.top - 100}px`,
+    }
+
+    hoverTime.value = formatTime(time)
+    getThumbnail(time)
+  }
+
+  const handleClick = (e) => {
+    const rect = progressBar.value.getBoundingClientRect()
+    const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width), 1)
+    player.currentTime = percent * videoDuration.value
+  }
+
+  progressBar.value.addEventListener('mousemove', handleMouseMove)
+  progressBar.value.addEventListener('click', handleClick)
+  progressBar.value.addEventListener('mouseleave', () => {
+    thumbnailPosition.value.display = 'none'
+  })
+}
+
+const getThumbnail = (time) => {
+  const canvas = document.createElement('canvas')
+  const hiddenVideo = document.getElementById('hidden-video')
+
+  hiddenVideo.currentTime = time
+  hiddenVideo.addEventListener(
+    'seeked',
+    () => {
+      canvas.width = 120
+      canvas.height = 80
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(hiddenVideo, 0, 0, canvas.width, canvas.height)
+      thumbnailSrc.value = canvas.toDataURL()
+    },
+    { once: true },
+  )
+}
+
+const formatTime = (seconds) => {
+  const date = new Date(seconds * 1000)
+  const mm = date.getUTCMinutes().toString().padStart(2, '0')
+  const ss = date.getUTCSeconds().toString().padStart(2, '0')
+  return `${mm}:${ss}`
+}
 </script>
-
-<style lang="scss" scoped>
-@import url('https://cdn.jsdelivr.net/npm/plyr@3.6.2/dist/plyr.css');
-.video-player {
+<style scoped>
+.video-container {
   width: 100%;
-  height: 100%;
-  background-color: #000;
-}
-
-:deep(video::-webkit-media-controls) {
-  display: flex !important; /* 确保控制条显示 */
-}
-
-.video-player {
-  width: 100%;
-  height: 100%;
-  background-color: #000;
+  margin: 0 auto;
+  position: relative;
 }
 
 .controls {
-  margin-top: 10px;
+  padding: 15px 0;
   text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+  position: relative;
+  z-index: 10;
 }
 
 .controls button {
-  padding: 5px 10px;
-  margin: 0 5px;
+  padding: 8px 20px;
+  margin: 0 10px;
+  background: #00aeec;
+  border: none;
+  color: white;
+  border-radius: 4px;
   cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.controls button:hover {
+  opacity: 0.8;
 }
 
 .thumbnail-preview {
-  position: absolute;
-  top: -80px; /* 在进度条上方显示 */
+  position: fixed;
   width: 120px;
   height: 80px;
-  display: none;
-  border: 1px solid #ccc;
-  background-color: rgba(0, 0, 0, 0.5);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  display: none; /* 默认为不显示 */
+
+  /* position: fixed;
+  width: 120px;
+  height: 80px;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  pointer-events: none; */
 }
 
 .thumbnail-preview img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+}
+
+/* 深度样式穿透 */
+:deep(.plyr) {
+  height: 93%;
+  min-height: 400px;
+  background: #000;
+}
+
+:deep(.plyr__controls) {
+  padding: 15px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+}
+
+:deep(.plyr__progress--played) {
+  color: #00aeec !important; /* 已播放进度颜色 */
+}
+
+:deep(.plyr__progress__buffer) {
+  color: rgba(255, 255, 255, 0.25) !important; /* 缓冲进度颜色 */
+}
+
+:deep(.plyr__progress) {
+  position: relative;
+  height: 8px;
+  background: #ccc;
+}
+
+:deep(.highlight) {
+  position: absolute;
+  height: 100%;
+  background: rgba(255, 0, 0, 0.3);
+  z-index: 2;
+}
+/* 新增缩略图时间显示样式 */
+.thumbnail-time {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  text-align: center;
+  font-size: 12px;
+  padding: 2px 0;
+}
+
+:deep(.progress-indicator) {
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  background: #00aeec;
+  z-index: 3;
 }
 </style>

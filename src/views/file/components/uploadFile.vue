@@ -48,6 +48,12 @@
               {{ currentParentFolder.uniqueKey }}
             </template>
             {{ file.name }}
+            <!-- 显示上传进度条 -->
+            <el-progress
+              style="flex: 1"
+              :color="customColorMethod"
+              :percentage="uploadProgress[index]?.progress"
+            />
             <el-button @click="removeFile(index)" style="margin-left: 10px">
               <el-icon><Close /></el-icon>
             </el-button>
@@ -101,6 +107,16 @@ const props = defineProps({
   },
 })
 
+const customColorMethod = (percentage) => {
+  if (percentage < 30) {
+    return '#909399'
+  }
+  if (percentage < 70) {
+    return '#e6a23c'
+  }
+  return '#67c23a'
+}
+
 const dialogTableVisible = ref(false)
 const fileList = ref([]) // 用于存储上传的文件列表
 const isUploadFile = ref(true) // 上传模式标志，true 为文件，false 为文件夹
@@ -110,8 +126,7 @@ const handleEdit = (uploadMode = 'file', parentFolder) => {
   isUploadFile.value = uploadMode === 'file'
   dialogTableVisible.value = true
   currentParentFolder.value = parentFolder
-  console.log(currentParentFolder.value);
-  
+  console.log(currentParentFolder.value)
 }
 
 // 处理拖拽进入事件
@@ -189,28 +204,47 @@ const handleFiles = (files) => {
 }
 
 const emits = defineEmits(['ok', 'close'])
-
+const uploadProgress = ref([]) // 用于存储每个文件的上传进度
 // 上传文件到服务器
 const uploadFiles = () => {
   if (fileList.value.length === 0) return
-  const formData = new FormData()
-  formData.append('demand', props.demand)
-  formData.append('spaceId', props.spaceId)
-  formData.append('directoryId', props.uploadParams.directoryId)
-  formData.append('fileType', props.uploadParams.fileType)
-  fileList.value.forEach((file) => {
+  const uploadPromises = fileList.value.map((file, index) => {
+    const formData = new FormData()
+    formData.append('demand', props.demand)
+    formData.append('spaceId', props.spaceId)
+    formData.append('directoryId', props.uploadParams.directoryId)
+    formData.append('fileType', props.uploadParams.fileType)
     formData.append('files', file)
+    uploadProgress.value.push({ fileName: file.name, progress: 0 })
+    return panApi
+      .uploadFile(formData, (progress) => {
+        uploadProgress.value[index].progress = progress
+      })
+      .then((res) => {
+        ElNotification({
+          title: '成功',
+          message: `${file.name} 上传成功`,
+          type: 'success',
+        })
+      })
   })
-  console.log(formData)
-  panApi.uploadFile(formData).then((res) => {
-    if (res.code === 0) {
-      proxy.$modal.msgSuccess('上传成功')
-      emits('ok')
-      handleClose()
-    } else {
-      proxy.$modal.msgWarning(res.msg)
-    }
+  Promise.all(uploadPromises).then(() => {
+    ElNotification({
+      title: '全部上传完成',
+      message: '所有文件上传完成',
+      type: 'success',
+    })
+    handleClose()
   })
+  // panApi.uploadFile(formData).then((res) => {
+  //   if (res.code === 0) {
+  //     proxy.$modal.msgSuccess('上传成功')
+  //     emits('ok')
+  //     handleClose()
+  //   } else {
+  //     proxy.$modal.msgWarning(res.msg)
+  //   }
+  // })
 }
 
 // 上传文件夹到服务器
@@ -273,6 +307,7 @@ onMounted(async () => {
 const handleClose = () => {
   fileList.value = []
   dialogTableVisible.value = false
+  emits('close')
 }
 
 defineExpose({
