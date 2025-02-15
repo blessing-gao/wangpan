@@ -112,13 +112,14 @@ const updateMarkers = () => {
   })
 }
 
+const moveindicator = ref(null)
+
 const setupProgressBarEvents = () => {
   let hiddenVideo = document.getElementById('hidden-video')
 
   // 初始化隐藏视频
   hiddenVideo.src = videoSrc.value
   hiddenVideo.load()
-
   const handleMouseMove = (e) => {
     const rect = progressBar.value.getBoundingClientRect()
     const percent = Math.min(Math.max((e.clientX - rect.left) / rect.width), 1)
@@ -130,6 +131,18 @@ const setupProgressBarEvents = () => {
       top: `${rect.top - 100}px`,
     }
 
+    const progress = (time / videoDuration.value) * 100
+    moveindicator.value = document.querySelector('.progress-indicator1')
+    if (moveindicator.value) {
+      moveindicator.value.style.display = 'block'
+      moveindicator.value.style.left = `${progress}%`
+    } else {
+      const newIndicator = document.createElement('div')
+      newIndicator.className = 'progress-indicator1'
+      newIndicator.style.left = `${progress}%`
+      newIndicator.style.display = 'block'
+      progressBar.value.appendChild(newIndicator)
+    }
     hoverTime.value = formatTime(time)
     getThumbnail(time)
   }
@@ -144,6 +157,7 @@ const setupProgressBarEvents = () => {
   progressBar.value.addEventListener('click', handleClick)
   progressBar.value.addEventListener('mouseleave', () => {
     thumbnailPosition.value.display = 'none'
+    moveindicator.value.style.display = 'none'
   })
 }
 
@@ -271,6 +285,14 @@ const formatTime = (seconds) => {
 }
 
 :deep(.progress-indicator) {
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  background: #00aeec;
+  z-index: 3;
+}
+
+:deep(.progress-indicator1) {
   position: absolute;
   height: 100%;
   width: 2px;
