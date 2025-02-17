@@ -95,6 +95,7 @@
 import { ref, getCurrentInstance } from 'vue'
 import { CopyDocument } from '@element-plus/icons-vue'
 import * as panApi from '@/api/pan.js'
+import { GET_USERID } from '../utils/auth'
 
 const props = defineProps({
   id: {
@@ -106,7 +107,7 @@ const props = defineProps({
 const { proxy } = getCurrentInstance()
 
 const shareDialogVisible = ref(false)
-const day = ref(0)
+const day = ref(7)
 const hours = ref(0)
 const minutes = ref(0)
 
@@ -137,21 +138,28 @@ const handleShare = () => {
   if (minutes.value != 0) {
     expireTime.value += minutes.value + '分钟'
   }
+  console.log(expireTime.value)
+
   addTimeToCurrent()
+  const totalSeconds = convertToSeconds()
   const params = {
     documentId: props.id,
-    expireTime: '12000',
-    userId: '1',
+    expireTime: totalSeconds,
+    userId: GET_USERID(),
   }
+  console.log(params);
+  
   panApi
     .getShareUrl(params)
     .then((res) => {
+      console.log(res)
+
       shareLink.value = res.data
     })
     .catch((err) => {
       console.error(err)
-      shareLink.value =
-        'http://locahost:8080/document/share/download/6fc11b2f-9184-4356-8cf2-44f33f7a9795'
+      // shareLink.value =
+      //   'http://locahost:8080/document/share/download/6fc11b2f-9184-4356-8cf2-44f33f7a9795'
     })
     .finally(() => {})
 }
@@ -234,6 +242,34 @@ const handleClose1 = () => {
 defineExpose({
   handleEdit,
 })
+
+const convertToSeconds = () => {
+  const timeStr = expireTime.value
+
+  // 默认秒数为0
+  let total = 0
+
+  // 使用正则表达式提取天、小时、分钟
+  const dayMatch = timeStr.match(/(\d+)天/)
+  const hourMatch = timeStr.match(/(\d+)小时/)
+  const minuteMatch = timeStr.match(/(\d+)分钟/)
+
+  // 如果匹配到天数，转换为秒数并累加
+  if (dayMatch) {
+    total += parseInt(dayMatch[1]) * 24 * 60 * 60 // 1天 = 86400秒
+  }
+
+  // 如果匹配到小时数，转换为秒数并累加
+  if (hourMatch) {
+    total += parseInt(hourMatch[1]) * 60 * 60 // 1小时 = 3600秒
+  }
+
+  // 如果匹配到分钟数，转换为秒数并累加
+  if (minuteMatch) {
+    total += parseInt(minuteMatch[1]) * 60 // 1分钟 = 60秒
+  }
+  return total
+}
 </script>
 
 <style lang="scss" scoped>
