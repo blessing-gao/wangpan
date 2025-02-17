@@ -136,39 +136,61 @@ const handleDragOver = (e) => e.preventDefault()
 // 处理文件或文件夹放下（drop）事件
 const handleDrop = (e) => {
   e.preventDefault()
+  hasMaxFilesWarning.value = false // 重置警告状态
+
   const items = Array.from(e.dataTransfer.items)
   const files = []
 
   items.forEach((item) => {
+    if (fileList.value.length >= 10) return
+
     if (item.kind === 'file') {
       const entry = item.webkitGetAsEntry()
       if (!isUploadFile.value && entry.isDirectory) {
-        // 如果是文件夹上传模式，递归处理文件夹内容
         traverseDirectory(entry)
       } else if (isUploadFile.value && entry.isFile) {
-        // 如果是文件上传模式，处理文件
         const file = item.getAsFile()
-        if (file) {
-          files.push(file)
-        }
+        file && files.push(file)
       }
     }
   })
 
-  // 处理文件
   handleFiles(files)
 }
+
+// 新增一个用于跟踪是否已显示最大文件数提示的状态
+const hasMaxFilesWarning = ref(false)
 
 // 处理文件选择框的变更事件
 const handleFileInputChange = (event) => {
   const files = Array.from(event.target.files)
+  const validFiles = []
 
-  let fileSize = files[0].size / 1024 / 1024
-  console.log(fileSize, props.maxSize)
-  if (fileSize > props.maxSize) {
-    proxy.$modal.msgWarning(`文件大小不能超过${props.maxSize}MB`)
-  } else {
-    handleFiles(files)
+  // 先过滤超大的文件
+  files.forEach((file) => {
+    const fileSize = file.size / 1024 / 1024
+    if (fileSize > props.maxSize) {
+      proxy.$modal.msgWarning(`文件 ${file.name} 大小超过限制，已跳过`)
+    } else {
+      validFiles.push(file)
+    }
+  })
+
+  // 再处理数量限制
+  const remainingSlots = 10 - fileList.value.length
+  if (remainingSlots <= 0) {
+    proxy.$modal.msgWarning('最多只能上传10个文件')
+    event.target.value = ''
+    return
+  }
+
+  const filesToAdd = validFiles.slice(0, remainingSlots)
+  filesToAdd.forEach((file) => fileList.value.push(file))
+
+  if (validFiles.length > remainingSlots) {
+    proxy.$modal.msgWarning(
+      `最多只能上传10个文件，已添加${filesToAdd.length}个`,
+    )
   }
 
   event.target.value = ''
@@ -185,10 +207,19 @@ const traverseDirectory = (entry) => {
   const dirReader = entry.createReader()
   dirReader.readEntries((entries) => {
     entries.forEach((entry) => {
+      if (fileList.value.length >= 10) return
+
       if (entry.isDirectory) {
         traverseDirectory(entry)
       } else {
         entry.file((file) => {
+          if (fileList.value.length >= 10) {
+            if (!hasMaxFilesWarning.value) {
+              proxy.$modal.msgWarning('最多只能上传10个文件')
+              hasMaxFilesWarning.value = true
+            }
+            return
+          }
           fileList.value.push(file)
         })
       }
@@ -198,9 +229,26 @@ const traverseDirectory = (entry) => {
 
 // 处理文件选择（通过拖拽选择文件）
 const handleFiles = (files) => {
-  files.forEach((file) => {
+  const remainingSlots = 10 - fileList.value.length
+  if (remainingSlots <= 0) {
+    if (!hasMaxFilesWarning.value) {
+      proxy.$modal.msgWarning('最多只能上传10个文件')
+      hasMaxFilesWarning.value = true
+    }
+    return
+  }
+
+  const filesToAdd = files.slice(0, remainingSlots)
+  filesToAdd.forEach((file) => {
     fileList.value.push(file)
   })
+
+  if (files.length > remainingSlots && !hasMaxFilesWarning.value) {
+    proxy.$modal.msgWarning(
+      `最多只能上传10个文件，已添加${filesToAdd.length}个`,
+    )
+    hasMaxFilesWarning.value = true
+  }
 }
 
 const emits = defineEmits(['ok', 'close'])
@@ -236,15 +284,6 @@ const uploadFiles = () => {
     })
     handleClose()
   })
-  // panApi.uploadFile(formData).then((res) => {
-  //   if (res.code === 0) {
-  //     proxy.$modal.msgSuccess('上传成功')
-  //     emits('ok')
-  //     handleClose()
-  //   } else {
-  //     proxy.$modal.msgWarning(res.msg)
-  //   }
-  // })
 }
 
 // 上传文件夹到服务器
@@ -306,6 +345,7 @@ onMounted(async () => {
 
 const handleClose = () => {
   fileList.value = []
+  hasMaxFilesWarning.value = false // 关闭时重置警告状态
   dialogTableVisible.value = false
   emits('close')
 }
