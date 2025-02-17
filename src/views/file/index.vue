@@ -71,8 +71,34 @@
           </div>
           <div class="table-top">
             <div class="table-top-title">
-              <el-button link @click="clickFile">根目录</el-button>
-              <el-button v-if="isLevelText" link>{{}}</el-button>
+              <el-breadcrumb :separator-icon="ArrowRight">
+                <el-breadcrumb-item @click="clickFile()">
+                  根目录
+                </el-breadcrumb-item>
+                <div v-if="isLevelText" style="display: flex">
+                  <el-breadcrumb-item
+                    v-for="item in tabList"
+                    :key="item.id"
+                    @click="clickFile(item)"
+                  >
+                    {{ item.name }}
+                  </el-breadcrumb-item>
+                </div>
+
+                <!-- <el-breadcrumb-item>promotion list</el-breadcrumb-item>
+                <el-breadcrumb-item>promotion detail</el-breadcrumb-item> -->
+              </el-breadcrumb>
+              <!-- <el-button link @click="clickFile()">根目录</el-button>
+              <div v-if="isLevelText" style="display: flex">
+                <el-button
+                  v-for="item in tabList"
+                  :key="item.id"
+                  link
+                  @click="clickFile(item)"
+                >
+                  {{ item.name }}
+                </el-button>
+              </div> -->
             </div>
             <div class="table-top-right">
               <el-select
@@ -167,6 +193,7 @@
 
 <script setup>
 import { onMounted, ref, getCurrentInstance, reactive } from 'vue'
+import { ArrowRight } from '@element-plus/icons-vue'
 import { SET_PACEID, GET_PACEID } from '@/utils/auth'
 import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
@@ -240,13 +267,15 @@ const getTableData = () => {
     status: 1,
     name: '',
   }
+  console.log(spaceId.value, fileId.value)
+
   panApi
     .contentsList(spaceId.value, fileId.value, params)
     .then((res) => {
       tableData.value = res.data
     })
     .catch((err) => {
-      proxy.$modal.msgError(err.message)
+      console.log(err)
     })
     .finally(() => {
       loading.value = false
@@ -308,11 +337,18 @@ const isCompressedFile = (file) => {
 
 // 当前选中查看的文件夹或文件
 const currentFolderOrFile = ref(null)
+// 用于判断是否是根目录，如果不是，上传文件或文件夹时需要添加父级
+const isFolder = ref(null)
+// 用于面包屑展示路径，需要name和id
+const tabList = ref([])
 
 const hanldeRowClick = (column) => {
   isLevelText.value = true
   if (column.fileType === 0) {
     fileId.value = column.id
+    uploadParams.directoryId = column.id
+    uploadParams.uniqueKey = column.uniqueKey
+    tabList.value.push(column)
     getTableData()
   } else {
     const exts = collaboraOnlineExts.map((item) => item.ext)
@@ -343,9 +379,18 @@ const hanldeRowClick = (column) => {
   }
 }
 
-const clickFile = () => {
-  isLevelText.value = false
-  fileId.value = 0
+const clickFile = (folder) => {
+  if (!folder) {
+    isLevelText.value = false
+    fileId.value = 0
+    tabList.value = []
+  } else {
+    isLevelText.value = true
+    fileId.value = folder.id
+    console.log(tabList.value)
+    tabList.value = tabList.value.filter((item) => item.parentId !== folder.id)
+  }
+
   getTableData()
 }
 
@@ -388,7 +433,7 @@ const uploadFolder = () => {
 
 // 上传文件
 const handleUploadFile = () => {
-  uploadFileRefs.value.handleEdit('file')
+  uploadFileRefs.value.handleEdit('file', isFolder.value)
 }
 
 const mdDialogRefs = ref(null)
@@ -399,8 +444,6 @@ const curretnOperateFolderOrFile = reactive({})
 const handleFileOperate = (type, operate, file) => {
   if (type === 'create') {
     if (operate == 'folder') {
-      console.log(111)
-
       folderDialogRefs.value.handleEdit('create', file)
     }
   } else if (type === 'upload') {
@@ -574,6 +617,9 @@ const handleClose = () => {
   uploadDialogVisible.value = false
   importMdDialogVisible.value = false
   moveDialogVisible.value = false
+  isFolder.value = null
+  uploadParams.directoryId = 0
+  uploadParams.uniqueKey = ''
   getTableData()
   leftTabsRefs.value.getLeftTabs(spaceId.value)
 }
