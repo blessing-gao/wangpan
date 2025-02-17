@@ -57,7 +57,11 @@
         <audioPreview :audioSrc="file_path" />
       </div>
       <div v-else class="error-content">
-        <p>无法预览此文件类型</p>
+        <p>
+          无法预览此文件类型，请点击
+          <el-button type="warning" link @click="downloadFiles">下载</el-button>
+          查看
+        </p>
       </div>
       <div class="file-detail-content-right">
         <el-tabs
@@ -97,7 +101,7 @@ import previewImage from '../../components/ImagePreview.vue'
 import previewPDF from '../../components/PdfPreview.vue'
 import fileTags from '../../components/fileTags.vue'
 import summarize from '../../components/summarize.vue'
-import audioPreview from '../../components/audioPreview.vue'
+import audioPreview from '../../components/customizeAudio.vue'
 import documentDetail from '../../components/documentDetail.vue'
 import shareDialog from '../../components/shareDialog.vue'
 import '@/styles/components/fileDetail.css' // 引入普通的 CSS 文件
