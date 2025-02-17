@@ -78,7 +78,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { SET_PACEID, GET_PACEID } from '@/utils/auth'
+import { SET_PACEID, GET_PACEID, GET_USERID } from '@/utils/auth'
 import useUserStore from '@/store/modules/user'
 import { useRouter, useRoute } from 'vue-router'
 import * as panApi from '@/api/pan.js'
@@ -97,7 +97,20 @@ const fileNumbers = ref(0)
 
 const getProId = () => {
   let proId = route.query.spaceId || GET_PACEID()
-  return proId || 233 // 如果proId为空则返回默认值233
+  if (proId == 'null' || proId == 'undefined') {
+    proId = getSpaceIdList()
+  }
+  return proId
+}
+
+// 获取spaceId列表
+const getSpaceIdList = () => {
+  const params = {
+    userId: GET_USERID(),
+  }
+  panApi.getUserSpace(params).then((res) => {
+    return res.data[0].spaceId
+  })
 }
 
 // 获取spaceId
@@ -105,8 +118,7 @@ const spaceId = ref('')
 const getSpaceId = async () => {
   const proId = getProId()
   SET_PACEID(proId)
-  const result = await panApi.getSpaceIdByProdId(proId)
-  spaceId.value = result.data
+  spaceId.value = proId
 }
 
 const getSpaceDetail = () => {

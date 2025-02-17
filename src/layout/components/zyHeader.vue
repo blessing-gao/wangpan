@@ -50,17 +50,15 @@
           v-for="(item, index) in organizationList"
           :key="index"
           @click="handleChange(item)"
+          :class="{ highlighted: item.spaceId === GET_PACEID() }"
         >
-          {{ item }}
+          {{ item.spaceName }}
         </div>
       </el-popover>
 
       <div class="right_header_icon">
         <userAvatar />
       </div>
-<!--      <div class="right_ai_icon">-->
-<!--        <img src="/assets/编组 11.png" class="menu-item-icon" />-->
-<!--      </div>-->
     </div>
   </div>
   <uploadSearch ref="uploadSearchRef" />
@@ -70,9 +68,11 @@
 <script setup>
 import { Search } from '@element-plus/icons-vue'
 import { ref, getCurrentInstance, onMounted } from 'vue'
+import { GET_USERID, GET_PACEID, SET_PACEID } from '@/utils/auth'
 import uploadSearch from '../../components/uploadSearch.vue'
 import inputSearch from '../../components/inputSearch.vue'
 import userAvatar from '../../components/userAvatar.vue'
+import * as panApi from '@/api/pan.js'
 import * as headerApi from '@/api/header.js'
 
 const { proxy } = getCurrentInstance()
@@ -84,7 +84,7 @@ const clickXiangji = () => {
   let params = {
     multiple: false,
     autoUpload: true,
-    type: 'search'
+    type: 'search',
   }
   uploadSearchRef.value.handleEdit(params)
 }
@@ -97,30 +97,23 @@ const clickInput = () => {
 
 const organizationList = ref([])
 
-onMounted(()=>{
-  // handleShow()
-})
-
 const handleShow = () => {
-  let params = {}
-  headerApi
-    .organizationData(params)
+  const params = {
+    userId: GET_USERID(),
+  }
+  panApi
+    .getUserSpace(params)
     .then((res) => {
-      organizationList.value = ['测试']
+      organizationList.value = res.data
     })
     .catch((err) => {
-      proxy.$modal.msgError(err.message)
+      console.error(err)
     })
 }
 
-const handleChange = (value) => {
-  let data = {}
-  headerApi
-    .changeOrganization(data)
-    .then((res) => {})
-    .catch((err) => {
-      proxy.$modal.msgError(err.message)
-    })
+const handleChange = (item) => {
+  SET_PACEID(item.spaceId)
+  window.location.reload()
 }
 </script>
 
@@ -224,9 +217,17 @@ const handleChange = (value) => {
   padding: 6px;
   text-align: center;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .organization-content:hover {
+  color: #de3a05;
+  background: rgba(255, 215, 202, 0.5);
+}
+
+.highlighted {
   color: #de3a05;
   background: rgba(255, 215, 202, 0.5);
 }

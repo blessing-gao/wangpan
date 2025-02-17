@@ -33,6 +33,7 @@
           highlight-current
           accordion
           :style="{ '--selected-bg-color': selectedBgColor }"
+          @node-click="handleCommand"
         >
           <template #default="{ node, data }">
             <span class="custom-tree-node">
@@ -93,7 +94,7 @@
 
 <script setup>
 import { ref, getCurrentInstance, onMounted } from 'vue'
-import { SET_PACEID, GET_PACEID } from '@/utils/auth'
+import { SET_PACEID, GET_PACEID, GET_USERID } from '@/utils/auth'
 import * as panApi from '@/api/pan.js'
 import { useRoute } from 'vue-router'
 import { fileTypeIcon } from '@/enum'
@@ -110,7 +111,7 @@ const defaultProps = {
 }
 const fileData = ref([])
 
-const emits = defineEmits(['handleNodeClick'])
+const emits = defineEmits(['handleNodeClick', 'onCommand'])
 
 const handleNodeClick = (data, node) => {
   if (data.fileType === 0) {
@@ -124,7 +125,20 @@ const handleNodeClick = (data, node) => {
 
 const getProId = () => {
   let proId = route.query.spaceId || GET_PACEID()
-  return proId || 233 // 如果proId为空则返回默认值233
+  if (proId == 'null' || proId == 'undefined') {
+    proId = getSpaceIdList()
+  }
+  return proId
+}
+
+// 获取spaceId列表
+const getSpaceIdList = () => {
+  const params = {
+    userId: GET_USERID(),
+  }
+  panApi.getUserSpace(params).then((res) => {
+    return res.data[0].spaceId
+  })
 }
 
 // 获取spaceId
@@ -132,8 +146,7 @@ const leftSpaceId = ref('')
 const getSpaceId = async () => {
   const proId = getProId()
   SET_PACEID(proId)
-  const result = await panApi.getSpaceIdByProdId(proId)
-  leftSpaceId.value = result.data
+  leftSpaceId.value = proId
 }
 
 const usedSize = ref('0')
@@ -211,7 +224,6 @@ const getLeftTabs = async (spaceId, data) => {
       }
     })
     .catch((err) => {
-      console.log(2222, err)
       proxy.$modal.msgError(err.message)
     })
 }
@@ -238,6 +250,10 @@ const otherList = ref([
 defineExpose({
   getLeftTabs,
 })
+
+const handleCommand = (data) => {
+  emits('onCommand', data)
+}
 </script>
 
 <style lang="scss" scoped>

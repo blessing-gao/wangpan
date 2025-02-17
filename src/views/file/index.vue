@@ -1,6 +1,10 @@
 <template>
   <div style="height: 100%; display: flex">
-    <leftTabs ref="leftTabsRefs" @handleNodeClick="handleNodeClick" />
+    <leftTabs
+      ref="leftTabsRefs"
+      @handleNodeClick="handleNodeClick"
+      @onCommand="handleOtherList"
+    />
     <!-- 详细表格信息 -->
     <!-- :pageSize="formInline.pageSize"
       :currentPage="formInline.currentPage"
@@ -17,8 +21,12 @@
         :loading="loading"
         :columns="columns"
         :tableData="tableData"
+        :total="total"
         :rowKey="rowKey"
-        :hasPagination="false"
+        :pageSize="formInline.pageSize"
+        :currentPage="formInline.currentPage"
+        @turnSize="turnSize"
+        :changePage="changePage"
         :enableSelection="true"
         :tableRowClassName="rowClassName"
         @handleSelectionChange="handleSelectionChange"
@@ -84,21 +92,7 @@
                     {{ item.name }}
                   </el-breadcrumb-item>
                 </div>
-
-                <!-- <el-breadcrumb-item>promotion list</el-breadcrumb-item>
-                <el-breadcrumb-item>promotion detail</el-breadcrumb-item> -->
               </el-breadcrumb>
-              <!-- <el-button link @click="clickFile()">根目录</el-button>
-              <div v-if="isLevelText" style="display: flex">
-                <el-button
-                  v-for="item in tabList"
-                  :key="item.id"
-                  link
-                  @click="clickFile(item)"
-                >
-                  {{ item.name }}
-                </el-button>
-              </div> -->
             </div>
             <div class="table-top-right">
               <el-select
@@ -145,13 +139,11 @@
 
         <template #operation="{ rows }">
           <div class="file-name_right">
-            <!-- <img class="file-name_right-img" src="/icons/FolderDown.svg" />
             <img
-              class="file-name_right-img"
-              src="/icons/FolderDown-hover.svg"
+              style="cursor: pointer"
+              src="/icons/常用文件.svg"
+              @click="handleCollect(rows)"
             />
-            <img class="file-name_right-img" src="/icons/常用文件.svg" /> -->
-
             <fileOperateMenu
               class="file-name_right-img"
               :file="rows"
@@ -194,7 +186,7 @@
 <script setup>
 import { onMounted, ref, getCurrentInstance, reactive } from 'vue'
 import { ArrowRight } from '@element-plus/icons-vue'
-import { SET_PACEID, GET_PACEID } from '@/utils/auth'
+import { SET_PACEID, GET_PACEID, GET_USERID } from '@/utils/auth'
 import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 import leftTabs from './components/leftTabs.vue'
@@ -237,7 +229,10 @@ const moveDialogVisible = ref(false)
 
 const getProId = () => {
   let proId = route.query.spaceId || GET_PACEID()
-  return proId || 233 // 如果proId为空则返回默认值233
+  if (proId == 'null' || proId == 'undefined') {
+    proId = getSpaceIdList()
+  }
+  return proId // 如果proId为空则返回默认值233
 }
 
 // 获取spaceId
@@ -245,12 +240,18 @@ const spaceId = ref('')
 const getSpaceId = async () => {
   const proId = getProId()
   SET_PACEID(proId)
-  const result = await panApi.getSpaceIdByProdId(proId)
-  spaceId.value = result.data
+  spaceId.value = proId
 }
 
 // 获取spaceId列表
-const getSpaceIdList = () => {}
+const getSpaceIdList = () => {
+  const params = {
+    userId: GET_USERID(),
+  }
+  panApi.getUserSpace(params).then((res) => {
+    return res.data[0].spaceId
+  })
+}
 
 const getMaxSize = async () => {
   const result = await panApi.getDocMaxSize()
@@ -259,16 +260,31 @@ const getMaxSize = async () => {
 
 const fileId = ref(0)
 
+const total = ref(0)
+const formInline = reactive({
+  current: 1,
+  size: 10,
+})
+
+// 修改当前页显示条数
+const turnSize = (val) => {
+  formInline.size = val
+  getTableData()
+}
+
+// 修改当前页数
+const changePage = (val) => {
+  formInline.current = val
+  getTableData()
+}
+
 const getTableData = () => {
   loading.value = true
   let params = {
-    current: 1,
-    size: 500,
+    ...formInline,
     status: 1,
     name: '',
   }
-  console.log(spaceId.value, fileId.value)
-
   panApi
     .contentsList(spaceId.value, fileId.value, params)
     .then((res) => {
@@ -428,7 +444,7 @@ const uploadFileRefs = ref(null)
 
 // 上传文件夹
 const uploadFolder = () => {
-  // uploadFileRefs.value.handleEdit('folder')
+  uploadFileRefs.value.handleEdit('folder', isFolder.value)
 }
 
 // 上传文件
@@ -721,6 +737,36 @@ const folderClose = (folderId, types) => {
   getTableData()
   // 还需要调用左侧tab的查询接口
   leftTabsRefs.value.getLeftTabs(spaceId.value)
+}
+
+const handleCollect = (row) => {
+  const params = {
+    documentId: row.id,
+    userId: GET_USERID(),
+  }
+  panApi
+    .addCollect(params)
+    .then((res) => {
+      console.log(res)
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
+
+const handleOtherList = (data) => {
+  if (data.label == '收藏文件') {
+    getCollect()
+  }
+}
+
+const getCollect = () => {
+  const params = {
+    userId: GET_USERID(),
+  }
+  panApi.getCollect(params).then((res) => {
+    console.log(res)
+  })
 }
 </script>
 <style lang="scss" scoped>

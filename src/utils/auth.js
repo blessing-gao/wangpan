@@ -24,3 +24,8 @@ export function SET_PACEID(proId) {
 export function GET_PACEID() {
   return localStorage.getItem('spaceId')
 }
+
+// 从 localStorage 获取 userId
+export function GET_USERID() {
+  return localStorage.getItem('userId')
+}
