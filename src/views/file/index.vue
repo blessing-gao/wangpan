@@ -100,18 +100,45 @@
                 placeholder="请选择类型"
                 style="width: 120px"
                 v-model="status"
+                @change="changetype"
+                clearable
               >
                 <el-option
-                  v-for="item in options"
+                  v-for="item in fileTypeList"
                   :key="item.value"
-                  :label="item.label"
+                  :label="item.name"
                   :value="item.value"
                 />
               </el-select>
-              <el-button style="margin-left: 12px">
+              <el-input
+                v-if="isExpanded"
+                style="margin-left: 12px"
+                ref="inputRef"
+                v-model="searchText"
+                placeholder="请输入搜索内容"
+                class="search-input"
+                clearable
+                @blur="handleBlur"
+                @keyup.enter="handleSearch"
+              >
+                <template #suffix>
+                  <el-icon class="search-icon" @click="handleSearch">
+                    <Search />
+                  </el-icon>
+                </template>
+              </el-input>
+
+              <!-- 按钮状态 -->
+              <el-button
+                v-else
+                style="margin-left: 12px"
+                class="search-btn"
+                circle
+                @mouseenter="expandSearch"
+              >
                 <img style="width: 14px" src="/icons/Vector.svg" />
               </el-button>
-              <el-button>
+              <el-button style="margin-left: 12px">
                 <img style="width: 14px" src="/icons/Menu 04.svg" />
               </el-button>
             </div>
@@ -184,8 +211,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref, getCurrentInstance, reactive } from 'vue'
-import { ArrowRight } from '@element-plus/icons-vue'
+import { onMounted, ref, getCurrentInstance, reactive, nextTick } from 'vue'
+import { ArrowRight, Search } from '@element-plus/icons-vue'
 import { SET_PACEID, GET_PACEID, GET_USERID } from '@/utils/auth'
 import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
@@ -205,17 +232,6 @@ import docDialog from './components/docDialog.vue'
 const { proxy } = getCurrentInstance()
 const route = useRoute()
 const router = useRouter()
-
-const options = [
-  {
-    value: 'Option111111',
-    label: 'Option111111',
-  },
-  {
-    value: 'Option222222',
-    label: 'Option222222',
-  },
-]
 
 const loading = ref(false)
 
@@ -298,7 +314,45 @@ const getTableData = () => {
     })
 }
 
+const fileTypeList = ref([])
+
+const getFileType = () => {
+  panApi.getFileTypes().then((res) => {
+    fileTypeList.value = res.data
+  })
+}
+
+// 响应式状态
+const isExpanded = ref(false)
+const searchText = ref('')
+const inputRef = ref(null)
+
+// 展开搜索框
+const expandSearch = async () => {
+  isExpanded.value = true
+  await nextTick()
+  inputRef.value?.focus()
+}
+
+// 处理失去焦点
+const handleBlur = () => {
+  if (!searchText.value) {
+    isExpanded.value = false
+  }
+}
+
+// 执行搜索
+const handleSearch = () => {
+  if (searchText.value) {
+  }
+}
+
+const changetype = () => {
+  getTableData()
+}
+
 onMounted(async () => {
+  getFileType()
   await getSpaceId()
   await getMaxSize()
   leftTabsRefs.value.getLeftTabs(spaceId.value)
@@ -765,7 +819,7 @@ const getCollect = () => {
     userId: GET_USERID(),
   }
   panApi.getCollect(params).then((res) => {
-    console.log(res)
+    tableData.value = res.data
   })
 }
 </script>
@@ -789,5 +843,31 @@ const getCollect = () => {
   &:hover {
     background-color: #fcfcfc;
   }
+}
+
+.search-container {
+  position: relative;
+  display: inline-block;
+}
+
+.search-btn {
+  transition: all 0.3s ease;
+}
+
+.search-input {
+  width: 200px;
+  transition: all 0.3s ease;
+}
+
+.search-icon {
+  cursor: pointer;
+  color: #de3a05;
+  padding: 0 5px;
+}
+
+/* 平滑过渡效果 */
+.el-input,
+.el-button {
+  vertical-align: middle;
 }
 </style>
