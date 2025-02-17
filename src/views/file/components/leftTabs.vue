@@ -2,36 +2,31 @@
   <div style="height: 100%">
     <!-- 左侧二级导航 -->
     <div class="two-left">
-      <div class="left-top">
-        <div class="all-file">全部文件</div>
-        <el-tree
-          :data="fileData"
-          :props="defaultProps"
-          accordion
-          highlight-current
-          :style="{ '--selected-bg-color': selectedBgColor }"
-          :loading="loading"
-          @node-click="handleNodeClick"
-        >
-          <template #default="{ data }">
-            <span class="custom-tree-node">
-              <img
-                style="margin-right: 12px; width: 14px"
-                :src="
-                  fileTypeIcon(
-                    data.fileType === 2
-                      ? data.name.replace('zip', 'md')
-                      : data.name,
-                  )
-                "
-              />
-              <span>{{ data.name }}</span>
-            </span>
-          </template>
-        </el-tree>
+      <div class="left-footer">
+        <div class="file-number">
+          <div class="file-number-title">{{ userName }}</div>
+        </div>
+        <div class="use-size">
+          <div class="use-size-left">
+            <div class="used-size">{{ usedSize }}</div>
+            /
+            <div class="all-size">{{ allSize }}</div>
+          </div>
+          <div class="proportion">
+            {{ proportion }}
+          </div>
+        </div>
+        <div>
+          <el-progress
+            :stroke-width="4"
+            :show-text="false"
+            :percentage="percentage"
+            color="#C38F5D"
+          />
+        </div>
       </div>
-      <div class="left-center">
-        <div class="all-file">其他</div>
+      <div class="left-top">
+        <div class="all-file">常用</div>
         <el-tree
           :data="otherList"
           :props="defaultProps"
@@ -64,28 +59,33 @@
           </template>
         </el-tree>
       </div>
-      <div class="left-footer">
-        <div class="file-number">
-          <div class="file-number-title">{{ userName }}</div>
-        </div>
-        <div class="use-size">
-          <div class="use-size-left">
-            <div class="used-size">{{ usedSize }}</div>
-            /
-            <div class="all-size">{{ allSize }}</div>
-          </div>
-          <div class="proportion">
-            {{ proportion }}
-          </div>
-        </div>
-        <div>
-          <el-progress
-            :stroke-width="4"
-            :show-text="false"
-            :percentage="percentage"
-            color="#C38F5D"
-          />
-        </div>
+      <div class="left-center">
+        <div class="all-file">全部文件</div>
+        <el-tree
+          :data="fileData"
+          :props="defaultProps"
+          accordion
+          highlight-current
+          :style="{ '--selected-bg-color': selectedBgColor }"
+          :loading="loading"
+          @node-click="handleNodeClick"
+        >
+          <template #default="{ data }">
+            <span class="custom-tree-node">
+              <img
+                style="margin-right: 12px; width: 14px"
+                :src="
+                  fileTypeIcon(
+                    data.fileType === 2
+                      ? data.name.replace('zip', 'md')
+                      : data.name,
+                  )
+                "
+              />
+              <span>{{ data.name }}</span>
+            </span>
+          </template>
+        </el-tree>
       </div>
     </div>
   </div>
@@ -317,10 +317,7 @@ defineExpose({
 }
 
 .left-footer {
-  position: absolute;
-  bottom: 0;
-  width: 77%;
-  margin-top: 17px;
+  width: 86%;
   background: rgba(243, 232, 222, 0.5);
   border-radius: 8px;
   padding: 10px 16px 14px 14px;
