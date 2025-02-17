@@ -52,6 +52,7 @@
           height: 100%;
           display: flex;
           justify-content: center;
+          align-items: center;
         "
       >
         <audioPreview :audioSrc="file_path" />
@@ -140,7 +141,7 @@ const fetchFileInfo = async () => {
 const determineFileType = (contentType) => {
   if (contentType.includes('mp4')) {
     return 'video'
-  } else if (contentType.includes('ppt')) {
+  } else if (contentType.includes('ppt')|| contentType.includes('pdf')) {
     return 'pdf'
   } else if (contentType.includes('png') || contentType.includes('jpg')) {
     return 'image'
