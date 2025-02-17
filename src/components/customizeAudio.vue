@@ -1,63 +1,65 @@
 <template>
   <div class="audio-player">
+    <!-- 音频控件 -->
     <audio
-      ref="audioElement"
+      ref="audioRef"
       src="http://www.shenben.club:9000/gjq/%E5%BD%95%E9%9F%B3.mp3"
-      @loadedmetadata="handleLoadedMetadata"
+      @timeupdate="updateTime"
+      @loadedmetadata="setDuration"
+      @ended="handleEnd"
     ></audio>
 
-    <!-- 进度条 -->
-    <div class="progress-bar" @click="seek">
-      <div class="progress" :style="{ width: progress + '%' }"></div>
-    </div>
-
-    <!-- 控制区域 -->
+    <!-- 播放器主体 -->
     <div class="controls">
-      <button @click="togglePlay" style="display: flex; padding: 8px 0">
-        <el-icon v-if="!isPlaying"><VideoPlay /></el-icon>
-        <el-icon v-else><VideoPause /></el-icon>
-      </button>
-
-      <div class="time-display">
-        {{ formatTime(currentTime) }} / {{ formatTime(totalDuration) }}
+      <!-- 左侧播放控制 -->
+      <div class="left-controls">
+        <el-icon :size="40" class="play-btn" @click="togglePlay">
+          <VideoPlay v-if="!isPlaying" />
+          <VideoPause v-else />
+        </el-icon>
       </div>
 
-      <!-- 音量控制 -->
-      <div class="volume-control">
-        <button @click="toggleMute" style="display: flex; padding: 8px 0">
-          <!-- <i :class="isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up'"></i> -->
-          <el-icon v-if="!isMuted"><Microphone /></el-icon>
-          <el-icon v-else><Mute /></el-icon>
-        </button>
-        <!-- <input
-          type="range"
+      <!-- 进度条区域 -->
+      <div class="progress-container">
+        <div class="time-display">{{ formatTime(currentTime) }}</div>
+        <el-slider
+          v-model="progress"
+          :max="duration"
+          :format-tooltip="formatTime"
+          @change="seek"
+          class="progress-bar"
+        />
+        <div class="time-display">{{ formatTime(duration) }}</div>
+      </div>
+
+      <!-- 右侧附加功能 -->
+      <div class="right-controls">
+        <el-icon @click="toggleMute">
+          <Headset v-if="!isMuted" />
+          <Mute v-else />
+        </el-icon>
+        <el-slider
           v-model="volume"
-          min="0"
-          max="1"
-          step="0.01"
-          @input="updateVolume"
-          class="volume"
-        /> -->
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.1"
-          v-model="volume"
+          :max="1"
+          :step="0.1"
+          :format-tooltip="formatVolume"
           class="volume-slider"
-          @input="updateVolume"
+          @input="adjustVolume"
+          :disabled="volumeDisabled"
         />
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, computed } from 'vue'
+<script setup lang="ts">
+import { ref, reactive, watch, onMounted } from 'vue'
+
 import {
   VideoPlay,
   VideoPause,
-  Microphone,
+  Headset,
+  Crop,
   Mute,
 } from '@element-plus/icons-vue'
 
@@ -67,145 +69,175 @@ const props = defineProps({
     required: true,
   },
 })
-
-const audioElement = ref(null)
+const audioRef = ref(null)
 const isPlaying = ref(false)
 const currentTime = ref(0)
-const totalDuration = ref(0)
-const volume = ref(1)
+const duration = ref(0)
+const progress = ref(0)
+const volume = ref(0.5)
 const isMuted = ref(false)
-const volumeBeforeMute = ref(1)
+const volumeDisabled = ref(false)
 
-// 计算播放进度百分比
-const progress = computed(() => {
-  return (currentTime.value / totalDuration.value) * 100 || 0
-})
-
-// 初始化时设置事件监听
-onMounted(() => {
-  const audio = audioElement.value
-  audio.addEventListener('timeupdate', () => {
-    currentTime.value = audio.currentTime
-  })
-  audio.addEventListener('ended', () => {
-    isPlaying.value = false
-  })
-})
-
-const handleLoadedMetadata = () => {
-  totalDuration.value = audioElement.value.duration
+// 格式化时间显示
+const formatTime = (time) => {
+  const minutes = Math.floor(time / 60)
+  const seconds = Math.floor(time % 60)
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
 
-const togglePlay = () => {
-  isPlaying.value = !isPlaying.value
-  isPlaying.value ? audioElement.value.play() : audioElement.value.pause()
+// 格式化音量显示
+const formatVolume = (value) => {
+  return `${Math.round(value * 100)}%`
 }
 
-const seek = (e) => {
-  const rect = e.target.getBoundingClientRect()
-  const pos = (e.clientX - rect.left) / rect.width
-  audioElement.value.currentTime = pos * totalDuration.value
-}
-
-const updateVolume = () => {
-  audioElement.value.volume = volume.value
-  isMuted.value = volume.value === 0
-}
-
-const toggleMute = () => {
-  isMuted.value = !isMuted.value
-  if (isMuted.value) {
-    volumeBeforeMute.value = volume.value
-    volume.value = 0
-  } else {
-    volume.value = volumeBeforeMute.value
+const setDuration = () => {
+  if (audioRef.value) {
+    duration.value = audioRef.value.duration || 0
   }
-  updateVolume()
 }
 
-const formatTime = (seconds) => {
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = Math.floor(seconds % 60)
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+// 播放结束时，自动将播放按钮切换为暂停状态
+const handleEnd = () => {
+  isPlaying.value = false
 }
+
+// 切换播放/暂停
+const togglePlay = () => {
+  if (!audioRef.value) return
+  isPlaying.value = !isPlaying.value
+  isPlaying.value ? audioRef.value.play() : audioRef.value.pause()
+}
+
+// 调整播放进度
+const seek = (value) => {
+  if (audioRef.value) {
+    audioRef.value.currentTime = value
+  }
+}
+
+// 调整音量
+const adjustVolume = (value) => {
+  if (audioRef.value) {
+    audioRef.value.volume = value
+    isMuted.value = value === 0
+  }
+}
+
+// 静音切换
+const toggleMute = () => {
+  if (audioRef.value) {
+    isMuted.value = !isMuted.value
+    audioRef.value.muted = isMuted.value
+    if (!isMuted.value && volume.value === 0) {
+      volume.value = 0.5
+    }
+  }
+  volumeDisabled.value = !volumeDisabled.value
+}
+
+// 更新时间
+const updateTime = () => {
+  if (audioRef.value) {
+    currentTime.value = audioRef.value.currentTime
+    progress.value = currentTime.value
+    duration.value = audioRef.value.duration || 0
+  }
+}
+
+// 初始化音量
+onMounted(() => {
+  if (audioRef.value) {
+    audioRef.value.volume = volume.value
+  }
+})
+
+// 监听播放结束
+watch(isPlaying, (playing) => {
+  if (!playing && audioRef.value?.ended) {
+    // 根据播放模式处理下一曲逻辑
+    // 这里可以扩展播放列表管理
+    isPlaying.value = false
+  }
+})
 </script>
 
 <style scoped>
 .audio-player {
   width: 100%;
-  max-width: 600px;
-  padding: 20px;
+  height: 50px;
   background: #f5f5f5;
-  border-radius: 8px;
+  padding: 12px 20px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.progress-bar {
-  height: 4px;
-  background: #ddd;
-  border-radius: 2px;
-  margin: 10px 0;
-  cursor: pointer;
+:deep(.el-slider__bar) {
+  background-color: #de3a05;
 }
 
-.progress {
-  height: 100%;
-  background: #2d8cf0;
-  border-radius: 2px;
-  transition: width 0.1s linear;
+:deep(.el-slider__button) {
+  border-color: #de3a05;
 }
 
 .controls {
   display: flex;
   align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.left-controls {
+  display: flex;
+  align-items: center;
   gap: 15px;
+  flex: 1;
 }
 
-button {
-  background: none;
-  border: none;
+.play-btn {
+  color: #de3a05;
   cursor: pointer;
-  padding: 8px;
-  color: #666;
+  transition: transform 0.2s;
 }
 
-button:hover {
-  color: #2d8cf0;
+.play-btn:hover {
+  transform: scale(1.1);
+}
+
+.progress-container {
+  flex: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 20px;
 }
 
 .time-display {
-  font-size: 0.9em;
+  min-width: 40px;
+  font-size: 12px;
   color: #666;
 }
 
-.volume {
-  width: 100%;
-  background: #555;
-  border: none;
-  height: 5px;
+.progress-bar {
+  flex: 1;
 }
-.volume-control {
+
+.right-controls {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 .volume-slider {
-  width: 80px;
-  height: 4px;
-  background: #555;
-  border-radius: 2px;
+  width: 100px;
 }
 
-.volume-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  background: #2d8cf0;
-  border-radius: 50%;
+.el-icon {
   cursor: pointer;
+  transition: color 0.2s;
 }
 
-.fas {
-  font-size: 16px;
+.el-icon:hover {
+  color: #de3a05;
 }
 </style>
