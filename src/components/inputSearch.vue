@@ -23,7 +23,7 @@
         </el-input>
       </template>
 
-      <div style="background-color: #ffffff;">
+      <div style="background-color: #ffffff; height: 100%;">
         <div class="advanced-search-box">
           <img style="margin-right: 12px" src="/icons/编组 14.svg" />
           <el-button link @click="clickAdvancedSearch">高级搜索</el-button>
@@ -31,7 +31,7 @@
 
         <div class="history">
           <div class="history-title">最近浏览</div>
-          <div>
+          <div style="overflow: scroll; height: calc(100% - 30px);">
             <div
               class="history-content-list"
               v-for="(item, index) in historyList"
@@ -39,12 +39,24 @@
               @click="jumpDetail(item)"
             >
               <div style="margin-right: 16px">
-                <img style="width: 24px" :src="getTypeIconSrc(item.type)" />
+                <img
+                  style="width: 24px"
+                  :src="
+                    fileTypeIcon(
+                      item.fileType === 2
+                        ? item.name.replace('zip', 'md')
+                        : item.name,
+                    )
+                  "
+                />
+                <!-- <img style="width: 24px" :src="getTypeIconSrc(item.type)" /> -->
               </div>
               <div>
-                <div class="history-content-title">{{ item.title }}</div>
+                <div class="history-content-title">{{ item.name }}</div>
                 <div class="history-content-detail">
-                  上传者：{{ item.user }}&nbsp;{{ item.notes }}
+                  上传者：{{ item.updateBy }}&nbsp;上传时间：{{
+                    item.updateTime
+                  }}
                 </div>
               </div>
             </div>
@@ -59,8 +71,9 @@
 
 <script setup>
 import { Search } from '@element-plus/icons-vue'
+import { fileTypeIcon, collaboraOnlineExts, compressedExts } from '@/enum'
 import { useRouter } from 'vue-router'
-import { ref, getCurrentInstance, onMounted } from 'vue'
+import { ref, getCurrentInstance } from 'vue'
 import * as searchApi from '@/api/search.js'
 
 import advancedSearch from './advancedSearch.vue'
@@ -71,7 +84,6 @@ const dialogTableVisible = ref(false)
 
 const handleEdit = () => {
   dialogTableVisible.value = true
-  getHistoryData()
 }
 
 const historyList = ref([])
@@ -89,31 +101,10 @@ const clickAdvancedSearch = () => {
 const searchInput = ref('')
 
 const handleSearch = () => {
-  proxy.$modal.msg('搜索')
-}
-
-const getHistoryData = () => {
-  searchApi
-    .getBrowsingHistory()
-    .then((res) => {
-      historyList.value = [
-        {
-          title: '2024.11.23浙江音乐学院校小提琴演出现场照片.jpg',
-          type: 'picture',
-          user: '张小伞',
-          notes: '你在6小时前打开过',
-        },
-        {
-          title: '2024.11.23浙江音乐学院校小提琴演出现场音频片段.mp3',
-          type: 'audio',
-          user: '张小伞',
-          notes: '你最近打开时间 2024.12.12 17:30',
-        },
-      ]
-    })
-    .catch((err) => {
-      proxy.$modal.msgError(err.message)
-    })
+  // proxy.$modal.msg('搜索')
+  searchApi.nameSearch(searchInput.value).then((res) => {
+    historyList.value = res.data
+  })
 }
 
 const handleClose = () => {
@@ -128,7 +119,7 @@ const jumpDetail = (item) => {
   router.push({
     name: 'VideoDetail',
     query: {
-      id: '123456',
+      id: item.id,
     },
   })
 }
@@ -145,6 +136,7 @@ defineExpose({
   height: 59.9%;
   left: 50%; /* 水平居中 */
   transform: translateX(-50%); /* 使其精确居中 */
+  box-shadow: none;
 }
 
 :deep(.el-dialog__header) {
@@ -232,5 +224,12 @@ defineExpose({
   letter-spacing: 0;
   line-height: 20px;
   font-weight: 400;
+}
+.history{
+  height: calc(100% - 40px);
+}
+
+:deep(.el-dialog__body){
+  height: calc(100% - 57px);
 }
 </style>
