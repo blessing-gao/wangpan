@@ -45,10 +45,12 @@ export const uploadFile = (data, onProgress) => {
     data,
     onUploadProgress: (progressEvent) => {
       if (progressEvent.lengthComputable) {
-        const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+        const percent = Math.round(
+          (progressEvent.loaded / progressEvent.total) * 100,
+        )
         onProgress(percent)
       }
-    }
+    },
   })
 }
 
@@ -166,5 +168,49 @@ export function commentOptions(params) {
     url: `${path}/comment/list`,
     method: 'get',
     params,
+  })
+}
+
+// 文件收藏
+export function addCollect(data) {
+  return request({
+    url: `${path}/userCollect/add`,
+    method: 'post',
+    data,
+  })
+}
+
+// 获取收藏列表
+export function getCollect(params) {
+  return request({
+    url: `${path}/userCollect/list`,
+    method: 'get',
+    params,
+  })
+}
+
+// 移除收藏
+export function deleteCollect(data) {
+  return request({
+    url: `${path}/userCollect/remove`,
+    method: 'delete',
+    data,
+  })
+}
+
+// 获取用户关联组织
+export function getUserSpace(params) {
+  return request({
+    url: `${path}/userSpace/list`,
+    method: 'get',
+    params,
+  })
+}
+
+// 获取文件类型
+export function getFileTypes() {
+  return request({
+    url: `${path}/document/file-types`,
+    method: 'get',
   })
 }
