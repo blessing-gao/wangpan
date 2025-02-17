@@ -330,12 +330,30 @@ defineExpose({
   width: 100%;
 }
 
-.el-table__body-header .cell{
+.el-table__body-header .cell {
   display: flex;
   align-items: center;
 }
 
-.el-scrollbar__view{
+.el-scrollbar__view {
   width: 100%;
+}
+
+.el-pagination.is-background .btn-next.is-active,
+.el-pagination.is-background .btn-prev.is-active,
+.el-pagination.is-background .el-pager li.is-active {
+  background-color: rgb(222, 58, 5);
+}
+
+.el-select-dropdown__item.is-selected {
+  color: rgb(222, 58, 5);
+}
+
+.el-select__wrapper.is-focused {
+  box-shadow: 0 0 0 1px rgb(222, 58, 5) inset;
+}
+
+.el-pager li:hover {
+  color: rgb(222, 58, 5);
 }
 </style>
