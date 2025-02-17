@@ -86,6 +86,7 @@ export default defineConfig(({ mode }) => {
     //静态资源服务的文件夹
     publicDir: 'public',
     server: {
+      host: '0.0.0.0',
       cors: true, //为开发服务器配置 CORS , 默认启用并允许任何源
       open: true, //服务启动时自动在浏览器中打开应用
       headers: {
@@ -95,7 +96,7 @@ export default defineConfig(({ mode }) => {
         '/api/file': {
           target: 'http://localhost:8081', // MinIO 的服务地址
           changeOrigin: true, // 代理跨域
-          rewrite: (path) => path.replace(/^\/api/, ''), // 可选，根据需要调整路径
+          rewrite: (path) => path.replace(/^\/api\/file/, ''), // 可选，根据需要调整路径
         },
         '/preview': {
           target: 'http://shenben.club:9000', // MinIO 的服务地址
