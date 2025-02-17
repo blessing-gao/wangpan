@@ -37,352 +37,454 @@ export const compressedExts = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'lz
 export const collaboraOnlineExts = [
   {
     ext: 'sxw',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'odt',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'fodt',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'stw',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'ott',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'doc',
-    action: 'edit'
+    action: 'edit',
+    type:'Word'
   },
   {
     ext: 'dot',
-    action: 'view'
+    action: 'view',
+    type:'Word'
   },
   {
     ext: 'docx',
-    action: 'edit'
+    action: 'edit',
+    type:'Word'
   },
   {
     ext: 'docm',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'dotx',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'dotm',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'wpd',
-    action: 'view'
+    action: 'view',
+    type:'EXCEL'
   },
   {
     ext: 'pdb',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'hwp',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'wps',
-    action: 'view'
+    action: 'view',
+    type:'EXCEL'
   },
   {
     ext: 'wri',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'lrf',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'mw',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'rtf',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'txt',
     // TODO 当前online兼容不好
-    action: 'view'
+    action: 'view',
+    type:'文本文件'
   },
   {
     ext: 'fb2',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'cwk',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'pages',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'abw',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'sxg',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'mp3',
-    action: 'view'
+    action: 'view',
+    type:'音频'
   },
   {
     ext: 'odm',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'otm',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'oth',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'sxc',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'ods',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'fods',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'stc',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'ots',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'xls',
-    action: 'edit'
+    action: 'edit',
+    type:'EXCEL'
   },
   {
     ext: 'xla',
-    action: 'edit'
+    action: 'edit',
+    type:'EXCEL'
   },
   {
     ext: 'xltx',
-    action: 'view'
+    action: 'view',
+    type:'EXCEL'
   },
   {
     ext: 'xltm',
-    action: 'view'
+    action: 'view',
+    type:'EXCEL'
   },
   {
     ext: 'xlsx',
-    action: 'edit'
+    action: 'edit',
+    type:'EXCEL'
   },
   {
     ext: 'xlsb',
-    action: 'edit'
+    action: 'edit',
+    type:'EXCEL'
   },
   {
     ext: 'xlsm',
-    action: 'edit'
+    action: 'edit',
+    type:'EXCEL'
   },
   {
     ext: 'dif',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'slk',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'csv',
-    action: 'edit'
+    action: 'edit',
+    type:'EXCEL'
   },
   {
     ext: 'dbf',
-    action: 'edit'
+    action: 'edit',
+    type:'EXCEL'
   },
   {
     ext: 'wk1',
-    action: 'view'
+    action: 'view',
+    type:'EXCEL'
   },
   {
     ext: 'gnumeric',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'numbers',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'sxi',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'odp',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'fodp',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'sti',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'otp',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'ppt',
-    action: 'edit'
+    action: 'edit',
+    type:'PPT'
   },
   {
     ext: 'pot',
-    action: 'view'
+    action: 'view',
+    type:'PPT'
   },
   {
     ext: 'pptx',
-    action: 'edit'
+    action: 'edit',
+    type:'PPT'
   },
   {
     ext: 'pptm',
-    action: 'edit'
+    action: 'edit',
+    type:'PPT'
   },
   {
     ext: 'potx',
-    action: 'view'
+    action: 'view',
+    type:'PPT'
   },
   {
     ext: 'potm',
-    action: 'view'
+    action: 'view',
+    type:'PPT'
   },
   {
     ext: 'ppsx',
-    action: 'edit'
+    action: 'edit',
+    type:'PPT'
   },
   {
     ext: 'cgm',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'key',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'sxd',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'odg',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'fodg',
-    action: 'edit'
+    action: 'edit',
+    type:'其他文件'
   },
   {
     ext: 'std',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'otg',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'svg',
-    action: 'view'
+    action: 'view',
+    type:'图片'
   },
   {
     ext: 'dxf',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'emf',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'wmf',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'cdr',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'vsd',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'vsdx',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'vss',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'pub',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'p65',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'wpg',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'fh',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'bmp',
-    action: 'view'
+    action: 'view',
+    type:'其他文件'
   },
   {
     ext: 'png',
-    action: 'view'
+    action: 'view',
+    type:'图片'
   },
   {
     ext: 'gif',
-    action: 'view'
+    action: 'view',
+    type:'图片'
   },
   {
     ext: 'tiff',
-    action: 'view'
+    action: 'view',
+    type:'图片'
   },
   {
     ext: 'jpg',
-    action: 'view'
+    action: 'view',
+    type:'图片'
   },
   {
     ext: 'jpeg',
-    action: 'view'
+    action: 'view',
+    type:'图片'
   },
   {
     ext: 'pdf',
-    action: 'view'
+    action: 'view',
+    type:'PDF'
   },
   {
     ext: 'mp4',
-    action: 'view'
+    action: 'view',
+    type:'视频'
+  },
+  {
+    ext: 'mp3',
+    action: 'view',
+    type:'音频'
+  },
+  {
+    ext: 'zip',
+    action: 'view',
+    type:'ZIP文件'
+  },
+  {
+    ext: 'tar',
+    action: 'view',
+    type:'ZIP文件'
   }
 ]
 

@@ -82,6 +82,7 @@
 
 <script setup>
 import { ref, nextTick, onMounted, getCurrentInstance } from 'vue'
+import { collaboraOnlineExts } from '@/enum'
 import { ElNotification } from 'element-plus'
 import { Close } from '@element-plus/icons-vue'
 import * as panApi from '@/api/pan.js'
@@ -127,6 +128,14 @@ const handleEdit = (uploadMode = 'file', parentFolder) => {
   dialogTableVisible.value = true
   currentParentFolder.value = parentFolder
   console.log(currentParentFolder.value)
+}
+
+const fileTypeList = ref([])
+
+const getFileType = () => {
+  panApi.getFileTypes().then((res) => {
+    fileTypeList.value = res.data
+  })
 }
 
 // 处理拖拽进入事件
@@ -257,11 +266,14 @@ const uploadProgress = ref([]) // 用于存储每个文件的上传进度
 const uploadFiles = () => {
   if (fileList.value.length === 0) return
   const uploadPromises = fileList.value.map((file, index) => {
+    const fileExt = file.name.split('.').pop().toLowerCase()
+    const exts = collaboraOnlineExts.filter((item) => item.ext == fileExt)
     const formData = new FormData()
     formData.append('demand', props.demand)
     formData.append('spaceId', props.spaceId)
     formData.append('directoryId', props.uploadParams.directoryId)
     formData.append('fileType', props.uploadParams.fileType)
+    formData.append('docFileType', exts[0].type)
     formData.append('files', file)
     uploadProgress.value.push({ fileName: file.name, progress: 0 })
     return panApi
@@ -289,50 +301,37 @@ const uploadFiles = () => {
 // 上传文件夹到服务器
 const uploadFolders = () => {
   if (fileList.value.length === 0) return
-
-  console.log('上传文件夹内容：', fileList.value)
-
-  const formData = new FormData()
-
-  fileList.value.forEach((file) => {
-    // 获取文件的相对路径（webkitRelativePath），包含文件夹结构
-    const relativePath = file.webkitRelativePath
-
-    // 拼接相对路径和文件名，作为存储在服务器的对象名
-    formData.append('files', file, relativePath)
-  })
-
-  const params = {
-    bucketName: 'gjq', // 替换为实际的存储桶名称
-    path: '/test',
-  }
-
-  // 调用上传文件夹的后端API
-  fileApi
-    .uploadFolder(params, formData)
-    .then((res) => {
-      if (res.success) {
+  const uploadPromises = fileList.value.map((file, index) => {
+    const fileExt = file.name.split('.').pop().toLowerCase()
+    const exts = collaboraOnlineExts.filter((item) => item.ext == fileExt)
+    const formData = new FormData()
+    formData.append('demand', props.demand)
+    formData.append('spaceId', props.spaceId)
+    formData.append('directoryId', props.uploadParams.directoryId)
+    formData.append('fileType', props.uploadParams.fileType)
+    formData.append('docFileType', exts[0].type)
+    formData.append('files', file)
+    uploadProgress.value.push({ fileName: file.name, progress: 0 })
+    return panApi
+      .uploadFile(formData, (progress) => {
+        uploadProgress.value[index].progress = progress
+      })
+      .then((res) => {
         ElNotification({
           title: '成功',
-          message: '文件夹上传成功！',
+          message: `${file.name} 上传成功`,
           type: 'success',
         })
-        fileList.value = []
-      } else {
-        ElNotification({
-          title: '失败',
-          message: `文件夹上传失败：${res.message}`,
-          type: 'error',
-        })
-      }
-    })
-    .catch((err) => {
-      ElNotification({
-        title: '错误',
-        message: `文件夹上传出错：${err.message}`,
-        type: 'error',
       })
+  })
+  Promise.all(uploadPromises).then(() => {
+    ElNotification({
+      title: '全部上传完成',
+      message: '所有文件上传完成',
+      type: 'success',
     })
+    handleClose()
+  })
 }
 
 const removeFile = (index) => {
@@ -341,6 +340,7 @@ const removeFile = (index) => {
 
 onMounted(async () => {
   await nextTick()
+  getFileType()
 })
 
 const handleClose = () => {
