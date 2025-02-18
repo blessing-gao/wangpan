@@ -1,5 +1,6 @@
 // 统一管理项目用户相关的接口
 import request from '@/utils/request.js'
+import { GET_USERID } from '@/utils/auth'
 const path = import.meta.env.VITE_BASE_PREV
 
 /**
@@ -201,7 +202,7 @@ export function deleteCollect(data) {
 // 获取用户关联组织
 export function getUserSpace(params) {
   return request({
-    url: `${path}/userSpace/list`,
+    url: `${path}/userSpace/list?userId=${GET_USERID()}`,
     method: 'get',
     params,
   })

@@ -93,11 +93,6 @@ export default defineConfig(({ mode }) => {
         'Access-Control-Allow-Origin': '*'
       },
       proxy: {
-        '/api/file': {
-          target: 'http://localhost:8081', // MinIO 的服务地址
-          changeOrigin: true, // 代理跨域
-          rewrite: (path) => path.replace(/^\/api\/file/, ''), // 可选，根据需要调整路径
-        },
         '/preview': {
           target: 'http://shenben.club:9000', // MinIO 的服务地址
           changeOrigin: true, // 代理跨域

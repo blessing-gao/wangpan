@@ -35,30 +35,30 @@ const constantRoutes = [
 
         ]
       },
-      {
-        path: '/middle-platform',
-        name: 'middle-platform',
-        meta: {
-          icon: '中台',
-          title: '中台',
-          keepAlive: true
-        },
-        component: () =>
-          import(
-            /* webpackChunkName: "dashboard" */ '../views/middlePlatform/index.vue'
-          ),
-      },
-      {
-        path: '/task',
-        name: 'task',
-        meta: {
-          icon: '任务',
-          title: '任务',
-          keepAlive: true
-        },
-        component: () =>
-          import(/* webpackChunkName: "dashboard" */ '../views/task/index.vue'),
-      },
+      // {
+      //   path: '/middle-platform',
+      //   name: 'middle-platform',
+      //   meta: {
+      //     icon: '中台',
+      //     title: '中台',
+      //     keepAlive: true
+      //   },
+      //   component: () =>
+      //     import(
+      //       /* webpackChunkName: "dashboard" */ '../views/middlePlatform/index.vue'
+      //     ),
+      // },
+      // {
+      //   path: '/task',
+      //   name: 'task',
+      //   meta: {
+      //     icon: '任务',
+      //     title: '任务',
+      //     keepAlive: true
+      //   },
+      //   component: () =>
+      //     import(/* webpackChunkName: "dashboard" */ '../views/task/index.vue'),
+      // },
     ],
   },
   {

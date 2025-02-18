@@ -56,6 +56,11 @@ export const collaboraOnlineExts = [
     type:'其他文件'
   },
   {
+    ext: 'ipynb',
+    action: 'view',
+    type:'其他文件'
+  },
+  {
     ext: 'ott',
     action: 'view',
     type:'其他文件'
