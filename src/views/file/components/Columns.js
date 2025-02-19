@@ -26,7 +26,7 @@ export const columns = [
     sortable: true,
   },
   {
-    prop: 'type',
+    prop: 'docFileType',
     label: '文件类型',
     align: 'left',
     width: '200',

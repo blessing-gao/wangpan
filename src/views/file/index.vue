@@ -164,6 +164,10 @@
           </div>
         </template>
 
+        <template #size="{ rows }">
+          {{ formatSize(rows.size) }}
+        </template>
+
         <template #operation="{ rows }">
           <div class="file-name_right">
             <img
@@ -719,22 +723,6 @@ const handleClose = () => {
 const uploadFiles = async () => {
   if (importMdFile.value) {
     // for (const { raw } of fileList) {
-    //   const schema = new Schema() //创建新模式
-    //   schema.register(AffineSchemas) //注册系统默认模块
-    //   const workspace = new Workspace({ id: 'foo', schema }) //创建新工作区
-    //   const page = await createPage(workspace)
-    //   const rootId = page.root?.id
-    //   const file = raw
-    //   if (!file) continue
-    //   const text = await file.text()
-    //   const contentParser = new ContentParser(page)
-    //   await contentParser.importMarkdown(text, rootId)
-    //   const blob = await ZipTransformer.exportPages(workspace, [page])
-    //   let _file = new File([blob], file.name.replace('.md', '.zip'), {
-    //     type: blob.type,
-    //   })
-    //   formData.append('files', _file)
-    // }
   } else {
     if (currentParentFolder.value) {
       fileId.value = currentParentFolder.value.id
@@ -842,6 +830,33 @@ const getCollect = () => {
   panApi.getCollect(params).then((res) => {
     tableData.value = res.data
   })
+}
+
+const formatSize = (size) => {
+  // 1 KB = 1024 bytes, 1 MB = 1024 KB, 1 GB = 1024 MB
+  const KB = 1024
+  const MB = KB * 1024
+  const GB = MB * 1024
+  const TB = GB * 1024
+  if (size) {
+    // 根据字节数大小决定转换的单位
+    if (size >= TB) {
+      // 如果大于等于 1GB，转换为 GB
+      return (size / TB).toFixed(2) + ' TB'
+    } else if (size >= GB) {
+      // 如果大于等于 1GB，转换为 GB
+      return (size / GB).toFixed(2) + ' GB'
+    } else if (size >= MB) {
+      // 如果大于等于 1MB，转换为 MB
+      return (size / MB).toFixed(2) + ' MB'
+    } else if (size >= KB) {
+      // 如果大于等于 1KB，转换为 KB
+      return (size / KB).toFixed(2) + ' KB'
+    } else if (size < KB) {
+      // 小于 1KB，显示为字节
+      return size + ' bytes'
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
