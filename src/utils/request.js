@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import { GET_USERID } from '@/utils/auth'
 //创建axios实例
 let request = axios.create({
   timeout: 600000,
@@ -22,6 +23,8 @@ request.interceptors.request.use(
             : ''),
       'Amp-App-Code':
         JSON.parse(localStorage.getItem('activedApp'))?.code || '',
+      'User-Id': GET_USERID() || '',
+      'Token': ''
     }
     return config
   },

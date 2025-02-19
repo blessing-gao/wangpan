@@ -34,9 +34,9 @@ export default defineConfig(({ mode }) => {
   // eslint-disable-next-line no-undef
   const env = loadEnv(mode, process.cwd(), '')
   const qiankunName = env.VITE_QIANKUN_NAME
-  const publicBase = env.VITE_PUBLIC_BASE
+  // const publicBase = env.VITE_PUBLIC_BASE
   return {
-    base: publicBase,
+    // base: publicBase,
     plugins: [
       nodePolyfills(),
       addCommitInfo(),

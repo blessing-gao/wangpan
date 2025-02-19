@@ -15,7 +15,11 @@
               v-for="(item, index) in classifyList"
               :key="index"
             >
-              <el-card shadow="never" style="cursor: pointer">
+              <el-card
+                shadow="never"
+                style="cursor: pointer"
+                @click="jumpFilePath(item)"
+              >
                 <div class="card-content">
                   <img :src="getIconSrc(item.name)" class="card-icon" />
                   <span :class="['card-title', getnameColor(item.name)]">
@@ -145,13 +149,13 @@ onMounted(async () => {
 
 const getIconSrc = (name) => {
   if (name === '相册') {
-    return '/knowledge/icons/项目.svg' // 本地图标路径
+    return '/icons/项目.svg' // 本地图标路径
   } else if (name === '视频') {
-    return '/knowledge/icons/编组 3.svg' // 本地图标路径
+    return '/icons/编组 3.svg' // 本地图标路径
   } else if (name === '音乐') {
-    return '/knowledge/icons/编组 4.svg' // 本地图标路径
+    return '/icons/编组 4.svg' // 本地图标路径
   } else if (name === '文档') {
-    return '/knowledge/icons/编组 5.svg' // 本地图标路径
+    return '/icons/编组 5.svg' // 本地图标路径
   }
 }
 
@@ -215,6 +219,9 @@ const handleClick = (item) => {
     },
   })
 }
+
+// 点击需要跳转到网盘列表，并查询当前点击的类型文件
+const jumpFilePath = () => {}
 </script>
 
 <style lang="scss" scoped>

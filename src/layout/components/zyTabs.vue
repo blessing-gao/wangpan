@@ -51,15 +51,15 @@ const getIconClass = (path) => {
 
 const getIconSrc = (routeName) => {
   if (routeName === 'home') {
-    return route.path === '/home' ? '/knowledge/icons/home-active.svg' : '/knowledge/icons/home.svg'
+    return route.path === '/home' ? '/icons/home-active.svg' : '/icons/home.svg'
   } else if (routeName === 'file') {
-    return route.path === '/file' ? '/knowledge/icons/pan-active.svg' : '/knowledge/icons/pan.svg'
+    return route.path === '/file' ? '/icons/pan-active.svg' : '/icons/pan.svg'
   } else if (routeName === 'middle-platform') {
     return route.path === '/middle-platform'
-      ? '/knowledge/icons/middle-platform-active.svg'
-      : '/knowledge/icons/middle-platform.svg'
+      ? '/icons/middle-platform-active.svg'
+      : '/icons/middle-platform.svg'
   } else if (routeName === 'task') {
-    return route.path === '/task' ? '/knowledge/icons/task-active.svg' : '/knowledge/icons/task.svg'
+    return route.path === '/task' ? '/icons/task-active.svg' : '/icons/task.svg'
   }
 }
 </script>
@@ -82,7 +82,7 @@ const getIconSrc = (routeName) => {
   text-align: center;
   background: #f4f5f7;
   border: 0px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 .menu-item-link {
   display: block; /* 使链接成为块级元素 */
@@ -96,12 +96,12 @@ const getIconSrc = (routeName) => {
 }
 
 .menu-item-icon {
-  width: 20px; /* 设置图标大小 */
+  width: 24px; /* 设置图标大小 */
   margin-bottom: 5px; /* 图标和标题之间的间距 */
 }
 
 .menu-item-title {
-  font-size: 12px; /* 设置标题文字的大小 */
+  font-size: 14px; /* 设置标题文字的大小 */
   line-height: 1.5; /* 设置标题的行高，避免过于紧凑 */
 }
 

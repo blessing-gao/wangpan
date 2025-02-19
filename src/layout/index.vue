@@ -41,6 +41,7 @@ import zyTabsVue from './components/zyTabs.vue'
 }
 .left_tab {
   background: #f4f5f7;
+  width: 71px;
 }
 .common-layout {
   height: 100%;
