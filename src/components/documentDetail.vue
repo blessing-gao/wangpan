@@ -66,8 +66,6 @@ const formatSize = (size) => {
 }
 
 onMounted(async () => {
-  console.log(111)
-
   await nextTick()
   getFileDetail()
 })

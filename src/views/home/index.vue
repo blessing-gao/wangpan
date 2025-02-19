@@ -120,25 +120,17 @@ const { proxy } = getCurrentInstance()
 const classifyList = ref([])
 
 const getClassification = async () => {
-  let params = {
-    org_id: 1,
-    user_id: 1,
-  }
   await homeApi
-    .channelList(params)
+    .channelList()
     .then((res) => {
-      if (!res.status) {
-        proxy.$modal.msgError(res.message)
-      } else {
-        let data = res.data
-        const result = [
-          { name: '相册', size: data.photo_size, quantity: data.photo },
-          { name: '视频', size: data.video_size, quantity: data.video },
-          { name: '音乐', size: data.music_size, quantity: data.music },
-          { name: '文档', size: data.doc_size, quantity: data.doc },
-        ]
-        classifyList.value = result
-      }
+      let data = res.data
+      const result = [
+        { name: '相册', size: data.photo_size, quantity: data.photo },
+        { name: '视频', size: data.video_size, quantity: data.video },
+        { name: '音乐', size: data.music_size, quantity: data.music },
+        { name: '文档', size: data.doc_size, quantity: data.doc },
+      ]
+      classifyList.value = result
     })
     .catch((err) => {
       proxy.$modal.msgError(err.message)
@@ -187,18 +179,10 @@ const getnameColor = (name) => {
 const historyList = ref([])
 
 const getHistoryList = async () => {
-  let params = {
-    org_id: 1,
-    user_id: 1,
-  }
   await homeApi
-    .getHistoryList(params)
+    .getHistoryList()
     .then((res) => {
-      if (!res.status) {
-        proxy.$modal.msgError(res.message)
-      } else {
-        historyList.value = res.data
-      }
+      historyList.value = res.data
     })
     .catch((err) => {
       proxy.$modal.msgError(err.message)
@@ -210,11 +194,7 @@ const getUploadList = async () => {
   await homeApi
     .getUploadList()
     .then((res) => {
-      if (!res.status) {
-        proxy.$modal.msgError(res.message)
-      } else {
-        uploadList.value = res.data
-      }
+      uploadList.value = res.data
     })
     .catch((err) => {
       proxy.$modal.msgError(err.message)

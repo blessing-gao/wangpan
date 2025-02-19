@@ -1,5 +1,7 @@
 // 统一管理项目用户相关的接口
 import request from '@/utils/request.js'
+import { GET_USERID } from '@/utils/auth'
+const path = import.meta.env.VITE_BASE_PREV
 
 /**
  * 获取分类
@@ -7,11 +9,10 @@ import request from '@/utils/request.js'
  * @requestBody data
  * @returns {AxiosPromise}
  */
-export const channelList = (params) => {
+export const channelList = () => {
   return request({
-    url: '/classification',
+    url: `${path}/workBench/recently/documentType?userId=${GET_USERID()}`,
     method: 'get',
-    params,
   })
 }
 
@@ -21,11 +22,10 @@ export const channelList = (params) => {
  * @requestBody data
  * @returns {AxiosPromise}
  */
-export const getHistoryList = (params) => {
+export const getHistoryList = () => {
   return request({
-    url: '/recent',
+    url: `${path}/workBench/recently/view?userId=${GET_USERID()}`,
     method: 'get',
-    params,
   })
 }
 
@@ -35,10 +35,9 @@ export const getHistoryList = (params) => {
  * @requestBody data
  * @returns {AxiosPromise}
  */
-export const getUploadList = (params) => {
+export const getUploadList = () => {
   return request({
-    url: '/recent-upload',
+    url: `${path}/workBench/recently/uploaded?userId=${GET_USERID()}`,
     method: 'get',
-    params,
   })
 }
