@@ -61,7 +61,7 @@
         >
           <audioPreview :audioSrc="file_path" />
         </div>
-        <div v-else-if="file_type && file_type == ''" class="error-content">
+        <div v-else-if="file_type == ''" class="error-content">
           <p>
             无法预览此文件类型，请点击
             <el-button type="warning" link @click="downloadFiles">
@@ -134,6 +134,8 @@ const fetchFileInfo = async () => {
         file_name.value = res.data.name || '未知文件'
         file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
         file_type.value = determineFileType(res.data.name)
+        console.log(file_type.value);
+        
       })
     } catch (error) {
       console.error('获取文件信息失败:', error)
