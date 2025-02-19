@@ -19,7 +19,6 @@
           <img style="width: 83px" src="/assets/upload.png" />
           <p v-if="isUploadFile">拖拽文件到这里</p>
           <p v-else>拖拽文件夹到这里</p>
-          <p>上传文件的大小最大不能超过{{ maxSize }}MB</p>
         </div>
         <!-- 隐藏的文件输入框 -->
         <input
@@ -86,14 +85,11 @@ import { collaboraOnlineExts } from '@/enum'
 import { ElNotification } from 'element-plus'
 import { Close } from '@element-plus/icons-vue'
 import * as panApi from '@/api/pan.js'
-import '@/styles/components/uploadFile.css' // 引入普通的 CSS 文件
+import '@/styles/components/uploadFile.css'
+
 const { proxy } = getCurrentInstance()
 
 const props = defineProps({
-  maxSize: {
-    type: String,
-    required: '0',
-  },
   demand: {
     type: Boolean,
     required: false,
@@ -127,7 +123,6 @@ const handleEdit = (uploadMode = 'file', parentFolder) => {
   isUploadFile.value = uploadMode === 'file'
   dialogTableVisible.value = true
   currentParentFolder.value = parentFolder
-  console.log(currentParentFolder.value)
 }
 
 const fileTypeList = ref([])
@@ -145,14 +140,11 @@ const handleDragOver = (e) => e.preventDefault()
 // 处理文件或文件夹放下（drop）事件
 const handleDrop = (e) => {
   e.preventDefault()
-  hasMaxFilesWarning.value = false // 重置警告状态
 
   const items = Array.from(e.dataTransfer.items)
   const files = []
 
   items.forEach((item) => {
-    if (fileList.value.length >= 10) return
-
     if (item.kind === 'file') {
       const entry = item.webkitGetAsEntry()
       if (!isUploadFile.value && entry.isDirectory) {
@@ -167,40 +159,14 @@ const handleDrop = (e) => {
   handleFiles(files)
 }
 
-// 新增一个用于跟踪是否已显示最大文件数提示的状态
 const hasMaxFilesWarning = ref(false)
 
 // 处理文件选择框的变更事件
 const handleFileInputChange = (event) => {
   const files = Array.from(event.target.files)
-  const validFiles = []
+  const validFiles = files // 取消了文件大小限制
 
-  // 先过滤超大的文件
-  files.forEach((file) => {
-    const fileSize = file.size / 1024 / 1024
-    if (fileSize > props.maxSize) {
-      proxy.$modal.msgWarning(`文件 ${file.name} 大小超过限制，已跳过`)
-    } else {
-      validFiles.push(file)
-    }
-  })
-
-  // 再处理数量限制
-  const remainingSlots = 10 - fileList.value.length
-  if (remainingSlots <= 0) {
-    proxy.$modal.msgWarning('最多只能上传10个文件')
-    event.target.value = ''
-    return
-  }
-
-  const filesToAdd = validFiles.slice(0, remainingSlots)
-  filesToAdd.forEach((file) => fileList.value.push(file))
-
-  if (validFiles.length > remainingSlots) {
-    proxy.$modal.msgWarning(
-      `最多只能上传10个文件，已添加${filesToAdd.length}个`,
-    )
-  }
+  validFiles.forEach((file) => fileList.value.push(file))
 
   event.target.value = ''
 }
@@ -216,19 +182,10 @@ const traverseDirectory = (entry) => {
   const dirReader = entry.createReader()
   dirReader.readEntries((entries) => {
     entries.forEach((entry) => {
-      if (fileList.value.length >= 10) return
-
       if (entry.isDirectory) {
         traverseDirectory(entry)
       } else {
         entry.file((file) => {
-          if (fileList.value.length >= 10) {
-            if (!hasMaxFilesWarning.value) {
-              proxy.$modal.msgWarning('最多只能上传10个文件')
-              hasMaxFilesWarning.value = true
-            }
-            return
-          }
           fileList.value.push(file)
         })
       }
@@ -238,44 +195,29 @@ const traverseDirectory = (entry) => {
 
 // 处理文件选择（通过拖拽选择文件）
 const handleFiles = (files) => {
-  const remainingSlots = 10 - fileList.value.length
-  if (remainingSlots <= 0) {
-    if (!hasMaxFilesWarning.value) {
-      proxy.$modal.msgWarning('最多只能上传10个文件')
-      hasMaxFilesWarning.value = true
-    }
-    return
-  }
-
-  const filesToAdd = files.slice(0, remainingSlots)
-  filesToAdd.forEach((file) => {
+  files.forEach((file) => {
     fileList.value.push(file)
   })
-
-  if (files.length > remainingSlots && !hasMaxFilesWarning.value) {
-    proxy.$modal.msgWarning(
-      `最多只能上传10个文件，已添加${filesToAdd.length}个`,
-    )
-    hasMaxFilesWarning.value = true
-  }
 }
 
 const emits = defineEmits(['ok', 'close'])
 const uploadProgress = ref([]) // 用于存储每个文件的上传进度
-// 上传文件到服务器
+
+// 上传文件到服务器，每次接口调用最多包含 10 个文件
 const uploadFiles = () => {
   if (fileList.value.length === 0) return
-  const uploadPromises = fileList.value.map((file, index) => {
-    const fileExt = file.name.split('.').pop().toLowerCase()
-    const exts = collaboraOnlineExts.filter((item) => item.ext == fileExt)
+
+  const uploadFileBatch = async (batchFiles) => {
     const formData = new FormData()
     formData.append('demand', props.demand)
     formData.append('spaceId', props.spaceId)
     formData.append('directoryId', props.uploadParams.directoryId)
     formData.append('fileType', props.uploadParams.fileType)
-    formData.append('docFileType', exts[0].type)
-    formData.append('files', file)
-    uploadProgress.value.push({ fileName: file.name, progress: 0 })
+    batchFiles.map((file, index) => {
+      formData.append('files', file)
+      uploadProgress.value.push({ fileName: file.name, progress: 0 })
+    })
+
     return panApi
       .uploadFile(formData, (progress) => {
         uploadProgress.value[index].progress = progress
@@ -287,15 +229,33 @@ const uploadFiles = () => {
           type: 'success',
         })
       })
+  }
+
+  // 分批上传文件，每次上传最多10个文件
+  const batchSize = 10
+  let currentBatchIndex = 0
+
+  // 上传文件直到没有剩余文件
+  const uploadNextBatch = async () => {
+    const batchFiles = fileList.value.slice(
+      currentBatchIndex,
+      currentBatchIndex + batchSize,
+    )
+    if (batchFiles.length > 0) {
+      await uploadFileBatch(batchFiles)
+      currentBatchIndex += batchSize
+      uploadNextBatch() // 递归调用上传下一个批次
+    }
+  }
+
+  uploadNextBatch()
+
+  ElNotification({
+    title: '全部上传完成',
+    message: '所有文件上传完成',
+    type: 'success',
   })
-  Promise.all(uploadPromises).then(() => {
-    ElNotification({
-      title: '全部上传完成',
-      message: '所有文件上传完成',
-      type: 'success',
-    })
-    handleClose()
-  })
+  handleClose()
 }
 
 // 上传文件夹到服务器
@@ -345,7 +305,7 @@ onMounted(async () => {
 
 const handleClose = () => {
   fileList.value = []
-  hasMaxFilesWarning.value = false // 关闭时重置警告状态
+  hasMaxFilesWarning.value = false
   dialogTableVisible.value = false
   emits('close')
 }
