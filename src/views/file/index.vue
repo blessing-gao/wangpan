@@ -439,6 +439,8 @@ const hanldeRowClick = (column) => {
     uploadParams.uniqueKey = column.uniqueKey
     tabList.value.push(column)
     isFolder.value = column
+    console.log(isFolder.value)
+
     getTableData()
   } else {
     const exts = collaboraOnlineExts.map((item) => item.ext)
@@ -478,8 +480,8 @@ const clickFile = (folder) => {
   } else {
     isLevelText.value = true
     fileId.value = folder.id
-    console.log(tabList.value)
     tabList.value = tabList.value.filter((item) => item.parentId !== folder.id)
+    isFolder.value = folder
   }
 
   getTableData()
@@ -499,9 +501,18 @@ const createDict = () => {
 const handleNodeClick = (data, node) => {
   if (data.fileType === 0) {
     fileId.value = data.id
+    if (tabList.value.length != 0 && data.parentId == 0) {
+      tabList.value = []
+    }
+    isLevelText.value = true
+    let idList = tabList.value.map((item) => item.id)
+    if (idList.indexOf(data.id) == -1) {
+      tabList.value.push(data)
+    }
+    isFolder.value = data
     getTableData()
   } else {
-    // 如果不是文件类型，需要跳转预览
+    // 如果不是文件夹类型，需要跳转预览
     const exts = collaboraOnlineExts.map((item) => item.ext)
     const fileExt = data.name.split('.').pop().toLowerCase()
     if (exts.includes(fileExt)) {
@@ -524,8 +535,6 @@ const uploadFolder = () => {
 
 // 上传文件
 const handleUploadFile = () => {
-  console.log(isFolder.value)
-
   uploadFileRefs.value.handleEdit('file', isFolder.value)
 }
 
@@ -826,6 +835,9 @@ const handleCollect = (row, types) => {
 
 const handleOtherList = (data) => {
   if (data.label == '收藏文件') {
+    isFolder.value = null
+    isLevelText.value = null
+    tabList.value = []
     getCollect()
   }
 }
