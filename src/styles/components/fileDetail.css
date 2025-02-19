@@ -53,6 +53,10 @@
     width: 100%;
     height: calc(100% - 55px);
 }
+.file-detail-content-left{
+    flex: 1;
+    height: 100%;
+}
 .file-detail-content-right {
     width: 21.1%;
     background-color: #fff;

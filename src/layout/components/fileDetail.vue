@@ -28,41 +28,48 @@
     </div>
     <div class="file-detail-content">
       <!-- 根据文件类型选择预览组件 -->
-      <div
-        v-if="file_type === 'video'"
-        style="
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-        "
-      >
-        <previewVideo :previewBoolean="true" :content="{ path: file_path }" />
-      </div>
-      <div v-else-if="file_type === 'pdf'" style="width: 100%; height: 100%">
-        <previewPDF :content="{ path: file_path }" />
-      </div>
-      <div v-else-if="file_type === 'image'" style="width: 100%; height: 100%">
-        <previewImage :content="{ path: file_path }" />
-      </div>
-      <div
-        v-else-if="file_type === 'audio'"
-        style="
-          width: 100%;
-          height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        "
-      >
-        <audioPreview :audioSrc="file_path" />
-      </div>
-      <div v-else class="error-content">
-        <p>
-          无法预览此文件类型，请点击
-          <el-button type="warning" link @click="downloadFiles">下载</el-button>
-          查看
-        </p>
+      <div class="file-detail-content-left">
+        <div
+          v-if="file_type === 'video'"
+          style="
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+          "
+        >
+          <previewVideo :previewBoolean="true" :content="{ path: file_path }" />
+        </div>
+        <div v-else-if="file_type === 'pdf'" style="width: 100%; height: 100%">
+          <previewPDF :content="{ path: file_path }" />
+        </div>
+        <div
+          v-else-if="file_type === 'image'"
+          style="width: 100%; height: 100%"
+        >
+          <previewImage :content="{ path: file_path }" />
+        </div>
+        <div
+          v-else-if="file_type === 'audio'"
+          style="
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          "
+        >
+          <audioPreview :audioSrc="file_path" />
+        </div>
+        <div v-else-if="file_type && file_type == ''" class="error-content">
+          <p>
+            无法预览此文件类型，请点击
+            <el-button type="warning" link @click="downloadFiles">
+              下载
+            </el-button>
+            查看
+          </p>
+        </div>
       </div>
       <div class="file-detail-content-right">
         <el-tabs
@@ -110,7 +117,7 @@ import '@/styles/components/fileDetail.css' // 引入普通的 CSS 文件
 const router = useRouter()
 
 const file_name = ref('') // 用来存储文件名称
-const file_type = ref('') // 用来存储文件类型 (video, ppt, etc.)
+const file_type = ref(null) // 用来存储文件类型 (video, ppt, etc.)
 const file_path = ref('') // 用来存储文件路径
 const activeName = ref('first')
 const summarizeRefs = ref(null)
@@ -123,8 +130,7 @@ const id = urlParams.get('id') // 获取id参数
 const fetchFileInfo = async () => {
   if (id) {
     try {
-      panApi.providerOptions(id).then((res) => {
-        console.log(res)
+      await panApi.providerOptions(id).then((res) => {
         file_name.value = res.data.name || '未知文件'
         file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
         file_type.value = determineFileType(res.data.name)
@@ -141,7 +147,7 @@ const fetchFileInfo = async () => {
 const determineFileType = (contentType) => {
   if (contentType.includes('mp4')) {
     return 'video'
-  } else if (contentType.includes('ppt')|| contentType.includes('pdf')) {
+  } else if (contentType.includes('ppt') || contentType.includes('pdf')) {
     return 'pdf'
   } else if (contentType.includes('png') || contentType.includes('jpg')) {
     return 'image'
