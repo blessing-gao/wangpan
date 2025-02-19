@@ -99,7 +99,7 @@
                 class="m-2"
                 placeholder="请选择类型"
                 style="width: 120px"
-                v-model="status"
+                v-model="formInline.docFileType"
                 @change="changetype"
                 clearable
               >
@@ -114,7 +114,7 @@
                 v-if="isExpanded"
                 style="margin-left: 12px"
                 ref="inputRef"
-                v-model="searchText"
+                v-model="formInline.name"
                 placeholder="请输入搜索内容"
                 class="search-input"
                 clearable
@@ -243,30 +243,47 @@ const docMaxSize = ref('0')
 const uploadDialogVisible = ref(false)
 const moveDialogVisible = ref(false)
 
-const getProId = () => {
+const getProId = async () => {
   let proId = route.query.spaceId || GET_PACEID()
-  if (proId == 'null' || proId == 'undefined') {
-    proId = getSpaceIdList()
+  // 检查proId的有效性
+  if (proId == 'null' || proId == 'undefined' || !proId) {
+    // 异步获取spaceId
+    proId = await getSpaceIdList()
   }
-  return proId // 如果proId为空则返回默认值233
+  return proId
 }
 
 // 获取spaceId
 const spaceId = ref('')
+
 const getSpaceId = async () => {
-  const proId = getProId()
+  // 使用await等待getProId的返回结果
+  const proId = await getProId()
+  // 保存到本地存储
   SET_PACEID(proId)
+  // 设置spaceId的值
   spaceId.value = proId
 }
 
 // 获取spaceId列表
-const getSpaceIdList = () => {
+const getSpaceIdList = async () => {
   const params = {
     userId: GET_USERID(),
   }
-  panApi.getUserSpace(params).then((res) => {
-    return res.data[0].spaceId
-  })
+
+  // 获取空间数据并进行安全检查
+  try {
+    let result = await panApi.getUserSpace(params)
+    if (result.data && result.data[0] && result.data[0].spaceId) {
+      return result.data[0].spaceId
+    } else {
+      console.error('获取spaceId失败:', result)
+      return null
+    }
+  } catch (error) {
+    console.error('请求错误:', error)
+    return null
+  }
 }
 
 const getMaxSize = async () => {
@@ -299,7 +316,6 @@ const getTableData = () => {
   let params = {
     ...formInline,
     status: 1,
-    name: '',
   }
   panApi
     .contentsList(spaceId.value, fileId.value, params)
@@ -324,7 +340,6 @@ const getFileType = () => {
 
 // 响应式状态
 const isExpanded = ref(false)
-const searchText = ref('')
 const inputRef = ref(null)
 
 // 展开搜索框
@@ -336,14 +351,16 @@ const expandSearch = async () => {
 
 // 处理失去焦点
 const handleBlur = () => {
-  if (!searchText.value) {
+  if (!formInline.name || formInline.name == '') {
     isExpanded.value = false
+    getTableData()
   }
 }
 
 // 执行搜索
 const handleSearch = () => {
-  if (searchText.value) {
+  if (formInline.name && formInline.name != '') {
+    getTableData()
   }
 }
 
@@ -419,6 +436,7 @@ const hanldeRowClick = (column) => {
     uploadParams.directoryId = column.id
     uploadParams.uniqueKey = column.uniqueKey
     tabList.value.push(column)
+    isFolder.value = column
     getTableData()
   } else {
     const exts = collaboraOnlineExts.map((item) => item.ext)
@@ -454,6 +472,7 @@ const clickFile = (folder) => {
     isLevelText.value = false
     fileId.value = 0
     tabList.value = []
+    isFolder.value = null
   } else {
     isLevelText.value = true
     fileId.value = folder.id
@@ -472,7 +491,9 @@ const handleDetail = (rows) => {
 
 const folderDialogRefs = ref(null)
 const createDict = () => {
-  folderDialogRefs.value.handleEdit('create')
+  console.log(isFolder.value)
+
+  folderDialogRefs.value.handleEdit('create', isFolder.value)
 }
 
 const handleNodeClick = (data, node) => {
@@ -503,6 +524,8 @@ const uploadFolder = () => {
 
 // 上传文件
 const handleUploadFile = () => {
+  console.log(isFolder.value)
+
   uploadFileRefs.value.handleEdit('file', isFolder.value)
 }
 
@@ -578,8 +601,6 @@ const docDialogRefs = ref(null)
 const handleShowRename = (file) => {
   curretnOperateFolderOrFile.value = file
   if (file.fileType === 0) {
-    console.log(222)
-
     folderDialogRefs.value.handleEdit('update', file)
   } else if (file.fileType === 2) {
     // this.suffixDocType = 'md'
@@ -687,7 +708,7 @@ const handleClose = () => {
   uploadDialogVisible.value = false
   importMdDialogVisible.value = false
   moveDialogVisible.value = false
-  isFolder.value = null
+  // isFolder.value = null
   uploadParams.directoryId = 0
   uploadParams.uniqueKey = ''
   getTableData()
