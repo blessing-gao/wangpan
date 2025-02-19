@@ -34,7 +34,7 @@
         @handleRowMouseLeave="handleRowMouseLeave"
       >
         <template #toolbarBtn>
-          <div v-if="selectedRows.length == 0">
+          <div v-if="selectedRowsName.length == 0">
             <el-popover
               placement="bottom-start"
               :width="108"
@@ -74,7 +74,7 @@
               disabled
               style="margin-right: 28px"
             />
-            <el-button>批量下载</el-button>
+            <el-button @click="handleDownload">批量下载</el-button>
             <el-button>批量删除</el-button>
           </div>
           <div class="table-top">
@@ -171,9 +171,16 @@
         <template #operation="{ rows }">
           <div class="file-name_right">
             <img
+              v-if="!rows.isCollect"
               style="cursor: pointer"
               src="/icons/常用文件.svg"
-              @click="handleCollect(rows)"
+              @click="handleCollect(rows, 'add')"
+            />
+            <img
+              v-else
+              style="cursor: pointer"
+              src="/icons/collect.svg"
+              @click="handleCollect(rows, 'delete')"
             />
             <fileOperateMenu
               class="file-name_right-img"
@@ -189,7 +196,6 @@
     <fileDetail ref="fileDetailRefs" />
     <uploadFileVue
       ref="uploadFileRefs"
-      :maxSize="docMaxSize"
       :demand="uploadDemandFile"
       :spaceId="spaceId"
       :uploadParams="uploadParams"
@@ -243,16 +249,17 @@ const tableData = ref([])
 
 const status = ref(null)
 
-const docMaxSize = ref('0')
 const uploadDialogVisible = ref(false)
 const moveDialogVisible = ref(false)
+const spaceList = ref([])
 
 const getProId = async () => {
   let proId = route.query.spaceId || GET_PACEID()
   // 检查proId的有效性
   if (proId == 'null' || proId == 'undefined' || !proId) {
-    // 异步获取spaceId
-    proId = await getSpaceIdList()
+    if (spaceList.value.length != 0) {
+      proId = spaceList.value[0].spaceId
+    }
   }
   return proId
 }
@@ -278,21 +285,11 @@ const getSpaceIdList = async () => {
   // 获取空间数据并进行安全检查
   try {
     let result = await panApi.getUserSpace(params)
-    if (result.data && result.data[0] && result.data[0].spaceId) {
-      return result.data[0].spaceId
-    } else {
-      console.error('获取spaceId失败:', result)
-      return null
-    }
+    spaceList.value = result.data
   } catch (error) {
     console.error('请求错误:', error)
     return null
   }
-}
-
-const getMaxSize = async () => {
-  const result = await panApi.getDocMaxSize()
-  docMaxSize.value = result.data
 }
 
 const fileId = ref(0)
@@ -320,6 +317,7 @@ const getTableData = () => {
   let params = {
     ...formInline,
     status: 1,
+    userId: GET_USERID(),
   }
   panApi
     .contentsList(spaceId.value, fileId.value, params)
@@ -373,9 +371,10 @@ const changetype = () => {
 }
 
 onMounted(async () => {
+  // 异步获取spaceId
+  await getSpaceIdList()
   getFileType()
   await getSpaceId()
-  await getMaxSize()
   leftTabsRefs.value.getLeftTabs(spaceId.value)
   getTableData()
 })
@@ -384,19 +383,19 @@ const rowKey = ref('id')
 
 const checkedNumber = ref('')
 const isCheckedNumber = ref(true)
-const selectedRows = ref([])
+const selectedRowsName = ref([])
+const selectedRowsId = ref([])
 
 const handleSelectionChange = (selection) => {
-  selectedRows.value = selection.map((item) => {
-    return item.name
-  })
-  checkedNumber.value = `已选 ${selectedRows.value.length} 项`
+  selectedRowsName.value = selection.map((item) => item.name)
+  selectedRowsId.value = selection.map((item) => item.id)
+  checkedNumber.value = `已选 ${selectedRowsName.value.length} 项`
 }
 
 const rowClassName = ({ row }) => {
   let color = ''
   // 如果当前行在选中的行中，添加背景色
-  if (selectedRows.value.includes(row.name)) {
+  if (selectedRowsName.value.includes(row.name)) {
     color = 'selected-row'
   }
   return color
@@ -407,8 +406,7 @@ const handleRowMouseEnter = (column) => {
 }
 
 const handleRowMouseLeave = (column) => {
-  // console.log(selectedRows.value, column)
-  if (selectedRows.value.indexOf(column.name) != -1) {
+  if (selectedRowsName.value.indexOf(column.name) != -1) {
     column['isHovered'] = true
   } else {
     column['isHovered'] = false
@@ -800,15 +798,26 @@ const folderClose = (folderId, types) => {
   leftTabsRefs.value.getLeftTabs(spaceId.value)
 }
 
-const handleCollect = (row) => {
+const handleCollect = (row, types) => {
   const params = {
-    documentId: row.id,
     userId: GET_USERID(),
   }
-  panApi
-    .addCollect(params)
+  let api = null
+  let message = null
+  if (types == 'add') {
+    api = 'addCollect'
+    params.documentId = row.id
+    message = '收藏成功'
+  } else {
+    api = 'deleteCollect'
+    params.collectId = row.id
+    message = '取消收藏成功'
+  }
+  panApi[api](params)
     .then((res) => {
-      console.log(res)
+      proxy.$modal.msgSuccess(message)
+
+      getTableData()
     })
     .catch((err) => {
       console.error(err)
@@ -855,6 +864,40 @@ const formatSize = (size) => {
       return size + ' bytes'
     }
   }
+}
+
+// 批量下载
+const handleDownload = () => {
+  console.log(spaceList.value)
+
+  let space = spaceList.value.filter((item) => {
+    return item.spaceId == GET_PACEID()
+  })
+  console.log(space)
+
+  const params = {
+    ids: selectedRowsId.value.toString(),
+    fileName: 'files',
+    bucketName: space[0].spaceName,
+  }
+
+  console.log(params)
+
+  panApi.downloadFiles(params).then((res) => {
+    let blob = new Blob([res.data])
+    let _fileNames = res.headers['content-disposition']
+      .split(';')[1]
+      .split('=')[1]
+      .trim()
+      .replace(/"/g, '')
+      .split('.')
+    _fileNames[0] = decodeURI(_fileNames[0])
+    let link = document.createElement('a')
+    link.href = window.URL.createObjectURL(blob)
+    link.download = _fileNames.join('.')
+    link.click()
+    window.URL.revokeObjectURL(link.href)
+  })
 }
 </script>
 <style lang="scss" scoped>

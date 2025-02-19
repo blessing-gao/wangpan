@@ -40,6 +40,7 @@
 // import { getFileList } from '@/api/file'
 import { reactive, ref, toRef, watch } from 'vue'
 import * as panApi from '@/api/pan.js'
+import { GET_USERID } from '@/utils/auth'
 
 const translateFileList = (preKey, list) => {
   list.forEach((item) => {
@@ -74,6 +75,7 @@ const treeProps = {
 const fileParams = reactive({
   status: 1,
   name: '',
+  userId: GET_USERID(),
 })
 
 const form = reactive({
@@ -87,10 +89,12 @@ const loadFiles = (node, resolve) => {
     if (props.spaceId) {
       panApi.contentsList(props.spaceId, 0, fileParams).then((res) => {
         let folderList = res.data.filter((item) => item.fileType === 0)
-        console.log(props.file.value.fileType);
-        
+        console.log(props.file.value.fileType)
+
         if (props.file.value.fileType === 0) {
-          folderList = folderList.filter((item) => item.id !== props.file.value.id)
+          folderList = folderList.filter(
+            (item) => item.id !== props.file.value.id,
+          )
         }
         const fileList = translateFileList('', folderList)
         return resolve(fileList)
@@ -102,7 +106,9 @@ const loadFiles = (node, resolve) => {
       panApi.contentsList(props.spaceId, file.id, fileParams).then((res) => {
         let folderList = res.data.filter((item) => item.fileType === 0)
         if (props.file.value.fileType === 0) {
-          folderList = folderList.filter((item) => item.id !== props.file.value.id)
+          folderList = folderList.filter(
+            (item) => item.id !== props.file.value.id,
+          )
         }
         const fileList = translateFileList(file.uniqueKey, folderList)
         return resolve(fileList)

@@ -123,28 +123,27 @@ const handleNodeClick = (data, node) => {
   emits('handleNodeClick', data, node)
 }
 
-const getProId = () => {
+const getProId = async () => {
   let proId = route.query.spaceId || GET_PACEID()
-  if (proId == 'null' || proId == 'undefined') {
-    proId = getSpaceIdList()
+  if (proId == 'null' || proId == 'undefined' || !proId) {
+    proId = await getSpaceIdList()
   }
   return proId
 }
 
 // 获取spaceId列表
-const getSpaceIdList = () => {
+const getSpaceIdList = async () => {
   const params = {
     userId: GET_USERID(),
   }
-  panApi.getUserSpace(params).then((res) => {
-    return res.data[0].spaceId
-  })
+  let result = await panApi.getUserSpace(params)
+  return result.data[0].spaceId
 }
 
 // 获取spaceId
 const leftSpaceId = ref('')
 const getSpaceId = async () => {
-  const proId = getProId()
+  const proId = await getProId()
   SET_PACEID(proId)
   leftSpaceId.value = proId
 }
@@ -158,7 +157,6 @@ const getSpaceDetail = () => {
   panApi
     .spaceDetail(leftSpaceId.value)
     .then((res) => {
-      console.log(res.data)
       if (res.data.quota == '-1') {
         allSize.value = '无限制'
       } else {
@@ -212,20 +210,15 @@ const getLeftTabs = async (spaceId, data) => {
     current: 1,
     size: 500,
     status: 1,
-    name: '',
+    userId: GET_USERID(),
   }
-  await panApi
-    .contentsList(spaceId, fileId.value, params)
-    .then((res) => {
-      if (fileId.value == 0 || fileData.value.length == 0) {
-        fileData.value = res.data
-      } else {
-        data.children = res.data
-      }
-    })
-    .catch((err) => {
-      proxy.$modal.msgError(err.message)
-    })
+  await panApi.contentsList(spaceId, fileId.value, params).then((res) => {
+    if (fileId.value == 0 || fileData.value.length == 0) {
+      fileData.value = res.data
+    } else {
+      data.children = res.data
+    }
+  })
 }
 
 onMounted(async () => {

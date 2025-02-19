@@ -202,7 +202,7 @@ export function deleteCollect(data) {
 // 获取用户关联组织
 export function getUserSpace(params) {
   return request({
-    url: `${path}/userSpace/list?userId=${GET_USERID()}`,
+    url: `${path}/userSpace/list`,
     method: 'get',
     params,
   })
@@ -213,5 +213,15 @@ export function getFileTypes() {
   return request({
     url: `${path}/document/file-types`,
     method: 'get',
+  })
+}
+
+// 文件批量下载
+export function downloadFiles(params) {
+  return request({
+    url: `${path}/directory/download`,
+    method: 'get',
+    responseType: 'blob',
+    params
   })
 }
