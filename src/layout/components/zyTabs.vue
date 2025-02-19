@@ -70,6 +70,7 @@ const getIconSrc = (routeName) => {
 }
 :deep(.el-menu) {
   text-align: center;
+  background-color: #f4f5f7;
 }
 :deep(.el-menu-item) {
   display: flex;
@@ -81,6 +82,7 @@ const getIconSrc = (routeName) => {
   text-align: center;
   background: #f4f5f7;
   border: 0px;
+  margin-bottom: 16px;
 }
 .menu-item-link {
   display: block; /* 使链接成为块级元素 */
@@ -94,7 +96,7 @@ const getIconSrc = (routeName) => {
 }
 
 .menu-item-icon {
-  font-size: 24px; /* 设置图标大小 */
+  width: 20px; /* 设置图标大小 */
   margin-bottom: 5px; /* 图标和标题之间的间距 */
 }
 
