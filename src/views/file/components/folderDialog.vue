@@ -34,7 +34,12 @@
       <template #footer>
         <el-button @click="hanldeClose">取 消</el-button>
         <el-button
-          style="background: #de3a05; border-radius: 4px; color: #fff; border: 0;"
+          style="
+            background: #de3a05;
+            border-radius: 4px;
+            color: #fff;
+            border: 0;
+          "
           type="primary"
           @click="createOrUpdateFolder"
         >
@@ -69,6 +74,9 @@ const handleEdit = (states1, type) => {
   folderDialogVisible.value = true
   states.value = states1
   currentParentFolder.value = type
+  if (states1 == 'update' && type) {
+    folderForm.name = type.name
+  }
 }
 
 const currentParentFolder = ref(null)

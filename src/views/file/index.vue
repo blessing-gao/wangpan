@@ -495,8 +495,6 @@ const handleDetail = (rows) => {
 
 const folderDialogRefs = ref(null)
 const createDict = () => {
-  console.log(isFolder.value)
-
   folderDialogRefs.value.handleEdit('create', isFolder.value)
 }
 

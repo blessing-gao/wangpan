@@ -75,6 +75,9 @@ const handleEdit = (file, suffixDocType1) => {
   docDialogVisible.value = true
   suffixDocType.value = suffixDocType1
   currentParentFolder.value = file
+  if (file) {
+    docForm.name = file.name.split('.')[0]
+  }
 }
 
 const createOrUpdateDoc = () => {
