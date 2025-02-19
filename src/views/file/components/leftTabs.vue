@@ -28,9 +28,11 @@
       <div class="left-top">
         <div class="all-file">常用</div>
         <el-tree
+          ref="commonTree"
           :data="otherList"
           :props="defaultProps"
           highlight-current
+          node-key="id"
           accordion
           :style="{ '--selected-bg-color': selectedBgColor }"
           @node-click="handleCommand"
@@ -63,10 +65,11 @@
       <div class="left-center">
         <div class="all-file">全部文件</div>
         <el-tree
+          ref="fileTree"
           :data="fileData"
           :props="defaultProps"
-          accordion
           highlight-current
+          node-key="id"
           :style="{ '--selected-bg-color': selectedBgColor }"
           :loading="loading"
           @node-click="handleNodeClick"
@@ -110,10 +113,13 @@ const defaultProps = {
   label: 'label',
 }
 const fileData = ref([])
+const commonTree = ref(null)
+const fileTree = ref(null)
 
 const emits = defineEmits(['handleNodeClick', 'onCommand'])
 
 const handleNodeClick = (data, node) => {
+  commonTree.value?.setCurrentKey(null)
   if (data.fileType === 0) {
     // 点击文件节点，获取数据并展开
     fileId.value = data.id
@@ -230,12 +236,15 @@ onMounted(async () => {
 
 const otherList = ref([
   {
+    id: 0,
     label: '最近使用',
   },
   {
+    id: 1,
     label: '收藏文件',
   },
   {
+    id: 2,
     label: '回收站',
   },
 ])
@@ -245,6 +254,10 @@ defineExpose({
 })
 
 const handleCommand = (data) => {
+  fileTree.value?.setCurrentKey(null)
+  fileData.value = []
+  fileId.value = 0
+  getLeftTabs(leftSpaceId.value)
   emits('onCommand', data)
 }
 </script>
