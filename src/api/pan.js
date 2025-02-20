@@ -36,7 +36,7 @@ export const contentsList = (spaceId, directoryId, params) => {
  * @requestBody data
  * @returns {AxiosPromise}
  */
-export const uploadFile = (data, onProgress) => {
+export const uploadFile = (data) => {
   return request({
     url: `${path}/document/upload`,
     method: 'post',
@@ -44,14 +44,14 @@ export const uploadFile = (data, onProgress) => {
       'Content-Type': 'multipart/form-data',
     },
     data,
-    onUploadProgress: (progressEvent) => {
-      if (progressEvent.lengthComputable) {
-        const percent = Math.round(
-          (progressEvent.loaded / progressEvent.total) * 100,
-        )
-        onProgress(percent)
-      }
-    },
+    // onUploadProgress: (progressEvent) => {
+    //   if (progressEvent.lengthComputable) {
+    //     const percent = Math.round(
+    //       (progressEvent.loaded / progressEvent.total) * 100,
+    //     )
+    //     onProgress(percent)
+    //   }
+    // },
   })
 }
 

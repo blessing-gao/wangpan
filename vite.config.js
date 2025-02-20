@@ -116,7 +116,12 @@ export default defineConfig(({ mode }) => {
         '/minio': {
           target: 'http://shenben.club:9000',
           changeOrigin: true,
-          rewrite: (path) => path.replace('/minio', '')
+          rewrite: (path) => path.replace('/minio', ''),
+        },
+        '/sso': {
+          target: 'http://192.168.0.106:8080',
+          changeOrigin: true, // 是否修改请求头中的 origin
+          rewrite: (path) => path.replace(/^\/sso/, '/sso'), // 去掉路径中的 /sso 部分
         },
         '/browser': {
           target: 'http://82.156.83.108:9980',

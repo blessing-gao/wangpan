@@ -14,6 +14,7 @@
               :span="6"
               v-for="(item, index) in classifyList"
               :key="index"
+              style="margin-bottom: 10px;"
             >
               <el-card
                 shadow="never"
@@ -21,7 +22,7 @@
                 @click="jumpFilePath(item)"
               >
                 <div class="card-content">
-                  <img :src="getIconSrc(item.name)" class="card-icon" />
+                  <img :src="typeIcon(item.name)" class="card-icon" />
                   <span :class="['card-title', getnameColor(item.name)]">
                     {{ item.name }}
                   </span>
@@ -55,12 +56,12 @@
               @click="handleClick(item)"
             >
               <div class="history-img">
-                <img :src="item.image" :alt="item.name" />
+                <img :src="item.url" :alt="item.name" />
               </div>
               <div class="history-detail">
                 <div class="history-detail-title">{{ item.name }}</div>
-                <div class="history-detail-synopsis">{{ item.remark }}</div>
-                <div class="history-detail-time">{{ item.lastViewed }}</div>
+                <div class="history-detail-synopsis">{{ item.updateBy }}</div>
+                <div class="history-detail-time">{{ item.updateTime }}</div>
               </div>
             </div>
           </div>
@@ -98,13 +99,19 @@
             <div>
               <img
                 style="width: 32px; margin-right: 16px"
-                :src="getUploadIconSrc(item.type)"
+                :src="
+                  fileTypeIcon(
+                    item.fileType === 2
+                      ? item.name.replace('zip', 'md')
+                      : item.name,
+                  )
+                "
               />
             </div>
             <div>
               <div class="upload-content-title">{{ item.name }}</div>
               <div class="upload-content-user">
-                {{ item.uploader }} 上传于 {{ item.lastModified }}
+                {{ item.updateBy }} 上传于 {{ item.updateTime }}
               </div>
             </div>
           </div>
@@ -116,10 +123,38 @@
 
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue'
+import { fileTypeIcon, typeIcon } from '@/enum'
 import * as homeApi from '@/api/home.js'
 import { useRouter } from 'vue-router'
 
 const { proxy } = getCurrentInstance()
+
+const formatSize = (size) => {
+  // 1 KB = 1024 bytes, 1 MB = 1024 KB, 1 GB = 1024 MB
+  const KB = 1024
+  const MB = KB * 1024
+  const GB = MB * 1024
+  const TB = GB * 1024
+  if (size) {
+    // 根据字节数大小决定转换的单位
+    if (size >= TB) {
+      // 如果大于等于 1GB，转换为 GB
+      return (size / TB).toFixed(2) + ' TB'
+    } else if (size >= GB) {
+      // 如果大于等于 1GB，转换为 GB
+      return (size / GB).toFixed(2) + ' GB'
+    } else if (size >= MB) {
+      // 如果大于等于 1MB，转换为 MB
+      return (size / MB).toFixed(2) + ' MB'
+    } else if (size >= KB) {
+      // 如果大于等于 1KB，转换为 KB
+      return (size / KB).toFixed(2) + ' KB'
+    } else if (size < KB) {
+      // 小于 1KB，显示为字节
+      return size + ' bytes'
+    }
+  }
+}
 
 const classifyList = ref([])
 
@@ -128,12 +163,11 @@ const getClassification = async () => {
     .channelList()
     .then((res) => {
       let data = res.data
-      const result = [
-        { name: '相册', size: data.photo_size, quantity: data.photo },
-        { name: '视频', size: data.video_size, quantity: data.video },
-        { name: '音乐', size: data.music_size, quantity: data.music },
-        { name: '文档', size: data.doc_size, quantity: data.doc },
-      ]
+      const result = Object.entries(data).map(([name, { num, size }]) => ({
+        name,
+        size: formatSize(size),
+        quantity: num,
+      }))
       classifyList.value = result
     })
     .catch((err) => {
@@ -147,18 +181,6 @@ onMounted(async () => {
   await getUploadList()
 })
 
-const getIconSrc = (name) => {
-  if (name === '相册') {
-    return '/icons/项目.svg' // 本地图标路径
-  } else if (name === '视频') {
-    return '/icons/编组 3.svg' // 本地图标路径
-  } else if (name === '音乐') {
-    return '/icons/编组 4.svg' // 本地图标路径
-  } else if (name === '文档') {
-    return '/icons/编组 5.svg' // 本地图标路径
-  }
-}
-
 const getnameColor = (name) => {
   if (name === '相册') {
     return 'blue' // 本地图标路径
@@ -171,14 +193,6 @@ const getnameColor = (name) => {
   }
 }
 
-// const historyList = ref([
-//   {
-//     title: '小提琴教学第1课',
-//     synopsis: '关于视频的一些介绍抱佛脚卡的肌肤大煞风景的撒了富士康地方',
-//     time: '18:10',
-//     img: '',
-//   },
-// ])
 
 const historyList = ref([])
 
@@ -205,23 +219,25 @@ const getUploadList = async () => {
     })
 }
 
-const getUploadIconSrc = (name) => {
-  return `/icons/${name}.svg`
-}
-
 const router = useRouter()
 const handleClick = (item) => {
-  console.log(item)
   router.push({
     name: 'VideoDetail',
     query: {
-      id: '123456',
+      id: item.id,
     },
   })
 }
 
 // 点击需要跳转到网盘列表，并查询当前点击的类型文件
-const jumpFilePath = () => {}
+const jumpFilePath = (item) => {
+  router.push({
+    name: 'file',
+    query: {
+      name: item.name,
+    },
+  })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -274,6 +290,8 @@ const jumpFilePath = () => {}
 
 .card-icon {
   font-size: 32px; /* 设置图标大小 */
+  width: 32px;
+  height: 32px;
   margin-bottom: 9px; /* 图标和标题之间的间距 */
 }
 

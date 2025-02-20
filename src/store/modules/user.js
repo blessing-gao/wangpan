@@ -59,18 +59,13 @@ const useUserStore = defineStore('user', {
         return Promise.reject(error)
       }
     },
-    async userLogout() {
-      const result = await reqLogout()
-      if (result.code == 200) {
-        //目前没有mock接口:退出登录接口(通知服务器本地用户唯一标识失效)
-        this.token = ''
-        this.username = ''
-        this.checkUser = {}
-        REMOVE_TOKEN()
-        return 'ok'
-      } else {
-        return Promise.reject(new Error(result.message))
-      }
+    async userLogout(path) {
+      const result = await reqLogout({ returnUrl: path })
+      this.token = ''
+      this.username = ''
+      this.checkUser = {}
+      REMOVE_TOKEN()
+      return 'ok'
     },
   },
 })

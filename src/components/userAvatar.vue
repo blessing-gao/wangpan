@@ -184,10 +184,10 @@ const formatSize = (size) => {
 const router = useRouter()
 
 const loginOut = async () => {
-  await userStore.userLogout()
-  router.push({
-    path: `/login`,
-  })
+  await userStore.userLogout(window.location.href)
+  // router.push({
+  //   path: `/login`,
+  // })
 }
 </script>
 

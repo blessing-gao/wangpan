@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%; display: flex">
+  <div style="height: 100%; display: flex; position: relative">
     <leftTabs
       ref="leftTabsRefs"
       @handleNodeClick="handleNodeClick"
@@ -217,6 +217,7 @@
       @onclose="folderClose"
     />
     <docDialog ref="docDialogRefs" :spaceId="spaceId" @onClose="folderClose" />
+    <!-- <uploadProgressDialog ref="uploadProgressDialogRefs" /> -->
   </div>
 </template>
 
@@ -238,6 +239,7 @@ import mdDialog from './components/mdDialog.vue'
 import moveDialog from './components/moveDialog.vue'
 import folderDialog from './components/folderDialog.vue'
 import docDialog from './components/docDialog.vue'
+import uploadProgressDialog from './components/uploadProgressDialog.vue'
 
 const { proxy } = getCurrentInstance()
 const route = useRoute()
@@ -334,8 +336,8 @@ const getTableData = () => {
 
 const fileTypeList = ref([])
 
-const getFileType = () => {
-  panApi.getFileTypes().then((res) => {
+const getFileType = async () => {
+  await panApi.getFileTypes().then((res) => {
     fileTypeList.value = res.data
   })
 }
@@ -373,9 +375,17 @@ const changetype = () => {
 onMounted(async () => {
   // 异步获取spaceId
   await getSpaceIdList()
-  getFileType()
+  await getFileType()
+  const name = route.query.name
+  if (name) {
+    const targetFileType = fileTypeList.value.filter(item=>{
+      return item.name == name
+    })
+    formInline.docFileType = targetFileType[0].value
+    router.replace({ name: 'file' })
+  }
   await getSpaceId()
-  leftTabsRefs.value.getLeftTabs(spaceId.value)
+  // leftTabsRefs.value.getLeftTabs(spaceId.value)
   getTableData()
 })
 
@@ -880,8 +890,6 @@ const formatSize = (size) => {
 
 // 批量下载
 const handleDownload = () => {
-  console.log(spaceList.value)
-
   let space = spaceList.value.filter((item) => {
     return item.spaceId == GET_PACEID()
   })
