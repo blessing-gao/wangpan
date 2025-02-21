@@ -259,8 +259,6 @@ import moveDialog from './components/moveDialog.vue'
 import folderDialog from './components/folderDialog.vue'
 import docDialog from './components/docDialog.vue'
 import uploadProgressDialog from './components/uploadProgressDialog.vue'
-import { list } from 'postcss'
-import { ca } from 'element-plus/es/locales.mjs'
 
 const { proxy } = getCurrentInstance()
 const route = useRoute()

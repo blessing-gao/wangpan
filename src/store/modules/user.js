@@ -1,11 +1,11 @@
 // user.js
 import { defineStore } from 'pinia'
 import { reqLogin, reqLogout, reqUserInfo } from '@/api/user.js'
-import { SET_TOKEN, REMOVE_TOKEN, GET_TOKEN } from '@/utils/auth'
+import { SET_TOKEN, REMOVE_TOKEN, GET_TOKEN, SET_USERID } from '@/utils/auth'
 const useUserStore = defineStore('user', {
   state: () => {
     return {
-      username: '',
+      userId: '',
       token: GET_TOKEN() || '',
       checkUser: {},
     }
@@ -36,23 +36,27 @@ const useUserStore = defineStore('user', {
       try {
         // 从本地存储中获取 token
         const token = GET_TOKEN() // 假设你有 GET_TOKEN 方法从本地存储获取 token
-        if (!token) {
-          return Promise.reject(new Error('用户未登录，无法获取用户信息'))
-        }
+        // if (!token || token === 'null') {
+        //   return Promise.reject(new Error('用户未登录，无法获取用户信息'))
+        // }
         // 请求用户信息，假设接口为 reqUserInfo
         let parmas = {
           token: token,
         }
-        const result = await reqUserInfo(parmas)
-        // 如果请求成功
-        if (result.code === 200) {
-          this.checkUser = result.data.checkUser
-          this.username = result.data.checkUser.username
-          return result.data // 返回用户信息
-        } else {
-          // 如果请求失败，抛出错误
-          return Promise.reject(new Error(result.data.message))
-        }
+
+        this.userId = '1'
+        SET_USERID(this.userId)
+        // 发送请求，期望获取到userId
+        // const result = await reqUserInfo(parmas)
+        // // 如果请求成功
+        // if (result.code === 200) {
+        //   this.checkUser = result.data.checkUser
+        //   this.username = result.data.checkUser.username
+        //   return result.data // 返回用户信息
+        // } else {
+        //   // 如果请求失败，抛出错误
+        //   return Promise.reject(new Error(result.data.message))
+        // }
       } catch (error) {
         // 捕获请求失败时的错误
         console.error('Get user info failed:', error)

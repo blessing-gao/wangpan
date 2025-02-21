@@ -15,6 +15,11 @@ export function REMOVE_TOKEN() {
   localStorage.removeItem('token')
 }
 
+// 将 token 存储到 localStorage 中
+export function SET_USERID(userId) {
+  localStorage.setItem('userId', userId)
+}
+
 // 将 spaceId 存储到 localStorage 中
 export function SET_PACEID(proId) {
   localStorage.setItem('spaceId', proId)

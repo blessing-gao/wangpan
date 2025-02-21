@@ -122,8 +122,6 @@ const props = defineProps({
   },
 })
 
-console.log(props.listType)
-
 const ifSupportFileExts = () => {
   let exts = collaboraOnlineExts.map((item) => item.ext)
   if (props.file.name) {

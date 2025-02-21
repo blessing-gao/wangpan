@@ -16,7 +16,7 @@ const constantRoutes = [
         meta: {
           icon: '工作台',
           title: '工作台',
-          keepAlive: true
+          keepAlive: true,
         },
         component: () =>
           import(/* webpackChunkName: "dashboard" */ '../views/home/index.vue'),
@@ -27,38 +27,12 @@ const constantRoutes = [
         meta: {
           icon: '网盘',
           title: '网盘',
-          keepAlive: true
+          keepAlive: true,
         },
         component: () =>
           import(/* webpackChunkName: "dashboard" */ '../views/file/index.vue'),
-        children: [
-
-        ]
+        children: [],
       },
-      // {
-      //   path: '/middle-platform',
-      //   name: 'middle-platform',
-      //   meta: {
-      //     icon: '中台',
-      //     title: '中台',
-      //     keepAlive: true
-      //   },
-      //   component: () =>
-      //     import(
-      //       /* webpackChunkName: "dashboard" */ '../views/middlePlatform/index.vue'
-      //     ),
-      // },
-      // {
-      //   path: '/task',
-      //   name: 'task',
-      //   meta: {
-      //     icon: '任务',
-      //     title: '任务',
-      //     keepAlive: true
-      //   },
-      //   component: () =>
-      //     import(/* webpackChunkName: "dashboard" */ '../views/task/index.vue'),
-      // },
     ],
   },
   {
@@ -70,6 +44,22 @@ const constantRoutes = [
     },
   },
   {
+    path: '/document/share/download/:id', // 视频详情页的路由路径
+    name: 'VideoDetail',
+    component: () =>
+      import(/* webpackChunkName: "404" */ '../views/sharePreview/index.vue'),
+    meta: {
+      link: true, // 可以根据需要设置
+    },
+  },
+  {
+    path: '/404',
+    name: '404',
+    component: () =>
+      import(/* webpackChunkName: "404" */ '../views/errorPage/404.vue'),
+    meta: { title: '404', affix: true },
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index.vue'),
     name: 'login',
@@ -77,6 +67,7 @@ const constantRoutes = [
       title: '登录',
     },
   },
+  { path: '/:catchAll(.*)', redirect: '/404' },
 ]
 
 export default constantRoutes

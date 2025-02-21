@@ -15,43 +15,19 @@ router.beforeEach(async (to, from, next) => {
   document.title = `${setting.title} - ${to.meta.title}`
   nprogress.start()
   //获取token,去判断用户登录、还是未登录
-  const token = userStore.token || 'Admin'
-  // const username = userStore.username
-  const username = '1'
+  userStore.userInfo()
+  const token = userStore.token
+  const userId = userStore.userId
   //用户登录判断
-  if (token) {
-    //登录成功,访问login,不能访问,指向首页
-    if (to.path == '/login') {
-      next({ path: '/' })
-    } else {
-
-      //登录成功访问其余六个路由(登录排除)
-      //有用户信息
-      if (username) {
-        //放行
-        next()
-      } else {
-        //如果没有用户信息,在守卫这里发请求获取到了用户信息再放行
-        try {
-          //获取用户信息
-          await userStore.userInfo()
-          //放行
-          //万一:刷新的时候是异步路由,有可能获取到用户信息、异步路由还没有加载完毕,出现空白的效果
-          next({ ...to })
-        } catch (error) {
-          console.log(error)
-
-          await userStore.userLogout()
-          next({ path: '/login', query: { redirect: to.path } })
-        }
-      }
-    }
+  if (token && userId) {
+    next();
   } else {
-    //用户未登录判断
-    if (to.path == '/login') {
+    // 没有token或者userId
+    // 需要先获取到当前路由是否是分享链接
+    if (['/404'].includes(to.path) || to.path.includes('share')) {
       next()
     } else {
-      next({ path: '/login', query: { redirect: to.path } })
+      next({ path: '/404' })
     }
   }
 })
