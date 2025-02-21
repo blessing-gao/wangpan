@@ -5,7 +5,7 @@
       width="41.7%"
       :modal="false"
       :show-close="false"
-      @close="handleClose"
+      @close="close"
     >
       <!-- 文件或文件夹拖拽区域 -->
       <div
@@ -41,18 +41,16 @@
             :key="index"
             class="file-style-content"
           >
-            <template
-              v-if="currentParentFolder && currentParentFolder.parentId != 0"
-            >
+            <template v-if="currentParentFolder">
               {{ currentParentFolder.uniqueKey }}
             </template>
             {{ file.name }}
             <!-- 显示上传进度条 -->
-            <el-progress
+            <!-- <el-progress
               style="flex: 1"
               :color="customColorMethod"
               :percentage="uploadProgress[index]?.progress"
-            />
+            /> -->
             <el-button @click="removeFile(index)" style="margin-left: 10px">
               <el-icon><Close /></el-icon>
             </el-button>
@@ -81,7 +79,6 @@
 
 <script setup>
 import { ref, nextTick, onMounted, getCurrentInstance } from 'vue'
-import { collaboraOnlineExts } from '@/enum'
 import { ElNotification } from 'element-plus'
 import { Close } from '@element-plus/icons-vue'
 import * as panApi from '@/api/pan.js'
@@ -104,15 +101,15 @@ const props = defineProps({
   },
 })
 
-const customColorMethod = (percentage) => {
-  if (percentage < 30) {
-    return '#909399'
-  }
-  if (percentage < 70) {
-    return '#e6a23c'
-  }
-  return '#67c23a'
-}
+// const customColorMethod = (percentage) => {
+//   if (percentage < 30) {
+//     return '#909399'
+//   }
+//   if (percentage < 70) {
+//     return '#e6a23c'
+//   }
+//   return '#67c23a'
+// }
 
 const dialogTableVisible = ref(false)
 const fileList = ref([]) // 用于存储上传的文件列表
@@ -217,18 +214,16 @@ const uploadFiles = () => {
       formData.append('files', file)
       uploadProgress.value.push({ fileName: file.name, progress: 0 })
     })
-
-    return panApi
-      .uploadFile(formData, (progress) => {
-        uploadProgress.value[index].progress = progress
-      })
-      .then((res) => {
-        ElNotification({
-          title: '成功',
-          message: `${file.name} 上传成功`,
-          type: 'success',
-        })
-      })
+    // , (progress) => {
+    //     uploadProgress.value[index].progress = progress
+    //   }
+    return panApi.uploadFile(formData).then((res) => {
+      // ElNotification({
+      //   title: '成功',
+      //   message: `${file.name} 上传成功`,
+      //   type: 'success',
+      // })
+    })
   }
 
   // 分批上传文件，每次上传最多10个文件
@@ -250,48 +245,63 @@ const uploadFiles = () => {
 
   uploadNextBatch()
 
-  ElNotification({
-    title: '全部上传完成',
-    message: '所有文件上传完成',
-    type: 'success',
-  })
+  // ElNotification({
+  //   title: '全部上传完成',
+  //   message: '所有文件上传完成',
+  //   type: 'success',
+  // })
   handleClose()
 }
 
 // 上传文件夹到服务器
 const uploadFolders = () => {
   if (fileList.value.length === 0) return
-  const uploadPromises = fileList.value.map((file, index) => {
-    const fileExt = file.name.split('.').pop().toLowerCase()
-    const exts = collaboraOnlineExts.filter((item) => item.ext == fileExt)
+
+  const uploadFileBatch = async (batchFiles) => {
     const formData = new FormData()
     formData.append('demand', props.demand)
     formData.append('spaceId', props.spaceId)
     formData.append('directoryId', props.uploadParams.directoryId)
     formData.append('fileType', props.uploadParams.fileType)
-    formData.append('docFileType', exts[0].type)
-    formData.append('files', file)
-    uploadProgress.value.push({ fileName: file.name, progress: 0 })
-    return panApi
-      .uploadFile(formData, (progress) => {
-        uploadProgress.value[index].progress = progress
-      })
-      .then((res) => {
-        ElNotification({
-          title: '成功',
-          message: `${file.name} 上传成功`,
-          type: 'success',
-        })
-      })
-  })
-  Promise.all(uploadPromises).then(() => {
-    ElNotification({
-      title: '全部上传完成',
-      message: '所有文件上传完成',
-      type: 'success',
+    batchFiles.map((file, index) => {
+      formData.append('files', file)
+      uploadProgress.value.push({ fileName: file.name, progress: 0 })
     })
-    handleClose()
-  })
+
+    return panApi.uploadFile(formData).then((res) => {
+      // ElNotification({
+      //   title: '成功',
+      //   message: `${file.name} 上传成功`,
+      //   type: 'success',
+      // })
+    })
+  }
+
+  // 分批上传文件，每次上传最多10个文件
+  const batchSize = 10
+  let currentBatchIndex = 0
+
+  // 上传文件直到没有剩余文件
+  const uploadNextBatch = async () => {
+    const batchFiles = fileList.value.slice(
+      currentBatchIndex,
+      currentBatchIndex + batchSize,
+    )
+    if (batchFiles.length > 0) {
+      await uploadFileBatch(batchFiles)
+      currentBatchIndex += batchSize
+      uploadNextBatch() // 递归调用上传下一个批次
+    }
+  }
+
+  uploadNextBatch()
+
+  // ElNotification({
+  //   title: '全部上传完成',
+  //   message: '所有文件上传完成',
+  //   type: 'success',
+  // })
+  handleClose()
 }
 
 const removeFile = (index) => {
@@ -302,6 +312,12 @@ onMounted(async () => {
   await nextTick()
   getFileType()
 })
+
+const close = () => {
+  fileList.value = []
+  hasMaxFilesWarning.value = false
+  dialogTableVisible.value = false
+}
 
 const handleClose = () => {
   fileList.value = []
