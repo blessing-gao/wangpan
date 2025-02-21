@@ -233,7 +233,7 @@ const handleClone = () => {
 }
 
 const handleClose1 = () => {
-  day.value = 0
+  day.value = 7
   hours.value = 0
   minutes.value = 0
   shareVisible.value = false

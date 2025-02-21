@@ -2,13 +2,13 @@
   <div class="video-container">
     <!-- 主视频播放器 -->
     <video ref="videoPlayer" class="plyr" crossorigin="anonymous">
-      <source :src="videoSrc" type="video/mp4" />
+      <source :src="content.path" type="video/mp4" />
       您的浏览器不支持视频标签
     </video>
 
     <!-- 隐藏的视频元素用于生成缩略图 -->
     <video id="hidden-video" crossorigin="anonymous" style="display: none">
-      <source :src="videoSrc" type="video/mp4" />
+      <source :src="content.path" type="video/mp4" />
     </video>
 
     <!-- 控制按钮 -->
@@ -30,7 +30,14 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Plyr from 'plyr'
 import 'plyr/dist/plyr.css'
 
-const videoSrc = ref('http://www.shenben.club:9000/gjq/test.mp4')
+const props = defineProps({
+  content: {
+    type: Object,
+    required: true,
+  },
+})
+
+// const videoSrc = ref('http://www.shenben.club:9000/gjq/test.mp4')
 const segments = {
   小张: [{ start: 5, end: 6 }],
   小李: [{ start: 30, end: 40 }],

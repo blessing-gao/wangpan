@@ -2,7 +2,7 @@
   <div class="image-preview">
     <el-image
       style="width: 100%; height: 100%; object-fit: contain"
-      :src="imgUrl"
+      :src="content.path"
       fit="contain"
       lazy
     />
@@ -24,7 +24,7 @@ const imgUrl = ref(null)
 const loadPdf = () => {
   // 假设content.path为pdf文件的URL
   // iframeUrl.value = props.content.path;  // 在这里填入实际的路径或获取链接
-  imgUrl.value = 'http://www.shenben.club:9000/gjq/%E5%93%AA%E5%90%92.jpeg'
+  // imgUrl.value = 'http://www.shenben.club:9000/gjq/%E5%93%AA%E5%90%92.jpeg'
 }
 
 onMounted(() => {

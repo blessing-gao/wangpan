@@ -1,7 +1,7 @@
 <template>
   <div class="pdf-preview">
     <iframe
-      :src="iframeUrl"
+      :src="content.path"
       frameborder="0"
       width="100%"
       height="100%"
@@ -26,7 +26,7 @@ const iframeUrl = ref(null)
 const loadPdf = () => {
   // 假设content.path为pdf文件的URL
   // iframeUrl.value = props.content.path;  // 在这里填入实际的路径或获取链接
-  iframeUrl.value = 'http://www.shenben.club:9000/gjq/course-01.pdf'
+  // iframeUrl.value = '/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=http://101.37.166.27:8080/wopi/files/3752367152326250496'
 }
 
 onMounted(() => {

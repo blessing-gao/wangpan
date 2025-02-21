@@ -155,11 +155,11 @@ export function providerOptions(id) {
 }
 
 // 获取分享外链
-export function getShareUrl(params) {
+export function getShareUrl(data) {
   return request({
     url: `${path}/document/share`,
-    method: 'get',
-    params,
+    method: 'post',
+    data,
   })
 }
 

@@ -1,9 +1,10 @@
 <template>
   <div class="audio-player">
     <!-- 音频控件 -->
+    <!-- http://www.shenben.club:9000/gjq/%E5%BD%95%E9%9F%B3.mp3 -->
     <audio
       ref="audioRef"
-      src="http://www.shenben.club:9000/gjq/%E5%BD%95%E9%9F%B3.mp3"
+      :src="audioSrc"
       @timeupdate="updateTime"
       @loadedmetadata="setDuration"
       @ended="handleEnd"
