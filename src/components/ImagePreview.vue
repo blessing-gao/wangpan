@@ -39,7 +39,6 @@ onMounted(() => {
   align-items: center;
   width: 100%;
   height: 100%;
-  padding: 20px; /* 添加适当的内边距，避免图片靠近边缘 */
   box-sizing: border-box;
 }
 </style>

@@ -231,4 +231,18 @@ const handleShare = () => {
   justify-content: center;
   align-items: center;
 }
+:deep(.el-button:hover) {
+  color: #de3a05;
+  border-color: #de3a05;
+}
+:deep(.el-tabs__item.is-active) {
+  color: #de3a05 !important;
+}
+:deep(.el-tabs__item:hover) {
+  color: #de3a05 !important;
+}
+
+:deep(.el-tabs__active-bar) {
+  background-color: #de3a05 !important;
+}
 </style>
