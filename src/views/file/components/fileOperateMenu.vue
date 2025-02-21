@@ -42,25 +42,59 @@
           <el-dropdown-item
             command="edit"
             @click="handleCommand('edit')"
-            v-if="file.fileType !== 0 && ifSupportFileExts()"
+            v-if="
+              file.fileType !== 0 &&
+              ifSupportFileExts() &&
+              (listType == 'default' || listType == 'collect')
+            "
           >
             预览
           </el-dropdown-item>
           <el-dropdown-item
             command="download"
-            v-if="file.fileType !== 0 && ifSupportFileExts()"
+            v-if="
+              file.fileType !== 0 &&
+              ifSupportFileExts() &&
+              (listType == 'default' || listType == 'collect')
+            "
             @click="handleCommand('download')"
           >
             下载
           </el-dropdown-item>
-          <el-dropdown-item command="move" @click="handleCommand('move')">
+          <el-dropdown-item
+            command="move"
+            @click="handleCommand('move')"
+            v-if="listType == 'default'"
+          >
             移动
           </el-dropdown-item>
-          <el-dropdown-item command="rename" @click="handleCommand('rename')">
+          <el-dropdown-item
+            command="rename"
+            @click="handleCommand('rename')"
+            v-if="listType == 'default'"
+          >
             重命名
           </el-dropdown-item>
-          <el-dropdown-item command="remove" @click="handleCommand('remove')">
+          <el-dropdown-item
+            command="remove"
+            @click="handleCommand('remove')"
+            v-if="listType == 'default'"
+          >
             删除
+          </el-dropdown-item>
+          <el-dropdown-item
+            command="restore"
+            @click="handleCommand('restore')"
+            v-if="listType == 'recycleBin'"
+          >
+            还原
+          </el-dropdown-item>
+          <el-dropdown-item
+            command="completelyDelete"
+            @click="handleCommand('completelyDelete')"
+            v-if="listType == 'recycleBin'"
+          >
+            彻底删除
           </el-dropdown-item>
         </el-dropdown-menu>
       </template>
@@ -82,7 +116,13 @@ const props = defineProps({
     type: String,
     default: 'left',
   },
+  listType: {
+    type: String,
+    default: 'default',
+  },
 })
+
+console.log(props.listType)
 
 const ifSupportFileExts = () => {
   let exts = collaboraOnlineExts.map((item) => item.ext)
@@ -130,10 +170,7 @@ defineExpose({
   color: #de3a05;
 }
 
-:deep(
-  .el-dropdown-menu__item:focus,
-  .el-dropdown-menu__item:hover
-) {
+:deep(.el-dropdown-menu__item:focus, .el-dropdown-menu__item:hover) {
   background-color: rgba(243, 232, 222, 0.5) !important;
   color: #de3a05;
 }

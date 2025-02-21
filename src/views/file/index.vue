@@ -5,13 +5,6 @@
       @handleNodeClick="handleNodeClick"
       @onCommand="handleOtherList"
     />
-    <!-- 详细表格信息 -->
-    <!-- :pageSize="formInline.pageSize"
-      :currentPage="formInline.currentPage"
-      @turnSize="turnSize"
-      :changePage="changePage"
-      :total="total"
-      -->
     <div style="padding: 16px; width: 100%">
       <vTableCustom
         style="width: 100%"
@@ -169,7 +162,7 @@
         </template>
 
         <template #operation="{ rows }">
-          <div class="file-name_right">
+          <div class="file-name_right" v-if="listType == 'default'">
             <img
               v-if="!rows.isCollect"
               style="cursor: pointer"
@@ -185,6 +178,32 @@
             <fileOperateMenu
               class="file-name_right-img"
               :file="rows"
+              :listType="listType"
+              @onCommand="handleFileOperate"
+            >
+              <img src="/icons/more_horiz.svg" />
+            </fileOperateMenu>
+          </div>
+          <div class="file-name_right" v-if="listType == 'collect'">
+            <img
+              style="cursor: pointer"
+              src="/icons/collect.svg"
+              @click="handleCollect(rows, 'delete')"
+            />
+            <fileOperateMenu
+              class="file-name_right-img"
+              :file="rows"
+              :listType="listType"
+              @onCommand="handleFileOperate"
+            >
+              <img src="/icons/more_horiz.svg" />
+            </fileOperateMenu>
+          </div>
+          <div class="file-name_right" v-if="listType == 'recycleBin'">
+            <fileOperateMenu
+              class="file-name_right-img"
+              :file="rows"
+              :listType="listType"
               @onCommand="handleFileOperate"
             >
               <img src="/icons/more_horiz.svg" />
@@ -240,6 +259,8 @@ import moveDialog from './components/moveDialog.vue'
 import folderDialog from './components/folderDialog.vue'
 import docDialog from './components/docDialog.vue'
 import uploadProgressDialog from './components/uploadProgressDialog.vue'
+import { list } from 'postcss'
+import { ca } from 'element-plus/es/locales.mjs'
 
 const { proxy } = getCurrentInstance()
 const route = useRoute()
@@ -249,11 +270,12 @@ const loading = ref(false)
 
 const tableData = ref([])
 
-const status = ref(null)
-
 const uploadDialogVisible = ref(false)
 const moveDialogVisible = ref(false)
 const spaceList = ref([])
+
+// 判断当前是在哪个列表
+const listType = ref('default')
 
 const getProId = async () => {
   let proId = route.query.spaceId || GET_PACEID()
@@ -378,7 +400,7 @@ onMounted(async () => {
   await getFileType()
   const name = route.query.name
   if (name) {
-    const targetFileType = fileTypeList.value.filter(item=>{
+    const targetFileType = fileTypeList.value.filter((item) => {
       return item.name == name
     })
     formInline.docFileType = targetFileType[0].value
@@ -482,6 +504,7 @@ const hanldeRowClick = (column) => {
 }
 
 const clickFile = (folder) => {
+  // listType.value = 'default'
   if (!folder) {
     isLevelText.value = false
     fileId.value = 0
@@ -493,8 +516,17 @@ const clickFile = (folder) => {
     tabList.value = tabList.value.filter((item) => item.parentId !== folder.id)
     isFolder.value = folder
   }
-
-  getTableData()
+  switch (listType.value) {
+    case 'default':
+      getTableData()
+      break
+    case 'collect':
+      getCollect()
+      break
+    case 'recycleBin':
+      getRecycleBinList()
+      break
+  }
 }
 
 const fileDetailRefs = ref(null)
@@ -566,26 +598,33 @@ const handleFileOperate = (type, operate, file) => {
     }
   } else {
     curretnOperateFolderOrFile.value = file
-    if (operate === 'edit') {
-      // this.folderOrFileClick(file)
-      router.push({
-        name: 'VideoDetail',
-        query: {
-          id: file.id,
-        },
-      })
-    }
-    if (operate === 'rename') {
-      handleShowRename(file)
-    }
-    if (operate === 'remove') {
-      showDeleteDialog(file)
-    }
-    if (operate === 'move') {
-      moveDialogVisible.value = true
-    }
-    if (operate === 'download') {
-      downloadFiles(file.id)
+    switch (operate) {
+      case 'edit':
+        router.push({
+          name: 'VideoDetail',
+          query: {
+            id: file.id,
+          },
+        })
+        break
+      case 'rename':
+        handleShowRename(file)
+        break
+      case 'remove':
+        showDeleteDialog(file)
+        break
+      case 'move':
+        moveDialogVisible.value = true
+        break
+      case 'download':
+        downloadFiles(file.id)
+        break
+      case 'restore':
+        handleRestore(file)
+        break
+      case 'completelyDelete':
+        handleRecycleBinDelete(file)
+        break
     }
   }
 }
@@ -685,6 +724,43 @@ const showDeleteDialog = (file) => {
         })
     }
   })
+}
+
+// 还原
+const handleRestore = (file) => {
+  const params = {
+    docId: file.id,
+  }
+  panApi
+    .restoreFile(params)
+    .then((res) => {
+      console.log(res)
+      if (res.code == 0) {
+        proxy.$modal.msgSuccess('还原成功')
+        getRecycleBinList()
+      }
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
+
+// 彻底删除
+const handleRecycleBinDelete = (file) => {
+  const params = {
+    docId: file.id,
+  }
+  panApi
+    .recycleBinDeleteFile(params)
+    .then((res) => {
+      if (res.code == 0) {
+        proxy.$modal.msgSuccess('删除成功')
+        getRecycleBinList()
+      }
+    })
+    .catch((err) => {
+      console.error(err)
+    })
 }
 
 // 创建或上传文件(夹)的父文件夹对象
@@ -835,8 +911,14 @@ const handleCollect = (row, types) => {
   panApi[api](params)
     .then((res) => {
       proxy.$modal.msgSuccess(message)
-
-      getTableData()
+      switch (listType.value) {
+        case 'collect':
+          getCollect()
+          break
+        case 'default':
+          getTableData()
+          break
+      }
     })
     .catch((err) => {
       console.error(err)
@@ -844,21 +926,52 @@ const handleCollect = (row, types) => {
 }
 
 const handleOtherList = (data) => {
+  isFolder.value = null
+  isLevelText.value = null
+  tabList.value = []
   if (data.label == '收藏文件') {
-    isFolder.value = null
-    isLevelText.value = null
-    tabList.value = []
+    listType.value = 'collect'
     getCollect()
+  } else if (data.label == '回收站') {
+    listType.value = 'recycleBin'
+    getRecycleBinList()
   }
 }
 
 const getCollect = () => {
+  loading.value = true
   const params = {
     userId: GET_USERID(),
   }
-  panApi.getCollect(params).then((res) => {
-    tableData.value = res.data
-  })
+  panApi
+    .getCollect(params)
+    .then((res) => {
+      tableData.value = res.data
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getRecycleBinList = () => {
+  loading.value = true
+  const params = {
+    userId: GET_USERID(),
+  }
+  panApi
+    .recycleBin(params)
+    .then((res) => {
+      tableData.value = res.data
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 const formatSize = (size) => {

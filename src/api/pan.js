@@ -133,7 +133,16 @@ export function deleteFolder(id) {
 export function deleteFile(params) {
   return request({
     url: `${path}/document/delete`,
-    method: 'get',
+    method: 'delete',
+    params,
+  })
+}
+
+// 文档 - 彻底删除文件
+export function recycleBinDeleteFile(params) {
+  return request({
+    url: `${path}/document/deleteFileFromRecycleBin`,
+    method: 'delete',
     params,
   })
 }
@@ -193,7 +202,7 @@ export function getCollect(params) {
 // 移除收藏
 export function deleteCollect(data) {
   return request({
-    url: `${path}/userCollect/remove`,
+    url: `${path}/userCollect/remove?collectId=${data.collectId}`,
     method: 'delete',
     data,
   })
@@ -222,6 +231,24 @@ export function downloadFiles(params) {
     url: `${path}/directory/download`,
     method: 'get',
     responseType: 'blob',
-    params
+    params,
+  })
+}
+
+// 查询回收站列表
+export function recycleBin(params) {
+  return request({
+    url: `${path}/document/recycleBin`,
+    method: 'get',
+    params,
+  })
+}
+
+// 还原文件
+export function restoreFile(params) {
+  return request({
+    url: `${path}/document/recoverFile`,
+    method: 'get',
+    params,
   })
 }
