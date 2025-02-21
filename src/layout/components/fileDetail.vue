@@ -6,22 +6,23 @@
           <span class="text-large font-600 mr-3">
             <div class="file-detail-header-left">
               <img
+                v-if="file_name"
                 style="width: 22px; margin-right: 12px"
-                src="/icons/编组 3.svg"
+                :src="fileTypeIcon(file_name)"
               />
               <div class="file-detail-header-title">{{ file_name }}</div>
-              <img style="width: 15px" src="/icons/常用文件.svg" alt="" />
+              <!-- <img style="width: 15px" src="/icons/常用文件.svg" alt="" /> -->
             </div>
           </span>
         </template>
         <template #extra>
           <div>
             <el-button plain @click="handleShare">分享</el-button>
-            <el-button plain>编辑</el-button>
+            <el-button plain v-if="isEdit" @click="handleEdit">编辑</el-button>
             <el-button plain :loading="downloading" @click="downloadFiles">
               下载
             </el-button>
-            <el-button plain>上传新版本</el-button>
+            <el-button plain v-if="isEdit">上传新版本</el-button>
           </div>
         </template>
       </el-page-header>
@@ -60,6 +61,30 @@
           "
         >
           <audioPreview :audioSrc="file_path" />
+        </div>
+        <div
+          v-else-if="file_type === 'excel'"
+          style="
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          "
+        >
+          <ExcelPreview :file_path="file_path" />
+        </div>
+        <div
+          v-else-if="file_type === 'word'"
+          style="
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          "
+        >
+          <vue-office-docx :src="file_path" style="width: 100%; height: 100%" />
         </div>
         <div v-else-if="file_type == ''" class="error-content">
           <p>
@@ -103,6 +128,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { fileTypeIcon, collaboraOnlineExts, compressedExts } from '@/enum'
 import * as panApi from '@/api/pan.js'
 import previewVideo from '../../components/VideoPreview.vue'
 import previewImage from '../../components/ImagePreview.vue'
@@ -112,6 +138,9 @@ import summarize from '../../components/summarize.vue'
 import audioPreview from '../../components/customizeAudio.vue'
 import documentDetail from '../../components/documentDetail.vue'
 import shareDialog from '../../components/shareDialog.vue'
+import VueOfficeDocx from '@vue-office/docx'
+import '@vue-office/docx/lib/index.css'
+import ExcelPreview from '../../components/ExcelPreview.vue'
 import '@/styles/components/fileDetail.css' // 引入普通的 CSS 文件
 
 const router = useRouter()
@@ -121,6 +150,7 @@ const file_type = ref(null) // 用来存储文件类型 (video, ppt, etc.)
 const file_path = ref('') // 用来存储文件路径
 const activeName = ref('first')
 const summarizeRefs = ref(null)
+const isEdit = ref(false)
 
 // 获取URL中的id参数
 const urlParams = new URLSearchParams(window.location.search)
@@ -132,10 +162,17 @@ const fetchFileInfo = async () => {
     try {
       await panApi.providerOptions(id).then((res) => {
         file_name.value = res.data.name || '未知文件'
+        const exts = collaboraOnlineExts.map((item) => item.ext)
+        const fileExt = file_name.value.split('.').pop().toLowerCase()
+        if (exts.includes(fileExt)) {
+          const isExt = collaboraOnlineExts.filter((item) => {
+            return item.ext === file_name.value.split('.').pop().toLowerCase()
+          })
+          isEdit.value = isExt[0].action == 'edit'
+        }
+
         file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
         file_type.value = determineFileType(res.data.name)
-        console.log(file_type.value);
-        
       })
     } catch (error) {
       console.error('获取文件信息失败:', error)
@@ -155,6 +192,14 @@ const determineFileType = (contentType) => {
     return 'image'
   } else if (contentType.includes('mp3')) {
     return 'audio'
+  } else if (
+    contentType.includes('xlsx') ||
+    contentType.includes('xls') ||
+    contentType.includes('csv')
+  ) {
+    return 'excel'
+  } else if (contentType.includes('docx') || contentType.includes('doc')) {
+    return 'word'
   } else {
     return '' // 如果是其他类型文件，返回空字符串
   }
@@ -221,6 +266,10 @@ const shareDialogRefs = ref(null)
 
 const handleShare = () => {
   shareDialogRefs.value.handleEdit()
+}
+
+const handleEdit = () => {
+  // 编辑
 }
 </script>
 <style lang="scss" scoped>

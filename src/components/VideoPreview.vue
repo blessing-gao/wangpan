@@ -125,7 +125,7 @@ const setupProgressBarEvents = () => {
   let hiddenVideo = document.getElementById('hidden-video')
 
   // 初始化隐藏视频
-  hiddenVideo.src = videoSrc.value
+  hiddenVideo.src = props.content.path
   hiddenVideo.load()
   const handleMouseMove = (e) => {
     const rect = progressBar.value.getBoundingClientRect()
