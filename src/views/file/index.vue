@@ -27,7 +27,7 @@
         @handleRowMouseLeave="handleRowMouseLeave"
       >
         <template #toolbarBtn>
-          <div style="display: flex; justify-content: space-between;">
+          <div style="display: flex; justify-content: space-between">
             <div v-if="selectedRowsName.length == 0">
               <el-popover
                 placement="bottom-start"
@@ -196,6 +196,11 @@
               src="/icons/collect.svg"
               @click="handleCollect(rows, 'delete')"
             />
+            <img
+              style="cursor: pointer; margin-left: 16px"
+              src="/icons/down.svg"
+              @click="handleFileOperate('self', 'download', rows)"
+            />
             <fileOperateMenu
               class="file-name_right-img"
               :file="rows"
@@ -210,6 +215,11 @@
               style="cursor: pointer"
               src="/icons/collect.svg"
               @click="handleCollect(rows, 'delete')"
+            />
+            <img
+              style="cursor: pointer; margin-left: 16px"
+              src="/icons/down.svg"
+              @click="handleFileOperate('self', 'download', rows)"
             />
             <fileOperateMenu
               class="file-name_right-img"
@@ -898,7 +908,7 @@ const handleCollect = (row, types) => {
     message = '收藏成功'
   } else {
     api = 'deleteCollect'
-    params.collectId = row.id
+    params.documentId = row.id
     message = '取消收藏成功'
   }
   panApi[api](params)

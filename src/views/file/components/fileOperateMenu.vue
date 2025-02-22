@@ -50,7 +50,7 @@
           >
             预览
           </el-dropdown-item>
-          <el-dropdown-item
+          <!-- <el-dropdown-item
             command="download"
             v-if="
               file.fileType !== 0 &&
@@ -60,7 +60,7 @@
             @click="handleCommand('download')"
           >
             下载
-          </el-dropdown-item>
+          </el-dropdown-item> -->
           <el-dropdown-item
             command="move"
             @click="handleCommand('move')"
