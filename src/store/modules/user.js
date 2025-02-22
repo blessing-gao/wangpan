@@ -1,7 +1,14 @@
 // user.js
 import { defineStore } from 'pinia'
 import { reqLogin, reqLogout, reqUserInfo } from '@/api/user.js'
-import { SET_TOKEN, REMOVE_TOKEN, GET_TOKEN, SET_USERID, SET_PACEID, GET_PACEID } from '@/utils/auth'
+import {
+  SET_TOKEN,
+  REMOVE_TOKEN,
+  GET_TOKEN,
+  SET_USERID,
+  SET_PACEID,
+  GET_PACEID,
+} from '@/utils/auth'
 import * as panApi from '@/api/pan.js'
 const useUserStore = defineStore('user', {
   state: () => {
@@ -48,8 +55,8 @@ const useUserStore = defineStore('user', {
         this.userId = '1'
         SET_USERID(this.userId)
         // 通过userId获取到用户的第一个speaceId
-        let result = await panApi.getUserSpace({userId: this.userId})
         if(this.spaceId === ''){
+          let result = await panApi.getUserSpace({userId: this.userId})
           this.spaceId = result.data[0].spaceId
           SET_PACEID(this.spaceId)
         }

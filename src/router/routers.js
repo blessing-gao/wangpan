@@ -60,6 +60,13 @@ const constantRoutes = [
     meta: { title: '404', affix: true },
   },
   {
+    path: '/notSpace',
+    name: 'notSpace',
+    component: () =>
+      import(/* webpackChunkName: "404" */ '../views/errorPage/notSpace.vue'),
+    meta: { title: '无用户信息', affix: true },
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index.vue'),
     name: 'login',

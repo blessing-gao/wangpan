@@ -14,22 +14,32 @@ const userStore = useUserStore(pinia)
 router.beforeEach(async (to, from, next) => {
   document.title = `${setting.title} - ${to.meta.title}`
   nprogress.start()
-  //获取token,去判断用户登录、还是未登录
-  await userStore.userInfo()
-  const token = userStore.token
-  const userId = userStore.userId
-  const spaceId = userStore.spaceId
-  //用户登录判断
-  if (userId && spaceId) {
-    next();
-  } else {
-    // 没有token或者userId
-    // 需要先获取到当前路由是否是分享链接
-    if (['/404'].includes(to.path) || to.path.includes('share')) {
+  try {
+    //获取token,去判断用户登录、还是未登录
+    await userStore.userInfo()
+    const token = userStore.token
+    const userId = userStore.userId
+    const spaceId = userStore.spaceId
+    //用户登录判断
+    if (userId && spaceId) {
       next()
     } else {
-      next({ path: '/404' })
+      // 没有token或者userId
+      // 需要先获取到当前路由是否是分享链接
+      if (['/404'].includes(to.path) || to.path.includes('share')) {
+        next()
+      } else if (!spaceId) {
+        if (to.path !== '/notSpace') {
+          next({ path: '/notSpace' }) // 跳转到没有空间的提示页面
+        } else {
+          next() // 如果已经在 /notSpace 页面，继续导航
+        }
+      } else {
+        next({ path: '/404' })
+      }
     }
+  } catch (error) {
+    next({ path: '/404' }) // In case of error, redirect to 404 page
   }
 })
 //全局后置守卫
