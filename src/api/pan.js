@@ -202,7 +202,7 @@ export function getCollect(params) {
 // 移除收藏
 export function deleteCollect(data) {
   return request({
-    url: `${path}/userCollect/remove?collectId=${data.collectId}`,
+    url: `${path}/userCollect/remove?documentId=${data.documentId}`,
     method: 'delete',
   })
 }
