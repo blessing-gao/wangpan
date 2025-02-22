@@ -198,7 +198,11 @@ const determineFileType = (contentType) => {
     contentType.includes('csv')
   ) {
     return 'excel'
-  } else if (contentType.includes('docx') || contentType.includes('doc')) {
+  } else if (
+    contentType.includes('docx') ||
+    contentType.includes('doc') ||
+    contentType.includes('txt')
+  ) {
     return 'word'
   } else {
     return '' // 如果是其他类型文件，返回空字符串
