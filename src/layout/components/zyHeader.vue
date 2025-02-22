@@ -72,10 +72,17 @@ import { GET_USERID, GET_PACEID, SET_PACEID } from '@/utils/auth'
 import uploadSearch from '../../components/uploadSearch.vue'
 import inputSearch from '../../components/inputSearch.vue'
 import userAvatar from '../../components/userAvatar.vue'
+import useUserStore from '@/store/modules/user'
+import pinia from '@/store'
+import { useRouter } from 'vue-router'
+
 import * as panApi from '@/api/pan.js'
 import * as headerApi from '@/api/header.js'
 
 const { proxy } = getCurrentInstance()
+const userStore = useUserStore(pinia)
+
+const router = useRouter()
 
 const uploadSearchRef = ref(null)
 
@@ -113,7 +120,8 @@ const handleShow = () => {
 
 const handleChange = (item) => {
   SET_PACEID(item.spaceId)
-  window.location.reload()
+  userStore.spaceId = item.spaceId
+  router.go(0)
 }
 </script>
 

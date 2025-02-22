@@ -1,13 +1,15 @@
 // user.js
 import { defineStore } from 'pinia'
 import { reqLogin, reqLogout, reqUserInfo } from '@/api/user.js'
-import { SET_TOKEN, REMOVE_TOKEN, GET_TOKEN, SET_USERID } from '@/utils/auth'
+import { SET_TOKEN, REMOVE_TOKEN, GET_TOKEN, SET_USERID, SET_PACEID, GET_PACEID } from '@/utils/auth'
+import * as panApi from '@/api/pan.js'
 const useUserStore = defineStore('user', {
   state: () => {
     return {
-      userId: '',
+      spaceId: GET_PACEID() || '',
       token: GET_TOKEN() || '',
       checkUser: {},
+      userId: '',
     }
   },
   actions: {
@@ -43,9 +45,14 @@ const useUserStore = defineStore('user', {
         let parmas = {
           token: token,
         }
-
         this.userId = '1'
         SET_USERID(this.userId)
+        // 通过userId获取到用户的第一个speaceId
+        let result = await panApi.getUserSpace({userId: this.userId})
+        if(this.spaceId === ''){
+          this.spaceId = result.data[0].spaceId
+          SET_PACEID(this.spaceId)
+        }
         // 发送请求，期望获取到userId
         // const result = await reqUserInfo(parmas)
         // // 如果请求成功
