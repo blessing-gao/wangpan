@@ -186,7 +186,11 @@ const fetchFileInfo = async () => {
 const determineFileType = (contentType) => {
   if (contentType.includes('mp4')) {
     return 'video'
-  } else if (contentType.includes('ppt') || contentType.includes('pdf')) {
+  } else if (
+    contentType.includes('ppt') ||
+    contentType.includes('pdf') ||
+    contentType.includes('txt')
+  ) {
     return 'pdf'
   } else if (contentType.includes('png') || contentType.includes('jpg')) {
     return 'image'
@@ -198,11 +202,7 @@ const determineFileType = (contentType) => {
     contentType.includes('csv')
   ) {
     return 'excel'
-  } else if (
-    contentType.includes('docx') ||
-    contentType.includes('doc') ||
-    contentType.includes('txt')
-  ) {
+  } else if (contentType.includes('docx') || contentType.includes('doc')) {
     return 'word'
   } else {
     return '' // 如果是其他类型文件，返回空字符串
