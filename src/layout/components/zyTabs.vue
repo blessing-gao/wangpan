@@ -60,6 +60,8 @@ const getIconSrc = (routeName) => {
       : '/icons/middle-platform.svg'
   } else if (routeName === 'task') {
     return route.path === '/task' ? '/icons/task-active.svg' : '/icons/task.svg'
+  }else if (routeName === 'search') {
+    return route.path === '/search' ? '/icons/search-page-active.svg' : '/icons/search-page.svg'
   }
 }
 </script>
