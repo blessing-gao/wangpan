@@ -15,11 +15,12 @@ router.beforeEach(async (to, from, next) => {
   document.title = `${setting.title} - ${to.meta.title}`
   nprogress.start()
   //获取token,去判断用户登录、还是未登录
-  userStore.userInfo()
+  await userStore.userInfo()
   const token = userStore.token
   const userId = userStore.userId
+  const spaceId = userStore.spaceId
   //用户登录判断
-  if (token && userId) {
+  if (userId && spaceId) {
     next();
   } else {
     // 没有token或者userId

@@ -97,9 +97,6 @@ const fileNumbers = ref(0)
 
 const getProId = async () => {
   let proId = route.query.spaceId || GET_PACEID()
-  if (proId == 'null' || proId == 'undefined' || !proId) {
-    proId = await getSpaceIdList()
-  }
   return proId
 }
 
@@ -116,7 +113,6 @@ const getSpaceIdList = async () => {
 const spaceId = ref('')
 const getSpaceId = async () => {
   const proId = await getProId()
-  SET_PACEID(proId)
   spaceId.value = proId
 }
 

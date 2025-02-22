@@ -131,26 +131,13 @@ const handleNodeClick = (data, node) => {
 
 const getProId = async () => {
   let proId = route.query.spaceId || GET_PACEID()
-  if (proId == 'null' || proId == 'undefined' || !proId) {
-    proId = await getSpaceIdList()
-  }
   return proId
-}
-
-// 获取spaceId列表
-const getSpaceIdList = async () => {
-  const params = {
-    userId: GET_USERID(),
-  }
-  let result = await panApi.getUserSpace(params)
-  return result.data[0].spaceId
 }
 
 // 获取spaceId
 const leftSpaceId = ref('')
 const getSpaceId = async () => {
   const proId = await getProId()
-  SET_PACEID(proId)
   leftSpaceId.value = proId
 }
 

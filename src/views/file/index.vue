@@ -27,49 +27,70 @@
         @handleRowMouseLeave="handleRowMouseLeave"
       >
         <template #toolbarBtn>
-          <div v-if="selectedRowsName.length == 0">
-            <el-popover
-              placement="bottom-start"
-              :width="108"
-              style="padding: 8px 0"
-              trigger="hover"
-            >
-              <template #reference>
-                <el-button
-                  style="background: #de3a05; border-radius: 4px; color: #fff"
-                >
-                  上传
-                </el-button>
-              </template>
-              <div class="organization-content" @click="uploadFolder">
-                <img
-                  src="/icons/文件管理.svg"
-                  style="margin-right: 12px; width: 16px"
-                />
-                上传文件夹
-              </div>
-              <div class="organization-content" @click="handleUploadFile">
-                <img
-                  src="/icons/文件.svg"
-                  style="margin-right: 12px; width: 16px"
-                />
-                上传文件
-              </div>
-            </el-popover>
+          <div style="display: flex; justify-content: space-between;">
+            <div v-if="selectedRowsName.length == 0">
+              <el-popover
+                placement="bottom-start"
+                :width="108"
+                style="padding: 8px 0"
+                trigger="hover"
+                v-if="listType != 'recycleBin'"
+              >
+                <template #reference>
+                  <el-button
+                    style="background: #de3a05; border-radius: 4px; color: #fff"
+                  >
+                    上传
+                  </el-button>
+                </template>
+                <div class="organization-content" @click="uploadFolder">
+                  <img
+                    src="/icons/文件管理.svg"
+                    style="margin-right: 12px; width: 16px"
+                  />
+                  上传文件夹
+                </div>
+                <div class="organization-content" @click="handleUploadFile">
+                  <img
+                    src="/icons/文件.svg"
+                    style="margin-right: 12px; width: 16px"
+                  />
+                  上传文件
+                </div>
+              </el-popover>
 
-            <el-button @click="createDict">新建文件夹</el-button>
+              <el-button v-if="listType != 'recycleBin'" @click="createDict">
+                新建文件夹
+              </el-button>
+            </div>
+            <div v-else class="isCheckedNumber-style">
+              <div v-if="listType != 'recycleBin'">
+                <el-checkbox
+                  v-model="isCheckedNumber"
+                  :label="checkedNumber"
+                  size="large"
+                  disabled
+                  style="margin-right: 28px"
+                />
+                <el-button @click="handleDownload">批量下载</el-button>
+                <el-button>批量删除</el-button>
+              </div>
+              <div v-else>
+                <el-checkbox
+                  v-model="isCheckedNumber"
+                  :label="checkedNumber"
+                  size="large"
+                  disabled
+                  style="margin-right: 28px"
+                />
+                <el-button>批量放回原处</el-button>
+              </div>
+            </div>
+            <div v-if="listType == 'recycleBin'">
+              <el-button>清空回收站</el-button>
+            </div>
           </div>
-          <div v-else class="isCheckedNumber-style">
-            <el-checkbox
-              v-model="isCheckedNumber"
-              :label="checkedNumber"
-              size="large"
-              disabled
-              style="margin-right: 28px"
-            />
-            <el-button @click="handleDownload">批量下载</el-button>
-            <el-button>批量删除</el-button>
-          </div>
+
           <div class="table-top">
             <div class="table-top-title">
               <el-breadcrumb :separator-icon="ArrowRight">
@@ -277,12 +298,6 @@ const listType = ref('default')
 
 const getProId = async () => {
   let proId = route.query.spaceId || GET_PACEID()
-  // 检查proId的有效性
-  if (proId == 'null' || proId == 'undefined' || !proId) {
-    if (spaceList.value.length != 0) {
-      proId = spaceList.value[0].spaceId
-    }
-  }
   return proId
 }
 
@@ -292,26 +307,8 @@ const spaceId = ref('')
 const getSpaceId = async () => {
   // 使用await等待getProId的返回结果
   const proId = await getProId()
-  // 保存到本地存储
-  SET_PACEID(proId)
   // 设置spaceId的值
   spaceId.value = proId
-}
-
-// 获取spaceId列表
-const getSpaceIdList = async () => {
-  const params = {
-    userId: GET_USERID(),
-  }
-
-  // 获取空间数据并进行安全检查
-  try {
-    let result = await panApi.getUserSpace(params)
-    spaceList.value = result.data
-  } catch (error) {
-    console.error('请求错误:', error)
-    return null
-  }
 }
 
 const fileId = ref(0)
@@ -393,8 +390,6 @@ const changetype = () => {
 }
 
 onMounted(async () => {
-  // 异步获取spaceId
-  await getSpaceIdList()
   await getFileType()
   const name = route.query.name
   if (name) {

@@ -204,7 +204,6 @@ export function deleteCollect(data) {
   return request({
     url: `${path}/userCollect/remove?collectId=${data.collectId}`,
     method: 'delete',
-    data,
   })
 }
 
