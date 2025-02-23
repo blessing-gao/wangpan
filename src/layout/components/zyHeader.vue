@@ -2,7 +2,7 @@
   <div class="zy_header">
     <div class="left_header">
       <div class="left_header_icon">
-        <img src="/assets/位图 2.png" class="menu-item-icon" />
+        <img src="/icons/logo.svg" class="menu-item-icon" />
       </div>
       <div class="left_header_text">浙音网盘</div>
     </div>
@@ -138,7 +138,6 @@ const handleChange = (item) => {
   align-items: center;
   .left_header_icon {
     margin-right: 17px;
-    background: #d9d9d9;
     width: 20px;
     height: 31px;
   }
