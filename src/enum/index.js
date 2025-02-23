@@ -66,6 +66,11 @@ export const collaboraOnlineExts = [
     type:'其他文件'
   },
   {
+    ext: 'vsix',
+    action: 'view',
+    type:'其他文件'
+  },
+  {
     ext: 'fodt',
     action: 'edit',
     type:'其他文件'
