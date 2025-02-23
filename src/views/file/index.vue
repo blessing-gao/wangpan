@@ -401,6 +401,7 @@ const changetype = () => {
 
 onMounted(async () => {
   await getFileType()
+  await getSpaceIdList()
   const name = route.query.name
   if (name) {
     const targetFileType = fileTypeList.value.filter((item) => {
@@ -1001,6 +1002,22 @@ const formatSize = (size) => {
       // 小于 1KB，显示为字节
       return size + ' bytes'
     }
+  }
+}
+
+// 获取spaceId列表
+const getSpaceIdList = async () => {
+  const params = {
+    userId: GET_USERID(),
+  }
+
+  // 获取空间数据并进行安全检查
+  try {
+    let result = await panApi.getUserSpace(params)
+    spaceList.value = result.data
+  } catch (error) {
+    console.error('请求错误:', error)
+    return null
   }
 }
 
