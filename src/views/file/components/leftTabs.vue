@@ -63,7 +63,7 @@
         </el-tree>
       </div>
       <div class="left-center">
-        <div class="all-file">全部文件</div>
+        <div class="all-file" @click="handleAllFile">全部文件</div>
         <el-tree
           ref="fileTree"
           :data="fileData"
@@ -236,6 +236,15 @@ const otherList = ref([
   },
 ])
 
+const handleAllFile =() => {
+  fileTree.value?.setCurrentKey(null)
+  fileData.value = []
+  fileId.value = 0
+  getLeftTabs(leftSpaceId.value)
+  commonTree.value?.setCurrentKey(null)
+  emits('onCommand', '全部文件')
+}
+
 defineExpose({
   getLeftTabs,
 })
@@ -295,6 +304,7 @@ const handleCommand = (data) => {
   letter-spacing: 0;
   font-weight: 400;
   margin-bottom: 4px;
+  cursor: pointer;
 }
 
 :deep(.el-tree-node__content > .el-tree-node__expand-icon) {

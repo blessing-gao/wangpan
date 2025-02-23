@@ -939,6 +939,9 @@ const handleOtherList = (data) => {
   } else if (data.label == '回收站') {
     listType.value = 'recycleBin'
     getRecycleBinList()
+  }else if (data== '全部文件') {
+    listType.value = 'default'
+    getTableData()
   }
 }
 
