@@ -57,7 +57,7 @@ const useUserStore = defineStore('user', {
         let url = window.location.href
         // 通过userId获取到用户的第一个speaceId
         // 如果当前的speaceId不为空或者路由包含了share，则不进行获取speaceId
-        if(this.spaceId === '' || !url.includes('share')){
+        if(this.spaceId === '' && !url.includes('share')){
           let result = await panApi.getUserSpace({userId: this.userId})
           this.spaceId = result.data[0].spaceId
           SET_PACEID(this.spaceId)
