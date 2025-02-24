@@ -51,6 +51,30 @@
         >
           <audioPreview :audioSrc="file_path" />
         </div>
+        <div
+          v-else-if="file_type === 'excel'"
+          style="
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          "
+        >
+          <ExcelPreview :file_path="file_path" />
+        </div>
+        <div
+          v-else-if="file_type === 'word'"
+          style="
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          "
+        >
+          <vue-office-docx :src="file_path" style="width: 100%; height: 100%" />
+        </div>
         <div v-else-if="file_type == ''" class="error-content">
           <p>
             无法预览此文件类型，请点击
@@ -68,7 +92,7 @@
           @tab-click="handleClick"
         >
           <el-tab-pane label="详情" name="first">
-            <!-- <documentDetail ref="documentDetailRefs" :documentId="id" /> -->
+            <documentDetail ref="documentDetailRefs" :documentId="id" />
           </el-tab-pane>
           <el-tab-pane label="标签" name="second">
             <fileTags />
@@ -91,8 +115,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import * as panApi from '@/api/pan.js'
+import * as shareApi from '@/api/share.js'
 import previewVideo from '../../components/VideoPreview.vue'
 import previewImage from '../../components/ImagePreview.vue'
 import previewPDF from '../../components/PdfPreview.vue'
@@ -100,6 +124,9 @@ import fileTags from '../../components/fileTags.vue'
 import summarize from '../../components/summarize.vue'
 import audioPreview from '../../components/customizeAudio.vue'
 import documentDetail from '../../components/documentDetail.vue'
+import VueOfficeDocx from '@vue-office/docx'
+import '@vue-office/docx/lib/index.css'
+import ExcelPreview from '@/components/ExcelPreview.vue'
 import '@/styles/components/fileDetail.css' // 引入普通的 CSS 文件
 
 const file_name = ref('') // 用来存储文件名称
@@ -107,50 +134,56 @@ const file_type = ref(null) // 用来存储文件类型 (video, ppt, etc.)
 const file_path = ref('') // 用来存储文件路径
 const activeName = ref('first')
 const summarizeRefs = ref(null)
+const id = ref('') // 用来存储文件id
 
 // 根据id请求文件信息
 const fetchFileInfo = async () => {
-  //   if (id) {
-  //     try {
-  //       await panApi.providerOptions(id).then((res) => {
-  //         file_name.value = res.data.name || '未知文件'
-  //         file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
-  //         file_type.value = determineFileType(res.data.name)
-  //         console.log(file_type.value)
-  //       })
-  //     } catch (error) {
-  //       console.error('获取文件信息失败:', error)
-  //     }
-  //   } else {
-  //     console.error('URL中没有找到id参数')
-  //   }
+  const uuid = window.location.href.split('/')
+  let result = await shareApi.share(uuid[uuid.length - 1])
+  id.value = result.data.id
+  file_name.value = result.data.name || '未知文件'
+  file_path.value = window.location.href
+  file_type.value = determineFileType(result.data.name)
 }
 
 // 根据contentType判断文件类型
 const determineFileType = (contentType) => {
   if (contentType.includes('mp4')) {
     return 'video'
-  } else if (contentType.includes('ppt') || contentType.includes('pdf')) {
+  } else if (
+    contentType.includes('ppt') ||
+    contentType.includes('pdf') ||
+    contentType.includes('txt')
+  ) {
     return 'pdf'
   } else if (contentType.includes('png') || contentType.includes('jpg')) {
     return 'image'
   } else if (contentType.includes('mp3')) {
     return 'audio'
+  } else if (
+    contentType.includes('xlsx') ||
+    contentType.includes('xls') ||
+    contentType.includes('csv')
+  ) {
+    return 'excel'
+  } else if (contentType.includes('docx') || contentType.includes('doc')) {
+    return 'word'
   } else {
     return '' // 如果是其他类型文件，返回空字符串
   }
 }
 
 // 页面加载时获取文件信息
-onMounted(() => {
-  //   fetchFileInfo()
+onMounted(async () => {
+  await fetchFileInfo()
+  documentDetailRefs.value.getFileDetail()
 })
 
 const documentDetailRefs = ref(null)
 
 const handleClick = (value) => {
   if (value.props.label == '详情') {
-    documentDetailRefs.value.getFileDetail()
+    // documentDetailRefs.value.getFileDetail()
   } else if (value.props.label == '评论') {
     const params = {
       documentId: id,

@@ -26,8 +26,8 @@ const props = defineProps({
 
 const form = ref({})
 
-const getFileDetail = () => {
-  panApi
+const getFileDetail = async () => {
+  await panApi
     .providerOptions(props.documentId)
     .then((res) => {
       form.value = res.data
@@ -67,7 +67,11 @@ const formatSize = (size) => {
 
 onMounted(async () => {
   await nextTick()
-  getFileDetail()
+  // await getFileDetail()
+})
+
+defineExpose({
+  getFileDetail,
 })
 </script>
 

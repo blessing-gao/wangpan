@@ -212,6 +212,7 @@ const determineFileType = (contentType) => {
 // 页面加载时获取文件信息
 onMounted(() => {
   fetchFileInfo()
+  documentDetailRefs.value.getFileDetail()
 })
 
 const documentDetailRefs = ref(null)
