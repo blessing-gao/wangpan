@@ -1,7 +1,7 @@
 <template>
   <div class="image-preview">
     <el-image
-      style="width: 100%; height: 100%; object-fit: contain"
+      style="width: 100%; height: 95%; object-fit: contain"
       :src="content.path"
       fit="contain"
       lazy

@@ -58,7 +58,10 @@
           v-else-if="file_type === 'image'"
           style="width: 100%; height: 100%"
         >
-          <previewImage :content="{ path: file_path }" />
+          <div v-if="file_path == ''" class="loading">
+            <p>图片加载中...</p>
+          </div>
+          <previewImage v-else :content="{ path: file_path }" />
         </div>
         <div
           v-else-if="file_type === 'audio'"
@@ -191,7 +194,11 @@ const fetchFileInfo = async () => {
           isEdit.value = isExt[0].action == 'edit'
         }
         file_type.value = determineFileType(res.data.name)
-        if (file_type.value == 'video' || file_type.value == 'audio') {
+        if (
+          file_type.value == 'video' ||
+          file_type.value == 'audio' ||
+          file_type.value == 'image'
+        ) {
           const videoBlob = await panApi.downloadFile(id)
           file_path.value = URL.createObjectURL(videoBlob.data)
 
@@ -218,7 +225,11 @@ const determineFileType = (contentType) => {
     contentType.includes('txt')
   ) {
     return 'pdf'
-  } else if (contentType.includes('png') || contentType.includes('jpg')) {
+  } else if (
+    contentType.includes('png') ||
+    contentType.includes('jpg') ||
+    contentType.includes('svg')
+  ) {
     return 'image'
   } else if (contentType.includes('mp3')) {
     return 'audio'
@@ -334,6 +345,6 @@ const handleEdit = () => {
   font-size: 20px;
   color: #de3a05;
   background-color: rgba(255, 255, 255, 0.7);
-  position: absolute;
+  // position: absolute;
 }
 </style>
