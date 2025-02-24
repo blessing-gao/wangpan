@@ -244,7 +244,7 @@ const loginOut = async () => {
     display: flex;
     .used-size {
       font-family: PingFangSC-Medium;
-      font-size: 12px;
+      font-size: 14px;
       color: #c38f5d;
       letter-spacing: 0;
       line-height: 17px;
@@ -253,7 +253,7 @@ const loginOut = async () => {
     }
     .all-size {
       font-family: PingFangSC-Medium;
-      font-size: 12px;
+      font-size: 14px;
       color: #999999;
       letter-spacing: 0;
       line-height: 17px;
@@ -263,7 +263,7 @@ const loginOut = async () => {
   }
   .proportion {
     font-family: PingFangSC-Medium;
-    font-size: 12px;
+    font-size: 14px;
     color: #333333;
     letter-spacing: 0;
     font-weight: 500;

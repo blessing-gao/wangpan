@@ -262,7 +262,7 @@ const handleCommand = (data) => {
 .two-left {
   position: relative;
   box-sizing: border-box;
-  width: 233px;
+  width: 332px;
   padding: 12px;
   height: 100%;
   border-right: 1px solid rgba(230, 231, 234, 1);
@@ -299,7 +299,7 @@ const handleCommand = (data) => {
 
 .all-file {
   font-family: PingFangSC-Regular;
-  font-size: 12px;
+  font-size: 14px;
   color: #999999;
   letter-spacing: 0;
   font-weight: 400;
@@ -336,7 +336,7 @@ const handleCommand = (data) => {
 }
 
 .left-footer {
-  width: 86%;
+  width: 90%;
   background: rgba(243, 232, 222, 0.5);
   border-radius: 8px;
   padding: 10px 16px 14px 14px;
@@ -376,7 +376,7 @@ const handleCommand = (data) => {
     display: flex;
     .used-size {
       font-family: PingFangSC-Medium;
-      font-size: 12px;
+      font-size: 14px;
       color: #c38f5d;
       letter-spacing: 0;
       line-height: 17px;
@@ -385,7 +385,7 @@ const handleCommand = (data) => {
     }
     .all-size {
       font-family: PingFangSC-Medium;
-      font-size: 12px;
+      font-size: 14px;
       color: #999999;
       letter-spacing: 0;
       line-height: 17px;
@@ -395,7 +395,7 @@ const handleCommand = (data) => {
   }
   .proportion {
     font-family: PingFangSC-Medium;
-    font-size: 12px;
+    font-size: 14px;
     color: #333333;
     letter-spacing: 0;
     font-weight: 500;

@@ -303,7 +303,7 @@ const jumpFilePath = (item) => {
 
 .card-quantity {
   font-family: PingFangSC-Medium;
-  font-size: 12px;
+  font-size: 14px;
   color: #aaaaaa;
   letter-spacing: 0;
   font-weight: 500;
@@ -311,7 +311,7 @@ const jumpFilePath = (item) => {
 
 .card-size {
   font-family: PingFangSC-Medium;
-  font-size: 12px;
+  font-size: 14px;
   color: #000000;
   letter-spacing: 0;
   text-align: right;
@@ -373,7 +373,7 @@ const jumpFilePath = (item) => {
   }
   .history-detail-time {
     font-family: Helvetica;
-    font-size: 12px;
+    font-size: 14px;
     color: #999999;
     letter-spacing: 0;
     font-weight: 400;
@@ -404,7 +404,7 @@ const jumpFilePath = (item) => {
 
 .upload-content-user {
   font-family: PingFangSC-Regular;
-  font-size: 12px;
+  font-size: 14px;
   color: #999999;
   letter-spacing: 0;
   line-height: 20px;

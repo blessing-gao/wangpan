@@ -94,7 +94,7 @@ const escapeRegExp = (str) => {
 <style lang="scss" scoped>
 .content-header {
   font-family: PingFangSC-Medium;
-  font-size: 12px;
+  font-size: 14px;
   color: #888888;
   letter-spacing: 0;
   font-weight: 500;
@@ -132,7 +132,7 @@ const escapeRegExp = (str) => {
 
 .history-content-detail {
   font-family: PingFangSC-Regular;
-  font-size: 12px;
+  font-size: 14px;
   color: #666666;
   letter-spacing: 0;
   line-height: 20px;
