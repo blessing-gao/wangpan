@@ -124,7 +124,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/sso/, '/sso'), // 去掉路径中的 /sso 部分
         },
         '/browser': {
-          target: 'http://82.156.83.108:9980',
+          target: 'http://localhost:9980',
           changeOrigin: true,
           ws: true,
           onProxyReq(proxyReq, req) {
@@ -135,7 +135,7 @@ export default defineConfig(({ mode }) => {
             }
           },
           headers: {
-            Host: '82.156.83.108:9980'
+            Host: 'localhost:9980'
           }
         },
       }
