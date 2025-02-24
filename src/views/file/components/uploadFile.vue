@@ -101,16 +101,6 @@ const props = defineProps({
   },
 })
 
-// const customColorMethod = (percentage) => {
-//   if (percentage < 30) {
-//     return '#909399'
-//   }
-//   if (percentage < 70) {
-//     return '#e6a23c'
-//   }
-//   return '#67c23a'
-// }
-
 const dialogTableVisible = ref(false)
 const fileList = ref([]) // 用于存储上传的文件列表
 const isUploadFile = ref(true) // 上传模式标志，true 为文件，false 为文件夹
@@ -214,16 +204,7 @@ const uploadFiles = () => {
       formData.append('files', file)
       uploadProgress.value.push({ fileName: file.name, progress: 0 })
     })
-    // , (progress) => {
-    //     uploadProgress.value[index].progress = progress
-    //   }
-    return panApi.uploadFile(formData).then((res) => {
-      // ElNotification({
-      //   title: '成功',
-      //   message: `${file.name} 上传成功`,
-      //   type: 'success',
-      // })
-    })
+    return panApi.uploadFile(formData).then((res) => {})
   }
 
   // 分批上传文件，每次上传最多10个文件
@@ -240,17 +221,20 @@ const uploadFiles = () => {
       await uploadFileBatch(batchFiles)
       currentBatchIndex += batchSize
       uploadNextBatch() // 递归调用上传下一个批次
+    } else {
+      return
     }
   }
 
   uploadNextBatch()
-
-  // ElNotification({
-  //   title: '全部上传完成',
-  //   message: '所有文件上传完成',
-  //   type: 'success',
-  // })
-  handleClose()
+    .then(() => {
+      // 在所有文件上传完成后，调用 handleClose
+      handleClose()
+    })
+    .catch((error) => {
+      console.error('上传过程中出错:', error)
+      handleClose() // 也可以在出错时调用 handleClose
+    })
 }
 
 // 上传文件夹到服务器
@@ -268,13 +252,7 @@ const uploadFolders = () => {
       uploadProgress.value.push({ fileName: file.name, progress: 0 })
     })
 
-    return panApi.uploadFile(formData).then((res) => {
-      // ElNotification({
-      //   title: '成功',
-      //   message: `${file.name} 上传成功`,
-      //   type: 'success',
-      // })
-    })
+    return panApi.uploadFile(formData).then((res) => {})
   }
 
   // 分批上传文件，每次上传最多10个文件
@@ -291,17 +269,22 @@ const uploadFolders = () => {
       await uploadFileBatch(batchFiles)
       currentBatchIndex += batchSize
       uploadNextBatch() // 递归调用上传下一个批次
+    } else {
+      return
     }
   }
 
   uploadNextBatch()
 
-  // ElNotification({
-  //   title: '全部上传完成',
-  //   message: '所有文件上传完成',
-  //   type: 'success',
-  // })
-  handleClose()
+  uploadNextBatch()
+    .then(() => {
+      // 在所有文件上传完成后，调用 handleClose
+      handleClose()
+    })
+    .catch((error) => {
+      console.error('上传过程中出错:', error)
+      handleClose() // 也可以在出错时调用 handleClose
+    })
 }
 
 const removeFile = (index) => {

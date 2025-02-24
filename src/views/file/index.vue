@@ -14,7 +14,7 @@
         :loading="loading"
         :columns="columns"
         :tableData="tableData"
-        :total="total"
+        :total="total1"
         :rowKey="rowKey"
         :pageSize="formInline.pageSize"
         :currentPage="formInline.currentPage"
@@ -326,7 +326,13 @@
       @onclose="folderClose"
     />
     <docDialog ref="docDialogRefs" :spaceId="spaceId" @onClose="folderClose" />
-    <!-- <uploadProgressDialog ref="uploadProgressDialogRefs" /> -->
+    <uploadProgressDialog
+      v-if="downloadingFiles.length != 0"
+      ref="uploadProgressDialogRefs"
+      :downloadingFiles="downloadingFiles"
+      :downloadProgress="downloadProgress"
+      @cancelDownload="cancelDownload"
+    />
   </div>
 </template>
 
@@ -350,6 +356,7 @@ import folderDialog from './components/folderDialog.vue'
 import docDialog from './components/docDialog.vue'
 import uploadProgressDialog from './components/uploadProgressDialog.vue'
 import * as homeApi from '@/api/home.js'
+import { downloadFile } from '@/api/down.js'
 
 const { proxy } = getCurrentInstance()
 const route = useRoute()
@@ -383,7 +390,7 @@ const getSpaceId = async () => {
 
 const fileId = ref(0)
 
-const total = ref(0)
+const total1 = ref(0)
 const formInline = reactive({
   current: 1,
   size: 10,
@@ -681,7 +688,7 @@ const handleFileOperate = (type, operate, file) => {
         moveDialogVisible.value = true
         break
       case 'download':
-        downloadFiles(file.id)
+        downloadFiles(file)
         break
       case 'restore':
         handleRestore(file)
@@ -693,28 +700,74 @@ const handleFileOperate = (type, operate, file) => {
   }
 }
 
+const downloadProgress = ref([]) // 存储下载进度
+const downloadingFiles = ref([]) // 存储正在下载的文件
 // 下载文档
-const downloadFiles = (id) => {
-  panApi
-    .downloadFile(id)
-    .then((res) => {
-      let blob = new Blob([res.data])
-      let _fileNames = res.headers['content-disposition']
-        .split(';')[1]
-        .split('=')[1]
-        .trim()
-        .replace(/"/g, '')
-        .split('.')
-      _fileNames[0] = decodeURI(_fileNames[0])
-      let link = document.createElement('a')
-      link.href = window.URL.createObjectURL(blob)
-      link.download = _fileNames.join('.')
-      link.click()
-      window.URL.revokeObjectURL(link.href)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+const downloadFiles = (file) => {
+  const { name, size, id } = file
+  const req = downloadFile(
+    size,
+    name,
+    id,
+    updateProgress,
+    onDownloadComplete,
+    onDownloadError,
+    onDownloadAbort,
+    onToastNotification,
+  )
+  // 将下载信息加入列表
+  downloadingFiles.value.push({ name, size, id, req })
+  downloadProgress.value.push({ id, progress: 0 })
+}
+
+// 更新进度
+const updateProgress = (id, percent, loaded, total) => {
+  const file = downloadProgress.value.find((file) => file.id === id)
+  if (file) {
+    file.progress = percent
+    file.loaded = loaded || 0 // 当前已下载字节数
+    file.total = total || 0
+  }
+}
+
+// 下载完成回调
+const onDownloadComplete = (id) => {
+  downloadingFiles.value = downloadingFiles.value.filter(
+    (file) => file.id !== id,
+  )
+  downloadProgress.value = downloadProgress.value.filter(
+    (progress) => progress.id !== id,
+  )
+}
+
+// 错误回调
+const onDownloadError = (errorMessage) => {
+  alert(`Error: ${errorMessage}`)
+}
+
+// 取消下载回调
+const onDownloadAbort = () => {
+  // alert('Download cancelled.')
+  console.log('取消下载')
+}
+
+// Toast通知
+const onToastNotification = (message) => {
+  console.log(message) // 或者使用某个通知库
+}
+
+// 取消下载
+const cancelDownload = (id) => {
+  const file = downloadingFiles.value.find((file) => file.id === id)
+  if (file) {
+    file.progress = 0
+    file.loaded = 0
+    file.req.abort()
+    const index = downloadingFiles.value.indexOf(file)
+    if (index > -1) {
+      downloadingFiles.value.splice(index, 1) // 从队列中移除文件
+    }
+  }
 }
 
 const docDialogRefs = ref(null)
