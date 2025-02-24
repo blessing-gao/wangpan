@@ -183,7 +183,10 @@
         </template>
 
         <template #operation="{ rows }">
-          <div class="file-name_right" v-if="listType == 'default'">
+          <div
+            class="file-name_right"
+            v-if="listType == 'default' || listType == 'history'"
+          >
             <el-tooltip
               v-if="!rows.isCollect"
               class="box-item"
@@ -217,7 +220,7 @@
               placement="top"
             >
               <img
-                style="cursor: pointer; margin-left: 16px; width: 18px;"
+                style="cursor: pointer; margin-left: 16px; width: 18px"
                 src="/icons/down.svg"
                 @click="handleFileOperate('self', 'download', rows)"
               />
@@ -258,7 +261,7 @@
               placement="top"
             >
               <img
-                style="cursor: pointer; margin-left: 16px; width: 18px;"
+                style="cursor: pointer; margin-left: 16px; width: 18px"
                 src="/icons/down.svg"
                 @click="handleFileOperate('self', 'download', rows)"
               />
@@ -346,6 +349,7 @@ import moveDialog from './components/moveDialog.vue'
 import folderDialog from './components/folderDialog.vue'
 import docDialog from './components/docDialog.vue'
 import uploadProgressDialog from './components/uploadProgressDialog.vue'
+import * as homeApi from '@/api/home.js'
 
 const { proxy } = getCurrentInstance()
 const route = useRoute()
@@ -998,6 +1002,9 @@ const handleOtherList = (data) => {
   } else if (data == '全部文件') {
     listType.value = 'default'
     getTableData()
+  } else if (data.label == '最近使用') {
+    listType.value = 'history'
+    getHistoryList()
   }
 }
 
@@ -1026,6 +1033,21 @@ const getRecycleBinList = () => {
   }
   panApi
     .recycleBin(params)
+    .then((res) => {
+      tableData.value = res.data
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const getHistoryList = () => {
+  loading.value = true
+  homeApi
+    .getHistoryList(GET_USERID)
     .then((res) => {
       tableData.value = res.data
     })
