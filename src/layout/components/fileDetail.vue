@@ -88,7 +88,10 @@
             align-items: center;
           "
         >
-          <ExcelPreview :file_path="file_path" />
+          <div v-if="file_path == ''" class="loading">
+            <p>加载中...</p>
+          </div>
+          <ExcelPreview v-else :file_path="file_path" />
         </div>
         <div
           v-else-if="file_type === 'word'"
@@ -197,7 +200,8 @@ const fetchFileInfo = async () => {
         if (
           file_type.value == 'video' ||
           file_type.value == 'audio' ||
-          file_type.value == 'image'
+          file_type.value == 'image' ||
+          file_type.value == 'excel'
         ) {
           const videoBlob = await panApi.downloadFile(id)
           file_path.value = URL.createObjectURL(videoBlob.data)
