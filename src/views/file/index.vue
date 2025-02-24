@@ -184,61 +184,117 @@
 
         <template #operation="{ rows }">
           <div class="file-name_right" v-if="listType == 'default'">
-            <img
+            <el-tooltip
               v-if="!rows.isCollect"
-              style="cursor: pointer"
-              src="/icons/常用文件.svg"
-              @click="handleCollect(rows, 'add')"
-            />
-            <img
-              v-else
-              style="cursor: pointer"
-              src="/icons/collect.svg"
-              @click="handleCollect(rows, 'delete')"
-            />
-            <img
-              style="cursor: pointer; margin-left: 16px"
-              src="/icons/down.svg"
-              @click="handleFileOperate('self', 'download', rows)"
-            />
-            <fileOperateMenu
-              class="file-name_right-img"
-              :file="rows"
-              :listType="listType"
-              @onCommand="handleFileOperate"
+              class="box-item"
+              effect="dark"
+              content="收藏"
+              placement="top"
             >
-              <img src="/icons/more_horiz.svg" />
-            </fileOperateMenu>
+              <img
+                style="cursor: pointer"
+                src="/icons/常用文件.svg"
+                @click="handleCollect(rows, 'add')"
+              />
+            </el-tooltip>
+            <el-tooltip
+              v-else
+              class="box-item"
+              effect="dark"
+              content="取消收藏"
+              placement="top"
+            >
+              <img
+                style="cursor: pointer"
+                src="/icons/collect.svg"
+                @click="handleCollect(rows, 'delete')"
+              />
+            </el-tooltip>
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="下载"
+              placement="top"
+            >
+              <img
+                style="cursor: pointer; margin-left: 16px"
+                src="/icons/down.svg"
+                @click="handleFileOperate('self', 'download', rows)"
+              />
+            </el-tooltip>
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="更多操作"
+              placement="top"
+            >
+              <fileOperateMenu
+                class="file-name_right-img"
+                :file="rows"
+                :listType="listType"
+                @onCommand="handleFileOperate"
+              >
+                <img src="/icons/more_horiz.svg" />
+              </fileOperateMenu>
+            </el-tooltip>
           </div>
           <div class="file-name_right" v-if="listType == 'collect'">
-            <img
-              style="cursor: pointer"
-              src="/icons/collect.svg"
-              @click="handleCollect(rows, 'delete')"
-            />
-            <img
-              style="cursor: pointer; margin-left: 16px"
-              src="/icons/down.svg"
-              @click="handleFileOperate('self', 'download', rows)"
-            />
-            <fileOperateMenu
-              class="file-name_right-img"
-              :file="rows"
-              :listType="listType"
-              @onCommand="handleFileOperate"
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="取消收藏"
+              placement="top"
             >
-              <img src="/icons/more_horiz.svg" />
-            </fileOperateMenu>
+              <img
+                style="cursor: pointer"
+                src="/icons/collect.svg"
+                @click="handleCollect(rows, 'delete')"
+              />
+            </el-tooltip>
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="下载"
+              placement="top"
+            >
+              <img
+                style="cursor: pointer; margin-left: 16px"
+                src="/icons/down.svg"
+                @click="handleFileOperate('self', 'download', rows)"
+              />
+            </el-tooltip>
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="更多操作"
+              placement="top"
+            >
+              <fileOperateMenu
+                class="file-name_right-img"
+                :file="rows"
+                :listType="listType"
+                @onCommand="handleFileOperate"
+              >
+                <img src="/icons/more_horiz.svg" />
+              </fileOperateMenu>
+            </el-tooltip>
           </div>
           <div class="file-name_right" v-if="listType == 'recycleBin'">
-            <fileOperateMenu
-              class="file-name_right-img"
-              :file="rows"
-              :listType="listType"
-              @onCommand="handleFileOperate"
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              content="更多操作"
+              placement="top"
             >
-              <img src="/icons/more_horiz.svg" />
-            </fileOperateMenu>
+              <fileOperateMenu
+                class="file-name_right-img"
+                :file="rows"
+                :listType="listType"
+                @onCommand="handleFileOperate"
+              >
+                <img src="/icons/more_horiz.svg" />
+              </fileOperateMenu>
+            </el-tooltip>
           </div>
         </template>
       </vTableCustom>
@@ -939,7 +995,7 @@ const handleOtherList = (data) => {
   } else if (data.label == '回收站') {
     listType.value = 'recycleBin'
     getRecycleBinList()
-  }else if (data== '全部文件') {
+  } else if (data == '全部文件') {
     listType.value = 'default'
     getTableData()
   }
