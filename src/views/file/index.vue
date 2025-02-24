@@ -217,7 +217,7 @@
               placement="top"
             >
               <img
-                style="cursor: pointer; margin-left: 16px"
+                style="cursor: pointer; margin-left: 16px; width: 18px;"
                 src="/icons/down.svg"
                 @click="handleFileOperate('self', 'download', rows)"
               />
@@ -258,7 +258,7 @@
               placement="top"
             >
               <img
-                style="cursor: pointer; margin-left: 16px"
+                style="cursor: pointer; margin-left: 16px; width: 18px;"
                 src="/icons/down.svg"
                 @click="handleFileOperate('self', 'download', rows)"
               />
