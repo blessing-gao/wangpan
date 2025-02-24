@@ -4,19 +4,19 @@
       <el-header>
         <zyHeaderVue />
       </el-header>
-      <el-container style="height: 93%;">
+      <el-container style="height: 93%">
         <el-aside width="61px" class="left_tab">
           <zyTabsVue />
         </el-aside>
         <el-main>
           <router-view v-slot="{ Component, route }">
-            <keep-alive>
-              <component
-                v-if="!route.meta.link"
-                :is="Component"
-                :key="route.path"
-              />
-            </keep-alive>
+            <!-- <keep-alive> -->
+            <component
+              v-if="!route.meta.link"
+              :is="Component"
+              :key="route.path"
+            />
+            <!-- </keep-alive> -->
           </router-view>
         </el-main>
       </el-container>
