@@ -290,7 +290,7 @@ const handleCommand = (data) => {
   display: flex;
   align-items: centere;
   span {
-    max-width: 166px;
+    max-width: 86%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -302,7 +302,7 @@ const handleCommand = (data) => {
   font-size: 14px;
   color: #999999;
   letter-spacing: 0;
-  font-weight: 400;
+  font-weight: 600;
   margin-bottom: 4px;
   cursor: pointer;
 }
