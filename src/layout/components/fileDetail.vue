@@ -201,7 +201,8 @@ const fetchFileInfo = async () => {
           file_type.value == 'video' ||
           file_type.value == 'audio' ||
           file_type.value == 'image' ||
-          file_type.value == 'excel'
+          file_type.value == 'excel' ||
+          file_type.value == 'word'
         ) {
           const videoBlob = await panApi.downloadFile(id)
           file_path.value = URL.createObjectURL(videoBlob.data)
