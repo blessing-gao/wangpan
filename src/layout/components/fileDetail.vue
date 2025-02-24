@@ -39,10 +39,20 @@
             justify-content: center;
           "
         >
-          <previewVideo :previewBoolean="true" :content="{ path: file_path }" />
+          <div v-if="file_path == ''" class="loading">
+            <p>视频加载中...</p>
+          </div>
+          <previewVideo
+            v-else
+            :previewBoolean="true"
+            :content="{ path: file_path }"
+          />
         </div>
         <div v-else-if="file_type === 'pdf'" style="width: 100%; height: 100%">
-          <previewPDF :content="{ path: file_path }" />
+          <div v-if="file_path == ''" class="loading">
+            <p>加载中...</p>
+          </div>
+          <previewPDF v-else :content="{ path: file_path }" />
         </div>
         <div
           v-else-if="file_type === 'image'"
@@ -60,7 +70,10 @@
             align-items: center;
           "
         >
-          <audioPreview :audioSrc="file_path" />
+          <div v-if="file_path == ''" class="loading">
+            <p>音频加载中...</p>
+          </div>
+          <audioPreview v-else :audioSrc="file_path" />
         </div>
         <div
           v-else-if="file_type === 'excel'"
@@ -84,7 +97,14 @@
             align-items: center;
           "
         >
-          <vue-office-docx :src="file_path" style="width: 100%; height: 100%" />
+          <div v-if="file_path == ''" class="loading">
+            <p>文档加载中...</p>
+          </div>
+          <vue-office-docx
+            v-else
+            :src="file_path"
+            style="width: 100%; height: 100%"
+          />
         </div>
         <div v-else-if="file_type == ''" class="error-content">
           <p>
@@ -160,7 +180,7 @@ const id = urlParams.get('id') // 获取id参数
 const fetchFileInfo = async () => {
   if (id) {
     try {
-      await panApi.providerOptions(id).then((res) => {
+      await panApi.providerOptions(id).then(async (res) => {
         file_name.value = res.data.name || '未知文件'
         const exts = collaboraOnlineExts.map((item) => item.ext)
         const fileExt = file_name.value.split('.').pop().toLowerCase()
@@ -170,9 +190,15 @@ const fetchFileInfo = async () => {
           })
           isEdit.value = isExt[0].action == 'edit'
         }
-
-        file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
         file_type.value = determineFileType(res.data.name)
+        if (file_type.value == 'video' || file_type.value == 'audio') {
+          const videoBlob = await panApi.downloadFile(id)
+          file_path.value = URL.createObjectURL(videoBlob.data)
+
+          console.log(file_path.value)
+        } else {
+          file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
+        }
       })
     } catch (error) {
       console.error('获取文件信息失败:', error)
@@ -298,5 +324,16 @@ const handleEdit = () => {
 
 :deep(.el-tabs__active-bar) {
   background-color: #de3a05 !important;
+}
+.loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: #de3a05;
+  background-color: rgba(255, 255, 255, 0.7);
+  position: absolute;
 }
 </style>
