@@ -327,11 +327,12 @@
     />
     <docDialog ref="docDialogRefs" :spaceId="spaceId" @onClose="folderClose" />
     <uploadProgressDialog
-      v-if="downloadingFiles.length != 0"
+      v-if="isDownloading"
       ref="uploadProgressDialogRefs"
       :downloadingFiles="downloadingFiles"
       :downloadProgress="downloadProgress"
       @cancelDownload="cancelDownload"
+      @onClose="isDownloading = false"
     />
   </div>
 </template>
@@ -702,6 +703,7 @@ const handleFileOperate = (type, operate, file) => {
 
 const downloadProgress = ref([]) // 存储下载进度
 const downloadingFiles = ref([]) // 存储正在下载的文件
+const isDownloading = ref(false) // 是否正在下载
 // 下载文档
 const downloadFiles = (file) => {
   const { name, size, id } = file
@@ -718,6 +720,7 @@ const downloadFiles = (file) => {
   // 将下载信息加入列表
   downloadingFiles.value.push({ name, size, id, req })
   downloadProgress.value.push({ id, progress: 0 })
+  isDownloading.value = true
 }
 
 // 更新进度

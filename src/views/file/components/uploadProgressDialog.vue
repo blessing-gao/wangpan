@@ -15,7 +15,9 @@
           </div>
           <div class="card-header-right">
             <div class="pause">全部暂停</div>
-            <el-icon style="cursor: pointer"><Close /></el-icon>
+            <el-icon style="cursor: pointer" @click="handleClose">
+              <Close />
+            </el-icon>
           </div>
         </div>
       </template>
@@ -114,7 +116,7 @@ const formatFileSize = (bytes) => {
   else return `${(bytes / 1073741824).toFixed(2)} GB`
 }
 
-const emits = defineEmits('cancelDownload')
+const emits = defineEmits('cancelDownload', 'onClose')
 const cancelDownload = (id) => {
   emits('cancelDownload', id)
   // props.downloadProgress.forEach((item, index) => {
@@ -122,6 +124,12 @@ const cancelDownload = (id) => {
   //     props.downloadProgress.splice(index, 1)
   //   }
   // })
+}
+
+const handleClose = () => {
+  console.log(11)
+
+  emits('onClose')
 }
 </script>
 
@@ -235,7 +243,7 @@ const cancelDownload = (id) => {
   letter-spacing: 0;
   font-weight: 500;
 }
-.download-item{
+.download-item {
   margin-bottom: 13px;
 }
 </style>
