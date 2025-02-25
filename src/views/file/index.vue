@@ -457,18 +457,32 @@
       :downloadProgress="downloadProgress"
       @cancelDownload="cancelDownload"
       @onClose="downloadClose"
+      @clear="handleClear"
     />
-    <!-- <uploadProgressDialog
+    <uploadProgressDialog
+      v-if="isUploading"
       :uploadingFiles="uploadingFiles"
       :uploadProgress="uploadProgress"
-    /> -->
+      @onClose="uploadClose"
+    />
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref, getCurrentInstance, reactive, nextTick } from 'vue'
 import { ArrowRight, Search } from '@element-plus/icons-vue'
-import { SET_PACEID, GET_PACEID, GET_USERID } from '@/utils/auth'
+import {
+  GET_PACEID,
+  GET_USERID,
+  set_uploadingFiles,
+  get_uploadingFiles,
+  set_downLoadingFiles,
+  get_downLoadingFiles,
+  remove_downLoadingFiles,
+  set_downloadProgress,
+  get_downloadProgress,
+  remove_downloadProgress,
+} from '@/utils/auth'
 import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
 import leftTabs from './components/leftTabs.vue'
@@ -825,16 +839,18 @@ const handleFileOperate = (type, operate, file) => {
   }
 }
 
-const downloadProgress = ref([]) // 存储下载进度
-const downloadingFiles = ref([]) // 存储正在下载的文件
-const isDownloading = ref(false) // 是否正在下载
+const downloadProgress = ref(JSON.parse(get_downloadProgress()) || []) // 存储下载进度
+const downloadingFiles = ref(JSON.parse(get_downLoadingFiles()) || []) // 存储正在下载的文件
+const isDownloading = ref(true) // 是否正在下载
 // 下载文档
 const downloadFiles = (file) => {
   const { name, size, id } = file
+  const index = downloadingFiles.value.length + 1
   const req = downloadFile(
     size,
     name,
     id,
+    index,
     downProgress,
     onDownloadComplete,
     onDownloadError,
@@ -842,14 +858,23 @@ const downloadFiles = (file) => {
     onToastNotification,
   )
   // 将下载信息加入列表
-  downloadingFiles.value.push({ name, size, id, req })
-  downloadProgress.value.push({ name, id, progress: 0 })
+  console.log(downloadingFiles.value)
+
+  downloadingFiles.value.push({ name, size, index, req })
+  downloadProgress.value.push({ name, index, progress: 0 })
   isDownloading.value = true
 }
 
+const handleClear = () => {
+  remove_downLoadingFiles()
+  downloadingFiles.value = []
+  remove_downloadProgress()
+  downloadProgress.value = []
+}
+
 // 更新进度
-const downProgress = (id, percent, loaded, total) => {
-  const file = downloadProgress.value.find((file) => file.id === id)
+const downProgress = (index, percent, loaded, total) => {
+  const file = downloadProgress.value.find((file) => file.index === index)
   if (file) {
     file.progress = percent
     file.loaded = loaded || 0 // 当前已下载字节数
@@ -859,12 +884,14 @@ const downProgress = (id, percent, loaded, total) => {
 
 // 下载完成回调
 const onDownloadComplete = (filename) => {
-  downloadingFiles.value = downloadingFiles.value.filter(
-    (file) => file.name !== filename,
-  )
-  downloadProgress.value = downloadProgress.value.filter(
-    (progress) => progress.filename !== filename,
-  )
+  set_downLoadingFiles(JSON.stringify(downloadingFiles.value))
+  set_downloadProgress(JSON.stringify(downloadProgress.value))
+  // downloadingFiles.value = downloadingFiles.value.filter(
+  //   (file) => file.name !== filename,
+  // )
+  // downloadProgress.value = downloadProgress.value.filter(
+  //   (progress) => progress.filename !== filename,
+  // )
 }
 
 // 错误回调
@@ -884,26 +911,27 @@ const onToastNotification = (message) => {
 }
 
 // 取消下载
-const cancelDownload = (id) => {
-  const file = downloadingFiles.value.find((file) => file.id === id)
+const cancelDownload = (index) => {
+  const file = downloadingFiles.value.find((file) => file.index === index)
   if (file) {
-    file.progress = 0
+    file.progress = 100
     file.loaded = 0
     file.req.abort()
-    const index = downloadingFiles.value.indexOf(file)
-    if (index > -1) {
-      downloadingFiles.value.splice(index, 1) // 从队列中移除文件
+    const index1 = downloadingFiles.value.indexOf(file)
+    if (index1 > -1) {
+      downloadingFiles.value.splice(index1, 1) // 从队列中移除文件
+      downloadProgress.value.splice(index1, 1) // 从队列中移除进度
     }
   }
 }
 
 const downloadClose = () => {
-  downloadProgress.value = downloadProgress.value.filter(
-    (item) => item.progress !== 100,
-  )
-  downloadingFiles.value = downloadingFiles.value.filter(
-    (item) => item.req.status == 200,
-  )
+  // downloadProgress.value = downloadProgress.value.filter(
+  //   (item) => item.progress !== 100,
+  // )
+  // downloadingFiles.value = downloadingFiles.value.filter(
+  //   (item) => item.req.status == 200,
+  // )
   isDownloading.value = false
 }
 
@@ -1081,7 +1109,8 @@ const handleClose = () => {
 }
 
 const uploadProgress = ref([]) // 存储上传进度
-const uploadingFiles = ref([]) // 存储正在上传的文件
+const uploadingFiles = ref(get_uploadingFiles()) // 存储正在上传的文件
+const isUploading = ref(false) // 是否正在上传
 
 // 上传文件
 const uploadFiles = async (fileList) => {
@@ -1095,10 +1124,12 @@ const uploadFiles = async (fileList) => {
     } else {
       fileId.value = 0
     }
+    isUploading.value = true
 
     fileList.forEach((file) => {
       const { name, size } = file
       uploadingFiles.value.push({ name, size })
+      set_uploadingFiles(uploadingFiles.value)
       uploadProgress.value.push({ name, progress: 0 })
     })
 
@@ -1169,7 +1200,7 @@ const updateProgress = (name, percent, loaded, total) => {
 
 const onUpdataComplete = (id) => {
   console.log(id)
-
+  getTableData()
   // uplaodingFiles.value = uplaodingFiles.value.filter((file) => file.id !== id)
   // uploadProgress.value = uploadProgress.value.filter(
   //   (progress) => progress.id !== id,
@@ -1184,6 +1215,12 @@ const onUploadError = (errorMessage) => {
 const onUploadAbort = () => {
   // alert('Download cancelled.')
   console.log('取消上传')
+}
+
+const uploadClose = () => {
+  uploadingFiles.value = []
+  uploadProgress.value = []
+  isUploading.value = false
 }
 
 const leftTabsRefs = ref(null)

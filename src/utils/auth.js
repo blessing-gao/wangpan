@@ -34,3 +34,39 @@ export function GET_PACEID() {
 export function GET_USERID() {
   return localStorage.getItem('userId')
 }
+
+export function set_uploadingFiles(uploadingFiles) {
+  return localStorage.setItem('uploadingFiles', uploadingFiles)
+}
+
+export function get_uploadingFiles() {
+  return localStorage.getItem('uploadingFiles')
+}
+
+export function remove_uploadingFiles() {
+  localStorage.removeItem('uploadingFiles')
+}
+
+export function set_downLoadingFiles(downLoadingFiles) {
+  return localStorage.setItem('downLoadingFiles', downLoadingFiles)
+}
+
+export function get_downLoadingFiles() {
+  return localStorage.getItem('downLoadingFiles')
+}
+
+export function remove_downLoadingFiles() {
+  localStorage.removeItem('downLoadingFiles')
+}
+
+export function set_downloadProgress(downloadProgress) {
+  return localStorage.setItem('downloadProgress', downloadProgress)
+}
+
+export function get_downloadProgress() {
+  return localStorage.getItem('downloadProgress')
+}
+
+export function remove_downloadProgress() {
+  localStorage.removeItem('downloadProgress')
+}

@@ -2,6 +2,7 @@ export function downloadFile(
   fileSize,
   overrideFileName = null,
   id,
+  index,
   progressCallback,
   completeCallback,
   errorCallback,
@@ -26,7 +27,7 @@ export function downloadFile(
   // 监听下载进度
   req.addEventListener('progress', (evt) => {
     let percentComplete = Math.round((evt.loaded / fileSize) * 100)
-    if (progressCallback) progressCallback(id, percentComplete, evt.loaded, fileSize) // 更新进度
+    if (progressCallback) progressCallback(index, percentComplete, evt.loaded, fileSize) // 更新进度
   })
 
   // 请求状态变化时处理

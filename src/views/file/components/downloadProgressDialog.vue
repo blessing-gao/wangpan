@@ -9,12 +9,10 @@
               src="/icons/refresh.svg"
               alt=""
             />
-            <div class="upload-number">
-              正在下载（{{ downloadingCount }}）
-            </div>
+            <div class="upload-number">正在下载（{{ downloadingCount }}）</div>
           </div>
           <div class="card-header-right">
-            <div class="pause">全部暂停</div>
+            <div class="pause" @click="handleClear">清空</div>
             <el-icon style="cursor: pointer" @click="handleClose">
               <Close />
             </el-icon>
@@ -56,7 +54,7 @@
                   src="/icons/关闭.svg"
                   alt=""
                   style="cursor: pointer; width: 15px"
-                  @click="cancelDownload(file.id)"
+                  @click="cancelDownload(file.index)"
                 />
               </div>
             </div>
@@ -88,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { Refresh, Close } from '@element-plus/icons-vue'
 import { fileTypeIcon } from '@/enum'
 const props = defineProps({
@@ -102,17 +100,11 @@ const props = defineProps({
   },
 })
 
-const downloadingCount = ref(0)
-watch(
-  () => props.downloadProgress,
-  (newProgress) => {
-    // 计算 progress 为 100 的文件数量
-    downloadingCount.value = newProgress.filter(
-      (item) => item.progress !== 100,
-    ).length
-  },
-  { immediate: true }, // 立即执行一次，以便初始化时也能设置值
-)
+console.log(props.downloadProgress)
+const downloadingCount = computed(() => {
+  // 计算 downloadProgress 中 progress 为 100 的文件数量
+  return props.downloadProgress.filter((item) => item.progress !== 100).length
+})
 
 const formatFileSize = (bytes) => {
   if (bytes < 1024) return `${bytes} B`
@@ -121,13 +113,25 @@ const formatFileSize = (bytes) => {
   else return `${(bytes / 1073741824).toFixed(2)} GB`
 }
 
-const emits = defineEmits('cancelDownload', 'onClose')
+const emits = defineEmits('cancelDownload', 'onClose', 'clear')
 const cancelDownload = (id) => {
+  const fileIndex = props.downloadProgress.findIndex(
+    (item) => item.index === id,
+  )
+  console.log(props.downloadProgress)
+
+  if (fileIndex !== -1) {
+    props.downloadProgress[fileIndex].progress = 100
+  }
   emits('cancelDownload', id)
 }
 
 const handleClose = () => {
   emits('onClose')
+}
+
+const handleClear = () => {
+  emits('clear')
 }
 </script>
 
