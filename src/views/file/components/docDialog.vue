@@ -23,10 +23,10 @@
             placeholder="请输入文件名称"
             @keyup.enter="createOrUpdateDoc"
           >
-            <!-- <template #prepend v-if="currentParentFolder && currentParentFolder.parentId != 0">
-              {{ currentParentFolder.uniqueKey }}
-            </template> -->
-            <template #append>.{{ suffixDocType }}</template>
+            <template #append>
+              .
+              <el-input style="width: 50px;" v-model="suffixDocType" />
+            </template>
           </el-input>
         </el-form-item>
       </el-form>
