@@ -40,8 +40,7 @@ export function downloadFile(
           let rspHeaderDecoded = decodeURIComponent(rspHeader)
           filename = rspHeaderDecoded.split('"')[1]
         }
-
-        if (completeCallback) completeCallback()
+        if (completeCallback) completeCallback(filename)
         downloadWithLink(window.URL.createObjectURL(req.response), filename)
       } else {
         if (req.getResponseHeader('Content-Type') === 'application/json') {

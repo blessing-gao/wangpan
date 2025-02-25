@@ -214,7 +214,7 @@ const getLeftTabs = async (spaceId, data) => {
     status: 1,
     userId: GET_USERID(),
   }
-  await panApi.contentsList(spaceId, fileId.value, params).then((res) => {
+  await panApi.leftFolder(spaceId, fileId.value, params).then((res) => {
     if (fileId.value == 0 || fileData.value.length == 0) {
       fileData.value = res.data
     } else {
@@ -273,7 +273,6 @@ const handleCommand = (data) => {
   box-sizing: border-box;
   width: 100%;
   padding: 12px;
-  height: 100%;
 }
 
 /* 样式覆盖选中项的字体颜色和背景颜色 */

@@ -135,7 +135,7 @@ const formatSize = (size) => {
   const MB = KB * 1024
   const GB = MB * 1024
   const TB = GB * 1024
-  if (size) {
+  if (size || size == 0) {
     // 根据字节数大小决定转换的单位
     if (size >= TB) {
       // 如果大于等于 1GB，转换为 GB
@@ -182,13 +182,13 @@ onMounted(async () => {
 })
 
 const getnameColor = (name) => {
-  if (name === '相册') {
+  if (name === '图片') {
     return 'blue' // 本地图标路径
   } else if (name === '视频') {
     return 'origin' // 本地图标路径
   } else if (name === '音频') {
     return 'red' // 本地图标路径
-  } else if (name === '文档') {
+  } else if (name === '文本文件') {
     return 'green' // 本地图标路径
   }
 }

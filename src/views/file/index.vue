@@ -83,7 +83,7 @@
                   disabled
                   style="margin-right: 28px"
                 />
-                <el-button>批量放回原处</el-button>
+                <el-button @click="handleRestores">批量放回原处</el-button>
               </div>
             </div>
             <div v-if="listType == 'recycleBin'">
@@ -196,7 +196,7 @@
                   <img
                     style="cursor: pointer"
                     src="/icons/常用文件.svg"
-                    @click="handleCollect(rows, 'add')"
+                    @click.stop="handleCollect(rows, 'add')"
                   />
                 </el-tooltip>
                 <el-tooltip
@@ -209,7 +209,7 @@
                   <img
                     style="cursor: pointer"
                     src="/icons/collect.svg"
-                    @click="handleCollect(rows, 'delete')"
+                    @click.stop="handleCollect(rows, 'delete')"
                   />
                 </el-tooltip>
                 <el-tooltip
@@ -221,7 +221,7 @@
                   <img
                     style="cursor: pointer; margin-left: 16px; width: 18px"
                     src="/icons/down.svg"
-                    @click="handleFileOperate('self', 'download', rows)"
+                    @click.stop="handleFileOperate('self', 'download', rows)"
                   />
                 </el-tooltip>
                 <el-tooltip
@@ -250,7 +250,7 @@
                   <img
                     style="cursor: pointer"
                     src="/icons/collect.svg"
-                    @click="handleCollect(rows, 'delete')"
+                    @click.stop="handleCollect(rows, 'delete')"
                   />
                 </el-tooltip>
                 <el-tooltip
@@ -262,7 +262,7 @@
                   <img
                     style="cursor: pointer; margin-left: 16px; width: 18px"
                     src="/icons/down.svg"
-                    @click="handleFileOperate('self', 'download', rows)"
+                    @click.stop="handleFileOperate('self', 'download', rows)"
                   />
                 </el-tooltip>
                 <el-tooltip
@@ -432,7 +432,7 @@
       :demand="uploadDemandFile"
       :spaceId="spaceId"
       :uploadParams="uploadParams"
-      @ok="uploadFiles"
+      @uploadFiles="uploadFiles"
       @close="handleClose"
     />
     <mdDialog ref="mdDialogRefs" @handleShowUpload="handleShowUpload" />
@@ -450,14 +450,18 @@
       @onclose="folderClose"
     />
     <docDialog ref="docDialogRefs" :spaceId="spaceId" @onClose="folderClose" />
-    <uploadProgressDialog
+    <downloadProgressDialog
       v-if="isDownloading"
-      ref="uploadProgressDialogRefs"
+      ref="downloadProgressDialogRefs"
       :downloadingFiles="downloadingFiles"
       :downloadProgress="downloadProgress"
       @cancelDownload="cancelDownload"
-      @onClose="isDownloading = false"
+      @onClose="downloadClose"
     />
+    <!-- <uploadProgressDialog
+      :uploadingFiles="uploadingFiles"
+      :uploadProgress="uploadProgress"
+    /> -->
   </div>
 </template>
 
@@ -479,9 +483,11 @@ import mdDialog from './components/mdDialog.vue'
 import moveDialog from './components/moveDialog.vue'
 import folderDialog from './components/folderDialog.vue'
 import docDialog from './components/docDialog.vue'
+import downloadProgressDialog from './components/downloadProgressDialog.vue'
 import uploadProgressDialog from './components/uploadProgressDialog.vue'
 import * as homeApi from '@/api/home.js'
 import { downloadFile } from '@/api/down.js'
+import { uploadFile } from '@/api/upload.js'
 
 const { proxy } = getCurrentInstance()
 const route = useRoute()
@@ -725,12 +731,6 @@ const clickFile = (folder) => {
   }
 }
 
-const fileDetailRefs = ref(null)
-
-const handleDetail = (rows) => {
-  fileDetailRefs.value.handleEdit(rows)
-}
-
 const folderDialogRefs = ref(null)
 const createDict = () => {
   folderDialogRefs.value.handleEdit('create', isFolder.value)
@@ -835,7 +835,7 @@ const downloadFiles = (file) => {
     size,
     name,
     id,
-    updateProgress,
+    downProgress,
     onDownloadComplete,
     onDownloadError,
     onDownloadAbort,
@@ -843,12 +843,12 @@ const downloadFiles = (file) => {
   )
   // 将下载信息加入列表
   downloadingFiles.value.push({ name, size, id, req })
-  downloadProgress.value.push({ id, progress: 0 })
+  downloadProgress.value.push({ name, id, progress: 0 })
   isDownloading.value = true
 }
 
 // 更新进度
-const updateProgress = (id, percent, loaded, total) => {
+const downProgress = (id, percent, loaded, total) => {
   const file = downloadProgress.value.find((file) => file.id === id)
   if (file) {
     file.progress = percent
@@ -858,12 +858,12 @@ const updateProgress = (id, percent, loaded, total) => {
 }
 
 // 下载完成回调
-const onDownloadComplete = (id) => {
+const onDownloadComplete = (filename) => {
   downloadingFiles.value = downloadingFiles.value.filter(
-    (file) => file.id !== id,
+    (file) => file.name !== filename,
   )
   downloadProgress.value = downloadProgress.value.filter(
-    (progress) => progress.id !== id,
+    (progress) => progress.filename !== filename,
   )
 }
 
@@ -895,6 +895,16 @@ const cancelDownload = (id) => {
       downloadingFiles.value.splice(index, 1) // 从队列中移除文件
     }
   }
+}
+
+const downloadClose = () => {
+  downloadProgress.value = downloadProgress.value.filter(
+    (item) => item.progress !== 100,
+  )
+  downloadingFiles.value = downloadingFiles.value.filter(
+    (item) => item.req.status == 200,
+  )
+  isDownloading.value = false
 }
 
 const docDialogRefs = ref(null)
@@ -982,11 +992,27 @@ const handleRestore = (file) => {
       if (res.code == 0) {
         proxy.$modal.msgSuccess('还原成功')
         getRecycleBinList()
+        selectedRowsId.value = []
+        const table = table_ref.value.table_ref
+        table.clearSelection()
       }
     })
     .catch((err) => {
       console.error(err)
     })
+}
+
+// 批量还原
+const handleRestores = () => {
+  const params = {
+    documentIds: selectedRowsId.value,
+  }
+  panApi.restoreFiles(params).then((res) => {
+    if (res.code == 0) {
+      proxy.$modal.msgSuccess('还原成功')
+      getT()
+    }
+  })
 }
 
 // 彻底删除
@@ -1054,8 +1080,13 @@ const handleClose = () => {
   leftTabsRefs.value.getLeftTabs(spaceId.value)
 }
 
+const uploadProgress = ref([]) // 存储上传进度
+const uploadingFiles = ref([]) // 存储正在上传的文件
+
 // 上传文件
-const uploadFiles = async () => {
+const uploadFiles = async (fileList) => {
+  console.log(fileList)
+
   if (importMdFile.value) {
     // for (const { raw } of fileList) {
   } else {
@@ -1065,10 +1096,94 @@ const uploadFiles = async () => {
       fileId.value = 0
     }
 
-    getTableData()
-    // 还需要调用左侧tab的查询接口
-    leftTabsRefs.value.getLeftTabs(spaceId.value)
+    fileList.forEach((file) => {
+      const { name, size } = file
+      uploadingFiles.value.push({ name, size })
+      uploadProgress.value.push({ name, progress: 0 })
+    })
+
+    const uploadFileBatch = async (batchFiles) => {
+      const formData = new FormData()
+      formData.append('demand', uploadDemandFile.value)
+      formData.append('spaceId', spaceId.value)
+      formData.append('directoryId', uploadParams.directoryId)
+      formData.append('fileType', uploadParams.fileType)
+      batchFiles.map((file, index) => {
+        formData.append('files', file)
+      })
+      const req = uploadFile(
+        formData,
+        null,
+        updateProgress,
+        onUpdataComplete,
+        onUploadError,
+        onUploadAbort,
+        onToastNotification,
+      )
+      req.fileNames = batchFiles.map((file) => file.name)
+      batchFiles.forEach((file, index) => {
+        // 为每个文件的请求添加一个自定义属性 index，表示该文件在 batchFiles 中的索引
+        req.upload.addEventListener('progress', (event) => {
+          event.target.index = index // 给事件目标添加一个索引，指明这是哪个文件的进度
+        })
+      })
+    }
+
+    // 分批上传文件，每次上传最多10个文件
+    const batchSize = 10
+    let currentBatchIndex = 0
+
+    // 上传文件直到没有剩余文件
+    const uploadNextBatch = async () => {
+      const batchFiles = fileList.slice(
+        currentBatchIndex,
+        currentBatchIndex + batchSize,
+      )
+      if (batchFiles.length > 0) {
+        await uploadFileBatch(batchFiles)
+        currentBatchIndex += batchSize
+        uploadNextBatch() // 递归调用上传下一个批次
+      } else {
+        return
+      }
+    }
+
+    uploadNextBatch()
+
+    // getTableData()
+    // // 还需要调用左侧tab的查询接口
+    // leftTabsRefs.value.getLeftTabs(spaceId.value)
   }
+}
+
+const updateProgress = (name, percent, loaded, total) => {
+  const file = uploadProgress.value.find((file) => file.name == name)
+  console.log(file)
+
+  if (file) {
+    file.progress = percent
+    file.loaded = loaded || 0 // 当前已下载字节数
+    file.total = total || 0
+  }
+}
+
+const onUpdataComplete = (id) => {
+  console.log(id)
+
+  // uplaodingFiles.value = uplaodingFiles.value.filter((file) => file.id !== id)
+  // uploadProgress.value = uploadProgress.value.filter(
+  //   (progress) => progress.id !== id,
+  // )
+}
+
+const onUploadError = (errorMessage) => {
+  alert(`Error: ${errorMessage}`)
+}
+
+// 取消上传回调
+const onUploadAbort = () => {
+  // alert('Download cancelled.')
+  console.log('取消上传')
 }
 
 const leftTabsRefs = ref(null)
@@ -1335,10 +1450,14 @@ const handleDetate = () => {
 }
 
 const handleEmpty = () => {
+  const params = {
+    userId: GET_USERID(),
+  }
   panApi
-    .empty()
+    .empty(params)
     .then((res) => {
       console.log(res)
+      getRecycleBinList()
     })
     .catch((err) => {
       console.error(err)

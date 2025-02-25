@@ -150,7 +150,7 @@ export function deleteFiles(data) {
 // 只查文件夹
 export function leftFolder(spaceId, directoryId, params) {
   return request({
-    url: `${path}/page/folder/${spaceId}/${directoryId}`,
+    url: `${path}/document/page/folder/${spaceId}/${directoryId}`,
     method: 'get',
     params,
   })
@@ -271,9 +271,19 @@ export function restoreFile(params) {
 }
 
 // 清空回收站
-export function empty() {
+export function empty(data) {
   return request({
     url: `${path}/document/recycleBin/empty`,
     method: 'delete',
+    data,
+  })
+}
+
+// 批量还原
+export function restoreFiles(data) {
+  return request({
+    url: `${path}/document/batch/restore`,
+    method: 'post',
+    data,
   })
 }

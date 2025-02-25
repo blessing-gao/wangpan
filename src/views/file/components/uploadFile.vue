@@ -45,12 +45,6 @@
               {{ currentParentFolder.uniqueKey }}
             </template>
             {{ file.name }}
-            <!-- 显示上传进度条 -->
-            <!-- <el-progress
-              style="flex: 1"
-              :color="customColorMethod"
-              :percentage="uploadProgress[index]?.progress"
-            /> -->
             <el-button @click="removeFile(index)" style="margin-left: 10px">
               <el-icon><Close /></el-icon>
             </el-button>
@@ -68,7 +62,7 @@
         <el-button
           style="background: #de3a05; border-radius: 4px; color: #fff"
           v-else
-          @click="uploadFolders"
+          @click="uploadFiles"
         >
           上传文件夹
         </el-button>
@@ -79,10 +73,10 @@
 
 <script setup>
 import { ref, nextTick, onMounted, getCurrentInstance } from 'vue'
-import { ElNotification } from 'element-plus'
 import { Close } from '@element-plus/icons-vue'
 import * as panApi from '@/api/pan.js'
 import '@/styles/components/uploadFile.css'
+import { uploadFile } from '@/api/upload.js'
 
 const { proxy } = getCurrentInstance()
 
@@ -187,104 +181,78 @@ const handleFiles = (files) => {
   })
 }
 
-const emits = defineEmits(['ok', 'close'])
-const uploadProgress = ref([]) // 用于存储每个文件的上传进度
+const emits = defineEmits(['close', 'uploadFiles'])
+
 
 // 上传文件到服务器，每次接口调用最多包含 10 个文件
 const uploadFiles = () => {
   if (fileList.value.length === 0) return
 
-  const uploadFileBatch = async (batchFiles) => {
-    const formData = new FormData()
-    formData.append('demand', props.demand)
-    formData.append('spaceId', props.spaceId)
-    formData.append('directoryId', props.uploadParams.directoryId)
-    formData.append('fileType', props.uploadParams.fileType)
-    batchFiles.map((file, index) => {
-      formData.append('files', file)
-      uploadProgress.value.push({ fileName: file.name, progress: 0 })
-    })
-    return panApi.uploadFile(formData).then((res) => {})
-  }
+  emits('uploadFiles', fileList.value)
 
-  // 分批上传文件，每次上传最多10个文件
-  const batchSize = 10
-  let currentBatchIndex = 0
+  handleClose()
 
-  // 上传文件直到没有剩余文件
-  const uploadNextBatch = async () => {
-    const batchFiles = fileList.value.slice(
-      currentBatchIndex,
-      currentBatchIndex + batchSize,
-    )
-    if (batchFiles.length > 0) {
-      await uploadFileBatch(batchFiles)
-      currentBatchIndex += batchSize
-      uploadNextBatch() // 递归调用上传下一个批次
-    } else {
-      return
-    }
-  }
+  // fileList.value.forEach((file) => {
+  //   const { name, size } = file
+  //   uplaodingFiles.value.push({ name, size })
+  //   uploadProgress.value.push({ name, progress: 0 })
+  // })
 
-  uploadNextBatch()
-    .then(() => {
-      // 在所有文件上传完成后，调用 handleClose
-      handleClose()
-    })
-    .catch((error) => {
-      console.error('上传过程中出错:', error)
-      handleClose() // 也可以在出错时调用 handleClose
-    })
-}
+  // const uploadFileBatch = async (batchFiles) => {
+  //   const formData = new FormData()
+  //   formData.append('demand', props.demand)
+  //   formData.append('spaceId', props.spaceId)
+  //   formData.append('directoryId', props.uploadParams.directoryId)
+  //   formData.append('fileType', props.uploadParams.fileType)
+  //   batchFiles.map((file, index) => {
+  //     formData.append('files', file)
+  //   })
+  //   const req = uploadFile(
+  //     formData,
+  //     null,
+  //     updateProgress,
+  //     onUpdataComplete,
+  //     onUploadError,
+  //     onUploadAbort,
+  //     onToastNotification,
+  //   )
+  //   req.fileNames = batchFiles.map((file) => file.name)
+  //   batchFiles.forEach((file, index) => {
+  //     // 为每个文件的请求添加一个自定义属性 index，表示该文件在 batchFiles 中的索引
+  //     req.upload.addEventListener('progress', (event) => {
+  //       event.target.index = index // 给事件目标添加一个索引，指明这是哪个文件的进度
+  //     })
+  //   })
+  // }
 
-// 上传文件夹到服务器
-const uploadFolders = () => {
-  if (fileList.value.length === 0) return
+  // // 分批上传文件，每次上传最多10个文件
+  // const batchSize = 10
+  // let currentBatchIndex = 0
 
-  const uploadFileBatch = async (batchFiles) => {
-    const formData = new FormData()
-    formData.append('demand', props.demand)
-    formData.append('spaceId', props.spaceId)
-    formData.append('directoryId', props.uploadParams.directoryId)
-    formData.append('fileType', props.uploadParams.fileType)
-    batchFiles.map((file, index) => {
-      formData.append('files', file)
-      uploadProgress.value.push({ fileName: file.name, progress: 0 })
-    })
+  // // 上传文件直到没有剩余文件
+  // const uploadNextBatch = async () => {
+  //   const batchFiles = fileList.value.slice(
+  //     currentBatchIndex,
+  //     currentBatchIndex + batchSize,
+  //   )
+  //   if (batchFiles.length > 0) {
+  //     await uploadFileBatch(batchFiles)
+  //     currentBatchIndex += batchSize
+  //     uploadNextBatch() // 递归调用上传下一个批次
+  //   } else {
+  //     return
+  //   }
+  // }
 
-    return panApi.uploadFile(formData).then((res) => {})
-  }
-
-  // 分批上传文件，每次上传最多10个文件
-  const batchSize = 10
-  let currentBatchIndex = 0
-
-  // 上传文件直到没有剩余文件
-  const uploadNextBatch = async () => {
-    const batchFiles = fileList.value.slice(
-      currentBatchIndex,
-      currentBatchIndex + batchSize,
-    )
-    if (batchFiles.length > 0) {
-      await uploadFileBatch(batchFiles)
-      currentBatchIndex += batchSize
-      uploadNextBatch() // 递归调用上传下一个批次
-    } else {
-      return
-    }
-  }
-
-  uploadNextBatch()
-
-  uploadNextBatch()
-    .then(() => {
-      // 在所有文件上传完成后，调用 handleClose
-      handleClose()
-    })
-    .catch((error) => {
-      console.error('上传过程中出错:', error)
-      handleClose() // 也可以在出错时调用 handleClose
-    })
+  // uploadNextBatch()
+  //   .then(() => {
+  //     // 在所有文件上传完成后，调用 handleClose
+  //     handleClose()
+  //   })
+  //   .catch((error) => {
+  //     console.error('上传过程中出错:', error)
+  //     handleClose() // 也可以在出错时调用 handleClose
+  //   })
 }
 
 const removeFile = (index) => {
@@ -306,7 +274,7 @@ const handleClose = () => {
   fileList.value = []
   hasMaxFilesWarning.value = false
   dialogTableVisible.value = false
-  emits('close')
+  // emits('close')
 }
 
 defineExpose({
