@@ -47,6 +47,18 @@ export function remove_uploadingFiles() {
   localStorage.removeItem('uploadingFiles')
 }
 
+export function set_uploadProgress(uploadProgress) {
+  return localStorage.setItem('uploadProgress', uploadProgress)
+}
+
+export function get_uploadProgress() {
+  return localStorage.getItem('uploadProgress')
+}
+
+export function remove_uploadProgress() {
+  localStorage.removeItem('uploadProgress')
+}
+
 export function set_downLoadingFiles(downLoadingFiles) {
   return localStorage.setItem('downLoadingFiles', downLoadingFiles)
 }

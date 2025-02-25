@@ -9,12 +9,10 @@
               src="/icons/refresh.svg"
               alt=""
             />
-            <div class="upload-number">
-              正在下载（{{ downloadProgress.length }}）
-            </div>
+            <div class="upload-number">正在上传（{{ downloadingCount }}）</div>
           </div>
           <div class="card-header-right">
-            <div class="pause">全部暂停</div>
+            <div class="pause" @click="handleClear">清空</div>
             <el-icon style="cursor: pointer" @click="handleClose">
               <Close />
             </el-icon>
@@ -26,7 +24,7 @@
           空文件夹或文件(夹)名以“.”开头可能会被浏览器过滤，且无任何提示
         </div>
         <div
-          v-for="(file, index) in downloadingFiles"
+          v-for="(file, index) in uploadingFiles"
           :key="file.id"
           class="download-item"
         >
@@ -41,7 +39,7 @@
             </div>
             <div class="title-right">
               <img
-                v-if="downloadProgress[index].progress === 100"
+                v-if="uploadProgress[index].progress === 100"
                 src="/icons/完成.svg"
                 alt=""
                 style="cursor: pointer; width: 15px; margin-right: 10px"
@@ -56,7 +54,7 @@
                   src="/icons/关闭.svg"
                   alt=""
                   style="cursor: pointer; width: 15px"
-                  @click="cancelDownload(file.id)"
+                  @click="cancelUpload(file.index)"
                 />
               </div>
             </div>
@@ -64,30 +62,23 @@
           <div class="pregress-style">
             <div class="pregress-left">
               <div class="pregress-left-left">
-                {{ formatFileSize(downloadProgress[index].loaded) }}
+                {{ formatFileSize(uploadProgress[index].loaded) }}
               </div>
               <div class="pregress-left-right">
                 /
-                {{ formatFileSize(downloadProgress[index].total) }}
+                {{ formatFileSize(uploadProgress[index].total) }}
               </div>
             </div>
 
             <div class="pregress-right">
-              {{ downloadProgress[index].progress }}%
+              {{ uploadProgress[index].progress }}%
             </div>
           </div>
           <el-progress
             color="#C38F5D"
             :show-text="false"
-            :percentage="downloadProgress[index].progress"
+            :percentage="uploadProgress[index].progress"
           ></el-progress>
-          <!-- <el-button
-            @click="cancelDownload(file.id)"
-            size="small"
-            type="danger"
-          >
-            取消
-          </el-button> -->
         </div>
       </div>
     </el-card>
@@ -95,41 +86,53 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Refresh, Close } from '@element-plus/icons-vue'
 import { fileTypeIcon } from '@/enum'
 const props = defineProps({
-  downloadProgress: {
+  uploadProgress: {
     type: Array,
     default: [],
   },
-  downloadingFiles: {
+  uploadingFiles: {
     type: Array,
     default: [],
   },
 })
 
+const downloadingCount = computed(() => {
+  // 计算 downloadProgress 中 progress 为 100 的文件数量
+  return props.uploadProgress.filter((item) => item.progress !== 100).length
+})
+
 const formatFileSize = (bytes) => {
-  if (bytes < 1024) return `${bytes} B`
-  else if (bytes < 1048576) return `${(bytes / 1024).toFixed(2)} KB`
-  else if (bytes < 1073741824) return `${(bytes / 1048576).toFixed(2)} MB`
-  else return `${(bytes / 1073741824).toFixed(2)} GB`
+  if (bytes) {
+    if (bytes < 1024) return `${bytes} B`
+    else if (bytes < 1048576) return `${(bytes / 1024).toFixed(2)} KB`
+    else if (bytes < 1073741824) return `${(bytes / 1048576).toFixed(2)} MB`
+    else return `${(bytes / 1073741824).toFixed(2)} GB`
+  } else {
+    return '0B'
+  }
 }
 
-const emits = defineEmits('cancelDownload', 'onClose')
-const cancelDownload = (id) => {
-  emits('cancelDownload', id)
-  // props.downloadProgress.forEach((item, index) => {
-  //   if (item.id === id) {
-  //     props.downloadProgress.splice(index, 1)
-  //   }
-  // })
+const emits = defineEmits('cancelUpload', 'onClose', 'clear')
+
+const cancelUpload = (id) => {
+  const fileIndex = props.uploadProgress.findIndex((item) => item.index === id)
+
+  if (fileIndex !== -1) {
+    props.uploadProgress[fileIndex].progress = 100
+  }
+  emits('cancelUpload', id)
 }
 
 const handleClose = () => {
-  console.log(11)
-
   emits('onClose')
+}
+
+const handleClear = () => {
+  emits('clear')
 }
 </script>
 

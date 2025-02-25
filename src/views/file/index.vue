@@ -464,6 +464,8 @@
       :uploadingFiles="uploadingFiles"
       :uploadProgress="uploadProgress"
       @onClose="uploadClose"
+      @clear="handleUploadClear"
+      @cancelUpload="cancelUpload"
     />
   </div>
 </template>
@@ -476,6 +478,10 @@ import {
   GET_USERID,
   set_uploadingFiles,
   get_uploadingFiles,
+  remove_uploadingFiles,
+  set_uploadProgress,
+  get_uploadProgress,
+  remove_uploadProgress,
   set_downLoadingFiles,
   get_downLoadingFiles,
   remove_downLoadingFiles,
@@ -841,7 +847,7 @@ const handleFileOperate = (type, operate, file) => {
 
 const downloadProgress = ref(JSON.parse(get_downloadProgress()) || []) // 存储下载进度
 const downloadingFiles = ref(JSON.parse(get_downLoadingFiles()) || []) // 存储正在下载的文件
-const isDownloading = ref(true) // 是否正在下载
+const isDownloading = ref(false) // 是否正在下载
 // 下载文档
 const downloadFiles = (file) => {
   const { name, size, id } = file
@@ -858,8 +864,6 @@ const downloadFiles = (file) => {
     onToastNotification,
   )
   // 将下载信息加入列表
-  console.log(downloadingFiles.value)
-
   downloadingFiles.value.push({ name, size, index, req })
   downloadProgress.value.push({ name, index, progress: 0 })
   isDownloading.value = true
@@ -870,6 +874,13 @@ const handleClear = () => {
   downloadingFiles.value = []
   remove_downloadProgress()
   downloadProgress.value = []
+}
+
+const handleUploadClear = () => {
+  remove_uploadingFiles()
+  uploadingFiles.value = []
+  remove_uploadProgress()
+  uploadProgress.value = []
 }
 
 // 更新进度
@@ -925,13 +936,22 @@ const cancelDownload = (index) => {
   }
 }
 
+// 取消上传
+const cancelUpload = (index) => {
+  const file = uploadingFiles.value.find((file) => file.index === index)
+  if (file) {
+    file.progress = 100
+    file.loaded = 0
+    file.req.abort()
+    const index1 = uploadingFiles.value.indexOf(file)
+    if (index1 > -1) {
+      uploadingFiles.value.splice(index1, 1) // 从队列中移除文件
+      uploadProgress.value.splice(index1, 1) // 从队列中移除进度
+    }
+  }
+}
+
 const downloadClose = () => {
-  // downloadProgress.value = downloadProgress.value.filter(
-  //   (item) => item.progress !== 100,
-  // )
-  // downloadingFiles.value = downloadingFiles.value.filter(
-  //   (item) => item.req.status == 200,
-  // )
   isDownloading.value = false
 }
 
@@ -1019,10 +1039,6 @@ const handleRestore = (file) => {
       console.log(res)
       if (res.code == 0) {
         proxy.$modal.msgSuccess('还原成功')
-        getRecycleBinList()
-        selectedRowsId.value = []
-        const table = table_ref.value.table_ref
-        table.clearSelection()
       }
     })
     .catch((err) => {
@@ -1038,7 +1054,10 @@ const handleRestores = () => {
   panApi.restoreFiles(params).then((res) => {
     if (res.code == 0) {
       proxy.$modal.msgSuccess('还原成功')
-      getT()
+      getRecycleBinList()
+      selectedRowsId.value = []
+      const table = table_ref.value.table_ref
+      table.clearSelection()
     }
   })
 }
@@ -1108,14 +1127,12 @@ const handleClose = () => {
   leftTabsRefs.value.getLeftTabs(spaceId.value)
 }
 
-const uploadProgress = ref([]) // 存储上传进度
-const uploadingFiles = ref(get_uploadingFiles()) // 存储正在上传的文件
+const uploadProgress = ref(JSON.parse(get_uploadProgress()) || []) // 存储上传进度
+const uploadingFiles = ref(JSON.parse(get_uploadingFiles()) || []) // 存储正在上传的文件
 const isUploading = ref(false) // 是否正在上传
 
 // 上传文件
 const uploadFiles = async (fileList) => {
-  console.log(fileList)
-
   if (importMdFile.value) {
     // for (const { raw } of fileList) {
   } else {
@@ -1126,24 +1143,21 @@ const uploadFiles = async (fileList) => {
     }
     isUploading.value = true
 
-    fileList.forEach((file) => {
-      const { name, size } = file
-      uploadingFiles.value.push({ name, size })
-      set_uploadingFiles(uploadingFiles.value)
-      uploadProgress.value.push({ name, progress: 0 })
-    })
+    fileList.forEach((file, index) => {
+      console.log(uploadingFiles.value.length)
 
-    const uploadFileBatch = async (batchFiles) => {
+      const targetIndex = uploadingFiles.value.length + 1
+      const { name, size } = file
       const formData = new FormData()
       formData.append('demand', uploadDemandFile.value)
       formData.append('spaceId', spaceId.value)
       formData.append('directoryId', uploadParams.directoryId)
       formData.append('fileType', uploadParams.fileType)
-      batchFiles.map((file, index) => {
-        formData.append('files', file)
-      })
+      formData.append('files', file)
       const req = uploadFile(
         formData,
+        name,
+        targetIndex,
         null,
         updateProgress,
         onUpdataComplete,
@@ -1151,35 +1165,30 @@ const uploadFiles = async (fileList) => {
         onUploadAbort,
         onToastNotification,
       )
-      req.fileNames = batchFiles.map((file) => file.name)
-      batchFiles.forEach((file, index) => {
-        // 为每个文件的请求添加一个自定义属性 index，表示该文件在 batchFiles 中的索引
-        req.upload.addEventListener('progress', (event) => {
-          event.target.index = index // 给事件目标添加一个索引，指明这是哪个文件的进度
-        })
-      })
-    }
+      uploadingFiles.value.push({ name, size, targetIndex, req })
+      uploadProgress.value.push({ name, targetIndex, progress: 0 })
+    })
 
     // 分批上传文件，每次上传最多10个文件
-    const batchSize = 10
-    let currentBatchIndex = 0
+    // const batchSize = 10
+    // let currentBatchIndex = 0
 
-    // 上传文件直到没有剩余文件
-    const uploadNextBatch = async () => {
-      const batchFiles = fileList.slice(
-        currentBatchIndex,
-        currentBatchIndex + batchSize,
-      )
-      if (batchFiles.length > 0) {
-        await uploadFileBatch(batchFiles)
-        currentBatchIndex += batchSize
-        uploadNextBatch() // 递归调用上传下一个批次
-      } else {
-        return
-      }
-    }
+    // // 上传文件直到没有剩余文件
+    // const uploadNextBatch = async () => {
+    //   const batchFiles = fileList.slice(
+    //     currentBatchIndex,
+    //     currentBatchIndex + batchSize,
+    //   )
+    //   if (batchFiles.length > 0) {
+    //     await uploadFileBatch(batchFiles)
+    //     currentBatchIndex += batchSize
+    //     uploadNextBatch() // 递归调用上传下一个批次
+    //   } else {
+    //     return
+    //   }
+    // }
 
-    uploadNextBatch()
+    // uploadNextBatch()
 
     // getTableData()
     // // 还需要调用左侧tab的查询接口
@@ -1187,8 +1196,8 @@ const uploadFiles = async (fileList) => {
   }
 }
 
-const updateProgress = (name, percent, loaded, total) => {
-  const file = uploadProgress.value.find((file) => file.name == name)
+const updateProgress = (name, id, percent, loaded, total) => {
+  const file = uploadProgress.value.find((file) => file.targetIndex == id)
   console.log(file)
 
   if (file) {
@@ -1199,7 +1208,8 @@ const updateProgress = (name, percent, loaded, total) => {
 }
 
 const onUpdataComplete = (id) => {
-  console.log(id)
+  set_uploadingFiles(JSON.stringify(uploadingFiles.value))
+  set_uploadProgress(JSON.stringify(uploadProgress.value))
   getTableData()
   // uplaodingFiles.value = uplaodingFiles.value.filter((file) => file.id !== id)
   // uploadProgress.value = uploadProgress.value.filter(

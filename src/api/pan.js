@@ -271,11 +271,11 @@ export function restoreFile(params) {
 }
 
 // 清空回收站
-export function empty(data) {
+export function empty(params) {
   return request({
     url: `${path}/document/recycleBin/empty`,
     method: 'delete',
-    data,
+    params,
   })
 }
 
