@@ -14,7 +14,7 @@
               :span="6"
               v-for="(item, index) in classifyList"
               :key="index"
-              style="margin-bottom: 10px;"
+              style="margin-bottom: 10px"
             >
               <el-card
                 shadow="never"
@@ -70,7 +70,7 @@
     </div>
     <div class="first_box">
       <div class="title1">最近上传</div>
-      <img style="height: 76px" src="/assets/Mask group.png" />
+      <img style="height: 76px" src="/assets/MaskGroup.png" />
       <div class="upload-content">
         <div v-if="uploadList.length == 0">
           <div
@@ -193,7 +193,6 @@ const getnameColor = (name) => {
   }
 }
 
-
 const historyList = ref([])
 
 const getHistoryList = async () => {
@@ -265,6 +264,7 @@ const jumpFilePath = (item) => {
   width: 84%;
   height: 110px;
   padding: 0px;
+  padding-bottom: 14px;
 }
 .el-col {
   padding: 0 !important;
@@ -359,6 +359,10 @@ const jumpFilePath = (item) => {
     color: #000000;
     letter-spacing: 0;
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 82%;
   }
   .history-detail-synopsis {
     font-family: Helvetica;
@@ -395,10 +399,10 @@ const jumpFilePath = (item) => {
 
 .upload-content-title {
   font-family: PingFangSC-Medium;
-  font-size: 14px;
+  font-size: 16px;
   color: #333333;
   letter-spacing: 0;
-  line-height: 22px;
+  line-height: 30x;
   font-weight: 500;
 }
 

@@ -227,15 +227,15 @@ const handleChange = (item) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  border-radius: 4px;
 }
 
 .organization-content:hover {
-  color: #de3a05;
-  background: rgba(255, 215, 202, 0.5);
+  background: #f9f3ee;
 }
 
 .highlighted {
   color: #de3a05;
-  background: rgba(255, 215, 202, 0.5);
+  background: #f9f3ee;
 }
 </style>

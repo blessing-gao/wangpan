@@ -85,9 +85,9 @@ import * as panApi from '@/api/pan.js'
 
 const route = useRoute()
 const userStore = useUserStore()
-const circleUrl = ref(userStore.checkUser.avatar)
+const circleUrl = ref('/icons/头像.svg')
 
-const userName = ref(userStore.checkUser.username)
+const userName = ref('')
 
 const usedSize = ref('0')
 const allSize = ref('0')
@@ -220,7 +220,7 @@ const loginOut = async () => {
   margin-bottom: 8px;
   .file-number-title {
     font-family: PingFangSC-Medium;
-    font-size: 14px;
+    font-size: 16px;
     color: #333333;
     letter-spacing: 0;
     font-weight: 500;

@@ -41,19 +41,19 @@
             <span class="custom-tree-node">
               <template v-if="data.label == '最近使用'">
                 <img
-                  style="margin-right: 12px; width: 12px"
+                  style="margin-right: 12px; width: 16px"
                   src="/icons/矩形.svg"
                 />
               </template>
               <template v-if="data.label == '收藏文件'">
                 <img
-                  style="margin-right: 12px; width: 12px"
+                  style="margin-right: 12px; width: 16px"
                   src="/icons/常用文件.svg"
                 />
               </template>
               <template v-if="data.label == '回收站'">
                 <img
-                  style="margin-right: 12px; width: 12px"
+                  style="margin-right: 12px; width: 16px"
                   src="/icons/垃圾桶.svg"
                 />
               </template>
@@ -77,7 +77,7 @@
           <template #default="{ data }">
             <span class="custom-tree-node">
               <img
-                style="margin-right: 12px; width: 14px"
+                style="margin-right: 12px; width: 16px"
                 :src="
                   fileTypeIcon(
                     data.fileType === 2
@@ -302,7 +302,6 @@ const handleCommand = (data) => {
   font-size: 14px;
   color: #999999;
   letter-spacing: 0;
-  font-weight: 600;
   margin-bottom: 4px;
   cursor: pointer;
 }
@@ -349,7 +348,7 @@ const handleCommand = (data) => {
   margin-bottom: 8px;
   .file-number-title {
     font-family: PingFangSC-Medium;
-    font-size: 14px;
+    font-size: 16px;
     color: #333333;
     letter-spacing: 0;
     font-weight: 500;
