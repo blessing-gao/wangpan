@@ -1,7 +1,13 @@
 <template>
-  <div style="height: 100%">
+  <div
+    style="
+      height: 100%;
+      width: 17%;
+      border-right: 1px solid rgba(230, 231, 234, 1);
+    "
+  >
     <!-- 左侧二级导航 -->
-    <div class="two-left">
+    <div style="display: flex; justify-content: center; padding-top: 12px;">
       <div class="left-footer">
         <div class="file-number">
           <div class="file-number-title">{{ userName }}</div>
@@ -25,6 +31,9 @@
           />
         </div>
       </div>
+    </div>
+
+    <div class="two-left">
       <div class="left-top">
         <div class="all-file">常用</div>
         <el-tree
@@ -236,7 +245,7 @@ const otherList = ref([
   },
 ])
 
-const handleAllFile =() => {
+const handleAllFile = () => {
   fileTree.value?.setCurrentKey(null)
   fileData.value = []
   fileId.value = 0
@@ -262,10 +271,9 @@ const handleCommand = (data) => {
 .two-left {
   position: relative;
   box-sizing: border-box;
-  width: 332px;
+  width: 100%;
   padding: 12px;
   height: 100%;
-  border-right: 1px solid rgba(230, 231, 234, 1);
 }
 
 /* 样式覆盖选中项的字体颜色和背景颜色 */
@@ -289,8 +297,8 @@ const handleCommand = (data) => {
 .custom-tree-node {
   display: flex;
   align-items: centere;
+  max-width: 85%;
   span {
-    max-width: 233px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -335,7 +343,7 @@ const handleCommand = (data) => {
 }
 
 .left-footer {
-  width: 90%;
+  width: 82%;
   background: rgba(243, 232, 222, 0.5);
   border-radius: 8px;
   padding: 10px 16px 14px 14px;

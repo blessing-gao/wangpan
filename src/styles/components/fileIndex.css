@@ -12,6 +12,9 @@
     .file-name_left {
         display: flex;
         align-items: center;
+        flex: 1;
+        margin-right: 10px;
+        max-width: 68%;
     }
 }
 
