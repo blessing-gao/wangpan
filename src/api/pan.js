@@ -138,6 +138,24 @@ export function deleteFile(params) {
   })
 }
 
+// 批量删除
+export function deleteFiles(data) {
+  return request({
+    url: `${path}/document/batch/delete`,
+    method: 'delete',
+    data,
+  })
+}
+
+// 只查文件夹
+export function leftFolder(spaceId, directoryId, params) {
+  return request({
+    url: `${path}/page/folder/${spaceId}/${directoryId}`,
+    method: 'get',
+    params,
+  })
+}
+
 // 文档 - 彻底删除文件
 export function recycleBinDeleteFile(params) {
   return request({
@@ -249,5 +267,13 @@ export function restoreFile(params) {
     url: `${path}/document/recoverFile`,
     method: 'get',
     params,
+  })
+}
+
+// 清空回收站
+export function empty() {
+  return request({
+    url: `${path}/document/recycleBin/empty`,
+    method: 'delete',
   })
 }

@@ -73,7 +73,7 @@
                   style="margin-right: 28px"
                 />
                 <el-button @click="handleDownload">批量下载</el-button>
-                <el-button>批量删除</el-button>
+                <el-button @click="handleDetate">批量删除</el-button>
               </div>
               <div v-else>
                 <el-checkbox
@@ -87,7 +87,7 @@
               </div>
             </div>
             <div v-if="listType == 'recycleBin'">
-              <el-button>清空回收站</el-button>
+              <el-button @click="handleEmpty">清空回收站</el-button>
             </div>
           </div>
 
@@ -174,7 +174,7 @@
                   "
                 />
               </div>
-              <div style="margin-right: 10px;">
+              <div style="margin-right: 10px">
                 {{ rows.name }}
               </div>
               <div>
@@ -1312,6 +1312,37 @@ const handleDownload = () => {
     link.click()
     window.URL.revokeObjectURL(link.href)
   })
+}
+
+const table_ref = ref(null)
+
+const handleDetate = () => {
+  const params = {
+    documentIds: selectedRowsId.value,
+  }
+  panApi
+    .deleteFiles(params)
+    .then((res) => {
+      getTableData()
+      // 清除选中项
+      selectedRowsId.value = []
+      const table = table_ref.value.table_ref
+      table.clearSelection()
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
+
+const handleEmpty = () => {
+  panApi
+    .empty()
+    .then((res) => {
+      console.log(res)
+    })
+    .catch((err) => {
+      console.error(err)
+    })
 }
 </script>
 <style lang="scss" scoped>
