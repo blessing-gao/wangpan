@@ -243,7 +243,7 @@ const downloading = ref(false)
 const downloadFiles = () => {
   downloading.value = true
   panApi
-    .downloadFile(id)
+    .downloadFile(id.value)
     .then((res) => {
       let blob = new Blob([res.data])
       let _fileNames = res.headers['content-disposition']
