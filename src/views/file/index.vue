@@ -1081,7 +1081,7 @@ const handleRecycleBinDelete = (file) => {
 }
 
 // 创建或上传文件(夹)的父文件夹对象
-const currentParentFolder = ref(null)
+// const currentParentFolder = ref(null)
 
 const uploadParams = reactive({
   spaceId: '',
@@ -1102,18 +1102,18 @@ const currentFile = ref(null)
 // 点击显示上传文件弹窗
 const handleShowUpload = (type, file, demand) => {
   if (file) {
-    currentParentFolder.value = file
+    isFolder.value = file
     uploadParams.directoryId = file.id
     uploadParams.uniqueKey = file.uniqueKey
   } else {
-    currentParentFolder.value = null
+    isFolder.value = null
     uploadParams.directoryId = 0
     uploadParams.uniqueKey = ''
   }
   uploadDemandFile.value = demand ? demand : false
   importMdNotion.value = ['mdNotion', 'mdFile'].includes(type)
   importMdFile.value = type === 'mdFile'
-  uploadFileRefs.value.handleEdit('file', currentParentFolder.value)
+  uploadFileRefs.value.handleEdit('file', isFolder.value)
 }
 
 const handleClose = () => {
@@ -1136,8 +1136,9 @@ const uploadFiles = async (fileList) => {
   if (importMdFile.value) {
     // for (const { raw } of fileList) {
   } else {
-    if (currentParentFolder.value) {
-      fileId.value = currentParentFolder.value.id
+    console.log(isFolder.value)
+    if (isFolder.value) {
+      fileId.value = isFolder.value.id
     } else {
       fileId.value = 0
     }
