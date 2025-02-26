@@ -318,7 +318,7 @@ const handleCommand = (data) => {
 }
 
 :deep(.el-tree-node__content) {
-  padding-left: 0 !important;
+  // padding-left: 0 !important;
 }
 
 .left-top {
