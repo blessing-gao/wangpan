@@ -28,16 +28,29 @@
             justify-content: center;
           "
         >
-          <previewVideo :previewBoolean="true" :content="{ path: file_path }" />
+          <div v-if="file_path == ''" class="loading">
+            <p>视频加载中...</p>
+          </div>
+          <previewVideo
+            v-else
+            :previewBoolean="true"
+            :content="{ path: file_path }"
+          />
         </div>
         <div v-else-if="file_type === 'pdf'" style="width: 100%; height: 100%">
-          <previewPDF :content="{ path: file_path }" />
+          <div v-if="file_path == ''" class="loading">
+            <p>加载中...</p>
+          </div>
+          <previewPDF v-else :content="{ path: file_path }" />
         </div>
         <div
           v-else-if="file_type === 'image'"
           style="width: 100%; height: 100%"
         >
-          <previewImage :content="{ path: file_path }" />
+          <div v-if="file_path == ''" class="loading">
+            <p>图片加载中...</p>
+          </div>
+          <previewImage v-else :content="{ path: file_path }" />
         </div>
         <div
           v-else-if="file_type === 'audio'"
@@ -49,7 +62,10 @@
             align-items: center;
           "
         >
-          <audioPreview :audioSrc="file_path" />
+          <div v-if="file_path == ''" class="loading">
+            <p>音频加载中...</p>
+          </div>
+          <audioPreview v-else :audioSrc="file_path" />
         </div>
         <div
           v-else-if="file_type === 'excel'"
@@ -61,7 +77,10 @@
             align-items: center;
           "
         >
-          <ExcelPreview :file_path="file_path" />
+          <div v-if="file_path == ''" class="loading">
+            <p>加载中...</p>
+          </div>
+          <ExcelPreview v-else :file_path="file_path" />
         </div>
         <div
           v-else-if="file_type === 'word'"
@@ -73,7 +92,14 @@
             align-items: center;
           "
         >
-          <vue-office-docx :src="file_path" style="width: 100%; height: 100%" />
+          <div v-if="file_path == ''" class="loading">
+            <p>文档加载中...</p>
+          </div>
+          <vue-office-docx
+            v-else
+            :src="file_path"
+            style="width: 100%; height: 100%"
+          />
         </div>
         <div v-else-if="file_type == ''" class="error-content">
           <p>
@@ -142,8 +168,21 @@ const fetchFileInfo = async () => {
   let result = await shareApi.share(uuid[uuid.length - 1])
   id.value = result.data.id
   file_name.value = result.data.name || '未知文件'
-  file_path.value = window.location.href
   file_type.value = determineFileType(result.data.name)
+  if (
+    file_type.value == 'video' ||
+    file_type.value == 'audio' ||
+    file_type.value == 'image' ||
+    file_type.value == 'excel' ||
+    file_type.value == 'word'
+  ) {
+    const videoBlob = await panApi.downloadFile(id.value)
+    file_path.value = URL.createObjectURL(videoBlob.data)
+
+    console.log(file_path.value)
+  } else {
+    file_path.value = window.location.href
+  }
 }
 
 // 根据contentType判断文件类型
@@ -249,5 +288,17 @@ const downloadFiles = () => {
 
 :deep(.el-tabs__active-bar) {
   background-color: #de3a05 !important;
+}
+
+.loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: #de3a05;
+  background-color: rgba(255, 255, 255, 0.7);
+  // position: absolute;
 }
 </style>
