@@ -34,6 +34,8 @@ router.beforeEach(async (to, from, next) => {
         } else {
           next() // 如果已经在 /notSpace 页面，继续导航
         }
+      } else if (!userId) {
+        window.location.href = import.meta.env.VITE_LOGIN_URL
       } else {
         next({ path: '/404' })
       }

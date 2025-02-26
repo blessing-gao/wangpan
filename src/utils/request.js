@@ -36,16 +36,20 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   (response) => {
     const { data } = response
+    // 如果是401，跳转到登录页面
+    if (response.status === 401) {
+      return (window.location.href = import.meta.env.VITE_LOGIN_URL)
+    }
     if (data instanceof Blob) {
       return response
     }
     if (data.code === 0) {
-      return data
-      // return window.location.href = import.meta.env.VITE_LOGIN_URL
-    } else {
-      if (code === 401) {
-        return window.location.href = import.meta.env.VITE_LOGIN_URL
+      // 如果返回的code是0，但msg中包含401，跳转到登录页面
+      if (data.msg && data.msg.includes('401')) {
+        return (window.location.href = import.meta.env.VITE_LOGIN_URL)
       }
+      return data
+    } else {
       ElMessage.warning(data.msg || '接口调用失败，请联系管理员')
       return Promise.reject()
     }

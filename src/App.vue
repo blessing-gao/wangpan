@@ -5,7 +5,7 @@ const urlParams = new URLSearchParams(window.location.search)
 
 const token = urlParams.get('token') // 获取id参数
 
-// SET_TOKEN(token)
+SET_TOKEN(token)
 </script>
 
 <template>
