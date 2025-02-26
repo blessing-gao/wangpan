@@ -5,9 +5,9 @@
       @handleNodeClick="handleNodeClick"
       @onCommand="handleOtherList"
     />
-    <div style="padding: 16px; flex: 1">
+    <div style="padding: 16px; flex: 1;height: 100%;">
       <vTableCustom
-        style="width: 100%"
+        style="width: 100%; height: 100%;"
         ref="table_ref"
         :tableHead="false"
         :border="false"
@@ -181,7 +181,7 @@
                 <el-tag class="ml-2" type="warning" size="small">标签</el-tag>
               </div>
             </div>
-            <div class="file-name_right">
+            <!-- <div class="file-name_right">
               <div
                 class="file-name_right"
                 v-if="listType == 'default' || listType == 'history'"
@@ -298,7 +298,7 @@
                   </fileOperateMenu>
                 </el-tooltip>
               </div>
-            </div>
+            </div> -->
           </div>
         </template>
 

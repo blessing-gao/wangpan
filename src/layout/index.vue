@@ -49,5 +49,6 @@ import zyTabsVue from './components/zyTabs.vue'
 .el-main {
   padding: 0;
   width: calc(100% - 71px);
+  height: 96%;
 }
 </style>

@@ -31,11 +31,11 @@ export const columns = [
     align: 'left',
     width: '120',
   },
-  // {
-  //   prop: "operation",
-  //   label: "操作",
-  //   width: 200,
-  //   align: "left",
-  //   slotName: "operation",
-  // },
+  {
+    prop: "operation",
+    label: "操作",
+    width: 200,
+    align: "left",
+    slotName: "operation",
+  },
 ]

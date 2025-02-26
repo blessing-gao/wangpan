@@ -317,8 +317,10 @@ defineExpose({
 }
 
 .table {
-  padding: 0px 10px 50px;
+  padding: 0px 10px;
   background-color: #fff;
+  height: calc(100% - 108px);
+  overflow: scroll;
 }
 </style>
 <style>
