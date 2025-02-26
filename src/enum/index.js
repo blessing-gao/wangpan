@@ -1,30 +1,30 @@
 export const fileTypeIcon = (fileName) => {
   const list = {
-    md: '/icons/编组 5.svg',
-    txt: '/icons/编组 5.svg',
-    dot: '/icons/file_type_word.svg',
-    doc: '/icons/file_type_word.svg',
-    docx: '/icons/file_type_word.svg',
-    docm: '/icons/file_type_word.svg',
-    dotx: '/icons/file_type_word.svg',
-    dotm: '/icons/file_type_word.svg',
-    pptx: '/icons/ppt.svg',
-    ppt: '/icons/ppt.svg',
-    xlsx: '/icons/file_type_excel.svg',
-    xls: '/icons/file_type_excel.svg',
+    md: '/icons/file-word.svg',
+    txt: '/icons/file-word.svg',
+    dot: '/icons/file-word.svg',
+    doc: '/icons/file-word.svg',
+    docx: '/icons/file-word.svg',
+    docm: '/icons/file-word.svg',
+    dotx: '/icons/file-word.svg',
+    dotm: '/icons/file-word.svg',
+    pptx: '/icons/file-ppt.svg',
+    ppt: '/icons/file-ppt.svg',
+    xlsx: '/icons/file-excel.svg',
+    xls: '/icons/file-excel.svg',
     jsmind: '/icons/file_type_jsmind.svg',
-    pdf: '/icons/ppt.svg',
-    png: '/icons/项目.svg',
-    jpg: '/icons/项目.svg',
-    svg: '/icons/项目.svg',
+    pdf: '/icons/file-pdf.svg',
+    png: '/icons/file-img.svg',
+    jpg: '/icons/file-img.svg',
+    svg: '/icons/file-img.svg',
     zip: '/icons/压缩.svg',
     tar: '/icons/压缩.svg',
-    mp3: '/icons/audio.svg',
-    mp4: '/icons/编组 3.svg',
+    mp3: '/icons/file-audio.svg',
+    mp4: '/icons/file-video.svg',
     '7z': '/icons/压缩.svg'
   }
   if (fileName.includes('.')) {
-    return list[fileName.split('.').pop()] || '/icons/编组 5.svg'
+    return list[fileName.split('.').pop()] || '/icons/file-other.svg'
   } else {
     return '/icons/文件管理.svg'
   }
