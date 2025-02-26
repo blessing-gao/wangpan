@@ -167,6 +167,7 @@ const fetchFileInfo = async () => {
   const uuid = window.location.href.split('/')
   let result = await shareApi.share(uuid[uuid.length - 1])
   id.value = result.data.id
+  documentDetailRefs.value.getFileDetail()
   file_name.value = result.data.name || '未知文件'
   file_type.value = determineFileType(result.data.name)
   if (
@@ -215,7 +216,7 @@ const determineFileType = (contentType) => {
 // 页面加载时获取文件信息
 onMounted(async () => {
   await fetchFileInfo()
-  documentDetailRefs.value.getFileDetail()
+  
 })
 
 const documentDetailRefs = ref(null)
