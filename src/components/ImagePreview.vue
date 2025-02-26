@@ -3,6 +3,7 @@
     <el-image
       style="width: 100%; height: 95%; object-fit: contain"
       :src="content.path"
+      :preview-src-list="srcList"
       fit="contain"
       lazy
     />
@@ -12,13 +13,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-defineProps({
+const props = defineProps({
   content: {
     type: Object,
     required: true,
   },
 })
-const imgUrl = ref(null)
+const srcList = ref([props.content.path])
 
 // 通过模拟请求或直接设定文件路径
 const loadPdf = () => {
