@@ -24,7 +24,7 @@ request.interceptors.request.use(
       'Amp-App-Code':
         JSON.parse(localStorage.getItem('activedApp'))?.code || '',
       'User-Id': GET_USERID() || '',
-      'Token': GET_TOKEN() || ''
+      Token: GET_TOKEN() || '',
     }
     return config
   },
@@ -41,7 +41,11 @@ request.interceptors.response.use(
     }
     if (data.code === 0) {
       return data
+      // return window.location.href = import.meta.env.VITE_LOGIN_URL
     } else {
+      if (code === 401) {
+        return window.location.href = import.meta.env.VITE_LOGIN_URL
+      }
       ElMessage.warning(data.msg || '接口调用失败，请联系管理员')
       return Promise.reject()
     }
