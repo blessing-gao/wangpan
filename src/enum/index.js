@@ -32,21 +32,21 @@ export const fileTypeIcon = (fileName) => {
 
 export const typeIcon = (name) => {
   const list = {
-    EXCEL: '/icons/file_type_excel.svg',
+    EXCEL: '/icons/home-excel.svg',
     视频: '/icons/编组 3.svg',
     图片: '/icons/项目.svg',
     音频: '/icons/audio.svg',
-    Word: '/icons/file_type_word.svg',
-    PPT: '/icons/ppt.svg',
-    PDF: '/icons/ppt.svg',
-    文本文件: '/icons/编组 5.svg',
+    Word: '/icons/home-word.svg',
+    PPT: '/icons/home-ppt.svg',
+    PDF: '/icons/home-pdf.svg',
+    文本文件: '/icons/home-word.svg',
     ZIP文件: '/icons/压缩.svg',
-    其他文件: '/icons/文件管理.svg',
+    其他文件: '/icons/home-other.svg',
   }
   if (name) {
-    return list[name] || '/icons/编组 5.svg'
+    return list[name] || '/icons/home-other.svg'
   } else {
-    return '/icons/文件管理.svg'
+    return '/icons/home-other.svg'
   }
 }
 

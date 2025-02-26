@@ -181,16 +181,35 @@ onMounted(async () => {
   await getUploadList()
 })
 
+const fileTypeMap = {
+  图片: 'image',
+  视频: 'video',
+  音频: 'audio',
+  文本文件: 'word',
+  word: 'word',
+  excel: 'excel',
+  ppt: 'ppt',
+  pdf: 'pdf',
+  ZIP文件: 'zip',
+  其他文件: 'other',
+}
+
 const getnameColor = (name) => {
-  if (name === '图片') {
-    return 'blue' // 本地图标路径
-  } else if (name === '视频') {
-    return 'origin' // 本地图标路径
-  } else if (name === '音频') {
-    return 'red' // 本地图标路径
-  } else if (name === '文本文件') {
-    return 'green' // 本地图标路径
+  // 将 name 转为小写，查找映射
+  const lowerCaseName = name.toLowerCase()
+
+  // 处理所有文件类型匹配
+  if (fileTypeMap[name]) {
+    return fileTypeMap[name]
   }
+
+  // 如果小写 name 匹配某种类型
+  if (fileTypeMap[lowerCaseName]) {
+    return fileTypeMap[lowerCaseName]
+  }
+
+  // 如果没有匹配的类型，返回 undefined 或其他默认值
+  return undefined
 }
 
 const historyList = ref([])
@@ -415,16 +434,31 @@ const jumpFilePath = (item) => {
   font-weight: 400;
 }
 
-.blue {
+.image {
   color: #5091ff;
 }
-.origin {
+.video {
   color: #ff890e;
 }
-.red {
+.audio {
   color: #ff605c;
 }
-.green {
+.word {
+  color: #0075ff;
+}
+.excel {
   color: #09b9a2;
+}
+.ppt {
+  color: #ff6a38;
+}
+.pdf {
+  color: #ff6a38;
+}
+.zip {
+  color: #BC8585;
+}
+.other {
+  color: #1dc1ab;
 }
 </style>

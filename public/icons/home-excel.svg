@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>excel</title>
+    <defs>
+        <linearGradient x1="10.1441676%" y1="4.94681215%" x2="93.9453125%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#28E28B" offset="0%"></stop>
+            <stop stop-color="#0DA365" offset="100%"></stop>
+        </linearGradient>
+        <path d="M22.04,0 L30,8.342 L30,28 C30,30.209139 28.209139,32 26,32 L4,32 C1.790861,32 1.78856188e-15,30.209139 0,28 L0,4.00039018 C-7.1463071e-16,1.79125118 1.790861,0.000390183958 4,0.000390183958 L22.04,0 Z" id="path-2"></path>
+        <linearGradient x1="40.3153147%" y1="45.2063041%" x2="65.2878476%" y2="78.0088786%" id="linearGradient-4">
+            <stop stop-color="#B6E4CE" stop-opacity="0.390189644" offset="0%"></stop>
+            <stop stop-color="#12B16C" stop-opacity="0.0851709326" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="72.9790329%" y1="50%" x2="8.92628595%" y2="100%" id="linearGradient-5">
+            <stop stop-color="#8CE3AE" offset="0%"></stop>
+            <stop stop-color="#8CE3A9" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="pc端" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon" transform="translate(-1305.000000, -117.000000)">
+            <g id="编组-9" transform="translate(1305.000000, 117.000000)">
+                <g id="编组-15" transform="translate(1.000000, 0.000000)">
+                    <g id="路径-10">
+                        <mask id="mask-3" fill="white">
+                            <use xlink:href="#path-2"></use>
+                        </mask>
+                        <use id="蒙版" fill="url(#linearGradient-1)" xlink:href="#path-2"></use>
+                        <path d="M17.9241948,35.3575348 C17.9445132,35.3950703 21.9395109,35.3950703 29.9091878,35.3575348 L31.1041883,9.89665588 C19.3149378,17.6652853 14.9216067,26.152245 17.9241948,35.3575348 Z" fill="url(#linearGradient-4)" mask="url(#mask-3)"></path>
+                    </g>
+                    <polygon id="路径-23" fill="#FFFFFF" points="10.5732087 11 19.040915 11 19.040915 13.3588292 13.2905448 13.3588292 13.2905448 15.9761067 19.040915 15.9761067 19.040915 18.2104223 13.2905448 18.2104223 13.2905448 20.6750671 19.040915 20.6750671 19.040915 23 10.5732087 23"></polygon>
+                </g>
+                <path d="M22.4260149,0.10019084 L22.4260149,5.14796568 C22.5954566,7.49595275 23.7988103,8.66994628 26.0360761,8.66994628 C28.2733419,8.66994628 29.9183049,8.66994628 30.9709651,8.66994628 C30.896739,8.31988562 30.6871383,7.95884687 30.3421631,7.58683004 C25.6250984,2.50000777 23.8001178,0.774491099 23.2877144,0.367273193 C23.0053281,0.142854803 22.7180949,0.0538273522 22.4260149,0.10019084 Z" id="路径-20" fill="url(#linearGradient-5)" opacity="0.5"></path>
+            </g>
+        </g>
+    </g>
+</svg>
