@@ -55,7 +55,7 @@ const constantRoutes = [
     },
   },
   {
-    path: '/document/share/download/:id', // 视频详情页的路由路径
+    path: '/document/share/:id', // 视频详情页的路由路径
     name: 'sharePreview',
     component: () =>
       import(/* webpackChunkName: "404" */ '../views/sharePreview/index.vue'),

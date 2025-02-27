@@ -113,7 +113,7 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(env.VITE_APPLICATION_PREV, '')
         },
-        '/minio': {
+        '/file': {
           target: 'http://shenben.club:9000',
           changeOrigin: true,
           rewrite: (path) => path.replace('/minio', ''),

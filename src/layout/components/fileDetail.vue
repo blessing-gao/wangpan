@@ -22,7 +22,7 @@
             <el-button plain :loading="downloading" @click="downloadFiles">
               下载
             </el-button>
-            <el-button plain v-if="isEdit">上传新版本</el-button>
+            <!--<el-button plain v-if="isEdit">上传新版本</el-button>-->
           </div>
         </template>
       </el-page-header>

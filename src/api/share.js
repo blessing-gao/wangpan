@@ -3,7 +3,7 @@ const path = import.meta.env.VITE_BASE_PREV
 
 export const share = (id) => {
   return request({
-    url: `${path}/document/share/download/${id}`,
+    url: `${path}/document/share/${id}`,
     method: 'get',
   })
 }
