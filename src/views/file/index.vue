@@ -1499,17 +1499,27 @@ const handleDetate = () => {
 }
 
 const handleEmpty = () => {
-  const params = {
-    userId: GET_USERID(),
-  }
-  panApi
-    .empty(params)
-    .then((res) => {
-      console.log(res)
-      getRecycleBinList()
+  ElMessageBox.confirm('此操作将永久删除文件, 是否继续?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      const params = {
+        userId: GET_USERID(),
+      }
+      panApi
+        .empty(params)
+        .then((res) => {
+          console.log(res)
+          getRecycleBinList()
+        })
+        .catch((err) => {
+          console.error(err)
+        })
     })
-    .catch((err) => {
-      console.error(err)
+    .catch(() => {
+      proxy.$modal.msg('取消清空')
     })
 }
 
