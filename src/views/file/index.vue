@@ -489,6 +489,7 @@ import {
   set_downloadProgress,
   get_downloadProgress,
   remove_downloadProgress,
+  GET_TOKEN,
 } from '@/utils/auth'
 import { ElMessageBox } from 'element-plus'
 import { useRoute, useRouter } from 'vue-router'
@@ -863,6 +864,8 @@ const downloadFiles = (file) => {
     onDownloadError,
     onDownloadAbort,
     onToastNotification,
+    GET_USERID(),
+    GET_TOKEN(),
   )
   // 将下载信息加入列表
   downloadingFiles.value.push({ name, size, index, req })
@@ -1166,6 +1169,8 @@ const uploadFiles = async (fileList) => {
         onUploadError,
         onUploadAbort,
         onToastNotification,
+        GET_USERID(),
+        GET_TOKEN(),
       )
       uploadingFiles.value.push({ name, size, targetIndex, req })
       uploadProgress.value.push({ name, targetIndex, progress: 0 })

@@ -16,6 +16,7 @@ export const fileTypeIcon = (fileName) => {
     pdf: '/icons/file-pdf.svg',
     png: '/icons/file-img.svg',
     jpg: '/icons/file-img.svg',
+    jpeg: '/icons/file-img.svg',
     svg: '/icons/file-img.svg',
     zip: '/icons/压缩.svg',
     tar: '/icons/压缩.svg',

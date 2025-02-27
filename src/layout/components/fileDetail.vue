@@ -244,7 +244,8 @@ const determineFileType = (contentType) => {
   } else if (
     contentType.includes('png') ||
     contentType.includes('jpg') ||
-    contentType.includes('svg')
+    contentType.includes('svg')||
+    contentType.includes('jpeg')
   ) {
     return 'image'
   } else if (contentType.includes('mp3')) {

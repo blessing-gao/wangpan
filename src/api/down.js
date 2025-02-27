@@ -8,6 +8,8 @@ export function downloadFile(
   errorCallback,
   abortCallback,
   toastCallback,
+  userId,
+  token,
 ) {
   const path1 = import.meta.env.VITE_BASE_PREV
   let path = `${path1}/document/download/${id}`
@@ -22,6 +24,8 @@ export function downloadFile(
   const req = new XMLHttpRequest()
   req.open('GET', path, true)
   req.responseType = 'blob'
+  req.setRequestHeader('User-Id', userId)
+  req.setRequestHeader('token', token)
   req.send()
 
   // 监听下载进度

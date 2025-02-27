@@ -8,6 +8,8 @@ export function uploadFile(
   errorCallback,
   abortCallback,
   toastCallback,
+  userId,
+  token,
 ) {
   const path1 = import.meta.env.VITE_BASE_PREV
   let path = `${path1}/document/upload`
@@ -15,6 +17,8 @@ export function uploadFile(
   // 创建 XMLHttpRequest 实例
   const req = new XMLHttpRequest()
   req.open('POST', path, true)
+  req.setRequestHeader('userId', userId)
+  req.setRequestHeader('token', token)
 
   // 监听上传进度
   req.upload.addEventListener('progress', (evt) => {
