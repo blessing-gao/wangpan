@@ -5,9 +5,9 @@
       @handleNodeClick="handleNodeClick"
       @onCommand="handleOtherList"
     />
-    <div style="padding: 16px; flex: 1;height: 100%;">
+    <div style="padding: 16px; flex: 1; height: 100%">
       <vTableCustom
-        style="width: 100%; height: 100%;"
+        style="width: 100%; height: 100%"
         ref="table_ref"
         :tableHead="false"
         :border="false"
@@ -110,6 +110,7 @@
             </div>
             <div class="table-top-right">
               <el-select
+                v-if="listType == 'default'"
                 class="m-2"
                 placeholder="请选择类型"
                 style="width: 120px"
@@ -125,7 +126,7 @@
                 />
               </el-select>
               <el-input
-                v-if="isExpanded"
+                v-if="isExpanded && listType == 'default'"
                 style="margin-left: 12px"
                 ref="inputRef"
                 v-model="formInline.name"
@@ -141,10 +142,9 @@
                   </el-icon>
                 </template>
               </el-input>
-
               <!-- 按钮状态 -->
               <el-button
-                v-else
+                v-if="!isExpanded && listType == 'default'"
                 style="margin-left: 12px"
                 class="search-btn"
                 circle
@@ -152,8 +152,9 @@
               >
                 <img style="width: 14px" src="/icons/Vector.svg" />
               </el-button>
-              <el-button style="margin-left: 12px">
-                <img style="width: 14px" src="/icons/Menu 04.svg" />
+
+              <el-button style="margin-left: 12px" @click="handleRefresh">
+                <img style="width: 14px" src="/icons/刷新.svg" />
               </el-button>
             </div>
           </div>
@@ -1510,6 +1511,25 @@ const handleEmpty = () => {
     .catch((err) => {
       console.error(err)
     })
+}
+
+const handleRefresh = () => {
+  formInline.current = 1
+  formInline.size = 10
+  formInline.docFileType = null
+  formInline.name = null
+  fileId.value = 0
+  switch (listType.value) {
+    case 'default':
+      getTableData()
+      break
+    case 'collect':
+      getCollect()
+      break
+    case 'recycleBin':
+      getRecycleBinList()
+      break
+  }
 }
 </script>
 <style lang="scss" scoped>
