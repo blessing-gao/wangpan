@@ -148,7 +148,7 @@ const handleShare = () => {
     userId: GET_USERID(),
   }
   console.log(params);
-  
+
   panApi
     .getShareUrl(params)
     .then((res) => {
@@ -159,7 +159,7 @@ const handleShare = () => {
     .catch((err) => {
       console.error(err)
       // shareLink.value =
-      //   'http://locahost:8080/document/share/download/6fc11b2f-9184-4356-8cf2-44f33f7a9795'
+      //   'http://locahost:8080/document/share/6fc11b2f-9184-4356-8cf2-44f33f7a9795'
     })
     .finally(() => {})
 }
