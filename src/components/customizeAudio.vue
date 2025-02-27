@@ -1,59 +1,63 @@
 <template>
   <div class="audio-player">
-    <!-- 音频控件 -->
-    <!-- http://www.shenben.club:9000/gjq/%E5%BD%95%E9%9F%B3.mp3 -->
-    <audio
-      ref="audioRef"
-      :src="audioSrc"
-      @timeupdate="updateTime"
-      @loadedmetadata="setDuration"
-      @ended="handleEnd"
-    ></audio>
+    <img v-if="isPlaying" style="width: 128px" src="/assets/音频.gif" alt="" />
+    <img v-else style="width: 128px" src="/assets/音频.png" alt="" />
+    <div class="audio-content">
+      <!-- 音频控件 -->
+      <!-- http://www.shenben.club:9000/gjq/%E5%BD%95%E9%9F%B3.mp3 -->
+      <audio
+        ref="audioRef"
+        :src="audioSrc"
+        @timeupdate="updateTime"
+        @loadedmetadata="setDuration"
+        @ended="handleEnd"
+      ></audio>
 
-    <!-- 播放器主体 -->
-    <div class="controls">
-      <!-- 左侧播放控制 -->
-      <div class="left-controls">
-        <el-icon :size="40" class="play-btn" @click="togglePlay">
-          <VideoPlay v-if="!isPlaying" />
-          <VideoPause v-else />
-        </el-icon>
-      </div>
+      <!-- 播放器主体 -->
+      <div class="controls">
+        <!-- 左侧播放控制 -->
+        <div class="left-controls">
+          <el-icon :size="40" class="play-btn" @click="togglePlay">
+            <VideoPlay v-if="!isPlaying" />
+            <VideoPause v-else />
+          </el-icon>
+        </div>
 
-      <!-- 进度条区域 -->
-      <div class="progress-container">
-        <div class="time-display">{{ formatTime(currentTime) }}</div>
-        <el-slider
-          v-model="progress"
-          :max="duration"
-          :format-tooltip="formatTime"
-          @change="seek"
-          class="progress-bar"
-        />
-        <div class="time-display">{{ formatTime(duration) }}</div>
-      </div>
+        <!-- 进度条区域 -->
+        <div class="progress-container">
+          <div class="time-display">{{ formatTime(currentTime) }}</div>
+          <el-slider
+            v-model="progress"
+            :max="duration"
+            :format-tooltip="formatTime"
+            @change="seek"
+            class="progress-bar"
+          />
+          <div class="time-display">{{ formatTime(duration) }}</div>
+        </div>
 
-      <!-- 右侧附加功能 -->
-      <div class="right-controls">
-        <el-icon @click="toggleMute">
-          <Headset v-if="!isMuted" />
-          <Mute v-else />
-        </el-icon>
-        <el-slider
-          v-model="volume"
-          :max="1"
-          :step="0.1"
-          :format-tooltip="formatVolume"
-          class="volume-slider"
-          @input="adjustVolume"
-          :disabled="volumeDisabled"
-        />
+        <!-- 右侧附加功能 -->
+        <div class="right-controls">
+          <el-icon @click="toggleMute">
+            <Headset v-if="!isMuted" />
+            <Mute v-else />
+          </el-icon>
+          <el-slider
+            v-model="volume"
+            :max="1"
+            :step="0.1"
+            :format-tooltip="formatVolume"
+            class="volume-slider"
+            @input="adjustVolume"
+            :disabled="volumeDisabled"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive, watch, onMounted } from 'vue'
 
 import {
@@ -70,6 +74,7 @@ const props = defineProps({
     required: true,
   },
 })
+
 const audioRef = ref(null)
 const isPlaying = ref(false)
 const currentTime = ref(0)
@@ -165,10 +170,15 @@ watch(isPlaying, (playing) => {
 <style scoped>
 .audio-player {
   width: 100%;
-  height: 50px;
-  background: #f5f5f5;
-  padding: 12px 20px;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  background: #f0f5fb;
+  /* padding: 12px 20px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
 }
 
 :deep(.el-slider__bar) {
@@ -240,5 +250,13 @@ watch(isPlaying, (playing) => {
 
 .el-icon:hover {
   color: #de3a05;
+}
+.audio-content {
+  width: 100%;
+  height: 74px;
+  background-color: #fff;
+  line-height: 74px;
+  position: absolute;
+  bottom: 0;
 }
 </style>

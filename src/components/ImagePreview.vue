@@ -3,6 +3,7 @@
     <el-image
       style="width: 100%; height: 95%; object-fit: contain"
       :src="content.path"
+      :hide-on-click-modal="true"
       :preview-src-list="srcList"
       fit="contain"
       lazy
