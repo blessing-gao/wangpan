@@ -197,16 +197,20 @@ const fetchFileInfo = async () => {
           isEdit.value = isExt[0].action == 'edit'
         }
         file_type.value = determineFileType(res.data.name)
-        if (
-          file_type.value == 'video' ||
-          file_type.value == 'audio' ||
+        if (file_type.value == 'video' || file_type.value == 'audio') {
+          // 获取文件夹地址
+          const folder = extractPath(res.data.uniqueKey)
+          // 拼合文件地址
+          const path1 = `/file/knowledge/${folder}${file_name.value}`
+          console.log(path1)
+          file_path.value = path1
+        } else if (
           file_type.value == 'image' ||
           file_type.value == 'excel' ||
           file_type.value == 'word'
         ) {
           const videoBlob = await panApi.downloadFile(id)
           file_path.value = URL.createObjectURL(videoBlob.data)
-
           console.log(file_path.value)
         } else {
           file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
@@ -218,6 +222,13 @@ const fetchFileInfo = async () => {
   } else {
     console.error('URL中没有找到id参数')
   }
+}
+
+function extractPath(filePath) {
+  // 使用正则表达式去掉文件名，提取路径部分
+  const regex = /^(.*[\/\\])/
+  const match = filePath.match(regex)
+  return match ? match[1] : ''
 }
 
 // 根据contentType判断文件类型
