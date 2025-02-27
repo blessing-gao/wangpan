@@ -14,7 +14,7 @@
               :span="6"
               v-for="(item, index) in classifyList"
               :key="index"
-              style="margin-bottom: 10px"
+              style="margin-bottom: 20px"
             >
               <el-card
                 shadow="never"
@@ -70,7 +70,11 @@
     </div>
     <div class="first_box">
       <div class="title1">最近上传</div>
-      <img style="height: 76px" src="/assets/MaskGroup.png" />
+      <!-- <img style="height: 76px" src="/assets/MaskGroup.png" /> -->
+      <div class="title-img">
+        <img src="/assets/WechatIMG1.jpg" style="height: 100%" alt="" />
+        <img src="/assets/WechatIMG2.jpg" alt="" />
+      </div>
       <div class="upload-content">
         <div v-if="uploadList.length == 0">
           <div
@@ -280,10 +284,11 @@ const jumpFilePath = (item) => {
 .el-card {
   border: 0;
   background: #f4f5f7;
-  width: 84%;
+  width: 89%;
   height: 110px;
   padding: 0px;
   padding-bottom: 14px;
+  border-radius: 8px;
 }
 .el-col {
   padding: 0 !important;
@@ -348,10 +353,11 @@ const jumpFilePath = (item) => {
 
 .history-content {
   display: flex;
-  margin-bottom: 24px;
   height: 78px;
   align-items: stretch;
   cursor: pointer;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(231, 231, 231, 1);
 }
 
 .history-img {
@@ -409,7 +415,7 @@ const jumpFilePath = (item) => {
 }
 
 .upload-content-list {
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid rgba(231, 231, 231, 1);
   height: 64px;
   display: flex;
   align-items: center;
@@ -456,9 +462,20 @@ const jumpFilePath = (item) => {
   color: #ff6a38;
 }
 .zip {
-  color: #BC8585;
+  color: #bc8585;
 }
 .other {
   color: #1dc1ab;
+}
+
+.title-img {
+  width: 100%;
+  height: 76px;
+  background-color: rgb(248, 247, 248);
+  display: flex;
+  justify-content: space-between;
+  img {
+    height: 100%;
+  }
 }
 </style>
