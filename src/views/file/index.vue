@@ -43,13 +43,13 @@
                     上传
                   </el-button>
                 </template>
-                <div class="organization-content" @click="uploadFolder">
-                  <img
-                    src="/icons/文件管理.svg"
-                    style="margin-right: 12px; width: 16px"
-                  />
-                  上传文件夹
-                </div>
+<!--                <div class="organization-content" @click="uploadFolder">-->
+<!--                  <img-->
+<!--                    src="/icons/文件管理.svg"-->
+<!--                    style="margin-right: 12px; width: 16px"-->
+<!--                  />-->
+<!--                  上传文件夹-->
+<!--                </div>-->
                 <div class="organization-content" @click="handleUploadFile">
                   <img
                     src="/icons/文件.svg"

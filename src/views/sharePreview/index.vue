@@ -120,19 +120,19 @@
           <el-tab-pane label="详情" name="first">
             <documentDetail ref="documentDetailRefs" :documentId="id" />
           </el-tab-pane>
-          <el-tab-pane label="标签" name="second">
-            <fileTags />
-          </el-tab-pane>
-          <el-tab-pane label="总结" name="third">
-            <div class="summarize">
-              <el-button plain @click="handleClickSummarize">
-                <img src="/assets/编组 4.png" alt="" />
-              </el-button>
-            </div>
-            <summarize ref="summarizeRefs" />
-          </el-tab-pane>
-          <el-tab-pane label="评论" name="fourth">评论</el-tab-pane>
-          <el-tab-pane label="动态" name="five">动态</el-tab-pane>
+<!--          <el-tab-pane label="标签" name="second">-->
+<!--            <fileTags />-->
+<!--          </el-tab-pane>-->
+<!--          <el-tab-pane label="总结" name="third">-->
+<!--            <div class="summarize">-->
+<!--              <el-button plain @click="handleClickSummarize">-->
+<!--                <img src="/assets/编组 4.png" alt="" />-->
+<!--              </el-button>-->
+<!--            </div>-->
+<!--            <summarize ref="summarizeRefs" />-->
+<!--          </el-tab-pane>-->
+<!--          <el-tab-pane label="评论" name="fourth">评论</el-tab-pane>-->
+<!--          <el-tab-pane label="动态" name="five">动态</el-tab-pane>-->
         </el-tabs>
       </div>
     </div>

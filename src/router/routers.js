@@ -21,17 +21,17 @@ const constantRoutes = [
         component: () =>
           import(/* webpackChunkName: "dashboard" */ '../views/home/index.vue'),
       },
-      {
-        path: '/search',
-        name: 'search',
-        meta: {
-          icon: '搜索',
-          title: '搜索',
-          keepAlive: true,
-        },
-        component: () =>
-          import(/* webpackChunkName: "dashboard" */ '../views/search/index.vue'),
-      },
+      // {
+      //   path: '/search',
+      //   name: 'search',
+      //   meta: {
+      //     icon: '搜索',
+      //     title: '搜索',
+      //     keepAlive: true,
+      //   },
+      //   component: () =>
+      //     import(/* webpackChunkName: "dashboard" */ '../views/search/index.vue'),
+      // },
       {
         path: '/file',
         name: 'file',

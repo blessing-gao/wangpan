@@ -103,21 +103,6 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(env.VITE_BASE_PREV, '')
         },
-        [env.VITE_DEVOPS_PREV]: {
-          target: env.VITE_DEVOPS_URL,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(env.VITE_DEVOPS_PREV, '')
-        },
-        [env.VITE_APPLICATION_PREV]: {
-          target: env.VITE_APPLICATION_URL,
-          changeOrigin: true,
-          rewrite: (path) => path.replace(env.VITE_APPLICATION_PREV, '')
-        },
-        '/file': {
-          target: 'http://shenben.club:9000',
-          changeOrigin: true,
-          rewrite: (path) => path.replace('/minio', ''),
-        },
         '/sso': {
           target: 'http://192.168.0.106:8080',
           changeOrigin: true, // 是否修改请求头中的 origin
