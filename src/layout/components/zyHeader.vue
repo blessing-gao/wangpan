@@ -68,7 +68,7 @@
 <script setup>
 // import { Search } from '@element-plus/icons-vue'
 import { ref, getCurrentInstance, onMounted } from 'vue'
-import { GET_USERID, GET_PACEID, SET_PACEID } from '@/utils/auth'
+import { GET_USERID, GET_PACEID, SET_PACEID, SET_USERNAME } from '@/utils/auth'
 import uploadSearch from '../../components/uploadSearch.vue'
 import inputSearch from '../../components/inputSearch.vue'
 import userAvatar from '../../components/userAvatar.vue'
@@ -120,6 +120,7 @@ const handleShow = () => {
 
 const handleChange = (item) => {
   SET_PACEID(item.spaceId)
+  SET_USERNAME(item.spaceName)
   userStore.spaceId = item.spaceId
   router.go(0)
 }

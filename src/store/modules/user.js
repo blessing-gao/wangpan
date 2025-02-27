@@ -9,6 +9,7 @@ import {
   GET_USERID,
   SET_PACEID,
   GET_PACEID,
+  SET_USERNAME,
 } from '@/utils/auth'
 import * as panApi from '@/api/pan.js'
 const useUserStore = defineStore('user', {
@@ -50,7 +51,7 @@ const useUserStore = defineStore('user', {
         let parmas = {
           token: token,
         }
-        
+        this.userId = 1
         SET_USERID(this.userId)
         let url = window.location.href
         // 通过userId获取到用户的第一个speaceId
@@ -59,6 +60,7 @@ const useUserStore = defineStore('user', {
           let result = await panApi.getUserSpace({ userId: this.userId })
           this.spaceId = result.data[0].spaceId
           SET_PACEID(this.spaceId)
+          SET_USERNAME(result.data[0].spaceName)
         }
       } catch (error) {
         // 捕获请求失败时的错误

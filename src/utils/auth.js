@@ -20,6 +20,14 @@ export function SET_USERID(userId) {
   localStorage.setItem('userId', userId)
 }
 
+export function SET_USERNAME(username) {
+  localStorage.setItem('username', username)
+}
+
+export function GET_USERNAME() {
+  return localStorage.getItem('username')
+}
+
 // 将 spaceId 存储到 localStorage 中
 export function SET_PACEID(proId) {
   localStorage.setItem('spaceId', proId)
