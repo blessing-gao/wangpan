@@ -140,7 +140,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import * as panApi from '@/api/pan.js'
 import * as shareApi from '@/api/share.js'
 import previewVideo from '../../components/VideoPreview.vue'
@@ -167,9 +167,11 @@ const fetchFileInfo = async () => {
   const uuid = window.location.href.split('/')
   let result = await shareApi.share(uuid[uuid.length - 1])
   id.value = result.data.id
-  documentDetailRefs.value.getFileDetail()
   file_name.value = result.data.name || '未知文件'
   file_type.value = determineFileType(result.data.name)
+  nextTick(() => {
+    documentDetailRefs.value.getFileDetail()
+  })
   if (
     file_type.value == 'video' ||
     file_type.value == 'audio' ||
@@ -216,7 +218,6 @@ const determineFileType = (contentType) => {
 // 页面加载时获取文件信息
 onMounted(async () => {
   await fetchFileInfo()
-  
 })
 
 const documentDetailRefs = ref(null)

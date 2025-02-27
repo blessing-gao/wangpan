@@ -202,7 +202,7 @@ const fetchFileInfo = async () => {
           // 获取文件夹地址
           const folder = extractPath(res.data.uniqueKey)
           // 拼合文件地址
-          const path1 = `http://shenben.club:9000/file/${GET_USERNAME()}/${folder}${file_name.value}`
+          const path1 = `/file/${GET_USERNAME()}/${folder}${file_name.value}`
           console.log(path1)
           file_path.value = path1
         } else if (

@@ -95,7 +95,7 @@
 import { ref, getCurrentInstance } from 'vue'
 import { CopyDocument } from '@element-plus/icons-vue'
 import * as panApi from '@/api/pan.js'
-import { GET_USERID } from '../utils/auth'
+import { GET_USERID, GET_USERNAME } from '../utils/auth'
 
 const props = defineProps({
   id: {
@@ -138,8 +138,6 @@ const handleShare = () => {
   if (minutes.value != 0) {
     expireTime.value += minutes.value + '分钟'
   }
-  console.log(expireTime.value)
-
   addTimeToCurrent()
   const totalSeconds = convertToSeconds()
   const params = {
@@ -147,14 +145,14 @@ const handleShare = () => {
     expireTime: totalSeconds,
     userId: GET_USERID(),
   }
-  console.log(params);
-
   panApi
     .getShareUrl(params)
     .then((res) => {
-      console.log(res)
-
-      shareLink.value = res.data
+      const hostName = window.location.hostname
+      const port = window.location.port
+      const uuid = res.data.match(/([^/]+)$/)[0]
+      const targetUrl = `http://${hostName}:${port}/share/${GET_USERNAME()}/${uuid}`
+      shareLink.value = targetUrl
     })
     .catch((err) => {
       console.error(err)
