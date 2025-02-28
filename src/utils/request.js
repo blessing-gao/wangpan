@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { GET_USERID, GET_TOKEN } from '@/utils/auth'
+import { GET_USERID, GET_TOKEN, GET_PACEID } from '@/utils/auth'
+import { space } from 'postcss/lib/list'
 //创建axios实例
 let request = axios.create({
   timeout: 600000,
@@ -9,6 +10,17 @@ let request = axios.create({
 //请求拦截器
 request.interceptors.request.use(
   (config) => {
+    if (config.data) {
+      config.data = {
+        ...config.data,
+        spaceId: GET_PACEID(),
+      }
+    } else {
+      config.params = {
+        ...config.params,
+        spaceId: GET_PACEID(),
+      }
+    }
     // 配置请求头
     config.headers = {
       Authorization: localStorage.getItem('userToken')
@@ -23,7 +35,7 @@ request.interceptors.request.use(
             : ''),
       'Amp-App-Code':
         JSON.parse(localStorage.getItem('activedApp'))?.code || '',
-      'UserId': GET_USERID() || '',
+      UserId: GET_USERID() || '',
       Token: GET_TOKEN() || '',
     }
     return config
@@ -55,6 +67,9 @@ request.interceptors.response.use(
     }
   },
   (error) => {
+    console.log(error)
+
+    ElMessage.warning(error.response.data.msg || '接口调用失败，请联系管理员')
     return Promise.reject(error)
   },
 )
