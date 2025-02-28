@@ -12,10 +12,10 @@
     </video>
 
     <!-- 控制按钮 -->
-    <div class="controls">
+    <!-- <div class="controls">
       <button @click="selectPerson('小张')">选择小张</button>
       <button @click="selectPerson('小李')">选择小李</button>
-    </div>
+    </div> -->
 
     <!-- 缩略图预览 -->
     <div class="thumbnail-preview" :style="thumbnailPosition">
@@ -73,7 +73,7 @@ onMounted(() => {
 
   player.on('loadedmetadata', () => {
     videoDuration.value = player.duration
-    updateMarkers()
+    // updateMarkers()
   })
   player.on('timeupdate', updateProgressIndicator)
   setupProgressBarEvents()
@@ -248,7 +248,7 @@ const formatTime = (seconds) => {
 
 /* 深度样式穿透 */
 :deep(.plyr) {
-  height: 93%;
+  height: 100%;
   min-height: 400px;
   background: #000;
 }
