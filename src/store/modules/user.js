@@ -84,9 +84,6 @@ const useUserStore = defineStore('user', {
             this.spaceId = spaceId
             SET_PACEID(this.spaceId)
             SET_USERNAME(spaceName)
-          } else {
-            console.error('Get user info failed:', error)
-            return Promise.reject(error)
           }
         }
       } catch (error) {
