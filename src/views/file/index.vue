@@ -1231,6 +1231,8 @@ const handleOtherList = (data) => {
     getRecycleBinList()
   } else if (data == '全部文件') {
     listType.value = 'default'
+    isFolder.value = null
+    fileId.value = 0
     getTableData()
   } else if (data.label == '最近使用') {
     listType.value = 'history'
