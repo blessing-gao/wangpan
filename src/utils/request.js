@@ -23,7 +23,7 @@ request.interceptors.request.use(
             : ''),
       'Amp-App-Code':
         JSON.parse(localStorage.getItem('activedApp'))?.code || '',
-      'User-Id': GET_USERID() || '',
+      'UserId': GET_USERID() || '',
       Token: GET_TOKEN() || '',
     }
     return config

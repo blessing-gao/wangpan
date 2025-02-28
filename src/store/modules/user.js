@@ -46,13 +46,17 @@ const useUserStore = defineStore('user', {
     async userInfo() {
       try {
         // 从本地存储中获取 token
-        const token = GET_TOKEN() // 假设你有 GET_TOKEN 方法从本地存储获取 token
-        // 请求用户信息，假设接口为 reqUserInfo
-        let parmas = {
-          token: token,
+        // const token = GET_TOKEN() // 假设你有 GET_TOKEN 方法从本地存储获取 token
+        // // 请求用户信息，假设接口为 reqUserInfo
+        // let parmas = {
+        //   token: token,
+        // }
+        // this.userId = 1
+        if (this.userId == '') {
+          window.location.href = import.meta.env.VITE_LOGIN_URL
         }
-        this.userId = 1
-        SET_USERID(this.userId)
+
+        // SET_USERID(this.userId)
         let url = window.location.href
         // 通过userId获取到用户的第一个speaceId
         // 如果当前的speaceId不为空或者路由包含了share，则不进行获取speaceId
