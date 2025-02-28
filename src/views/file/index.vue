@@ -182,124 +182,6 @@
                 <el-tag class="ml-2" type="warning" size="small">标签</el-tag>
               </div>
             </div>
-            <!-- <div class="file-name_right">
-              <div
-                class="file-name_right"
-                v-if="listType == 'default' || listType == 'history'"
-              >
-                <el-tooltip
-                  v-if="!rows.isCollect"
-                  class="box-item"
-                  effect="dark"
-                  content="收藏"
-                  placement="top"
-                >
-                  <img
-                    style="cursor: pointer"
-                    src="/icons/常用文件.svg"
-                    @click.stop="handleCollect(rows, 'add')"
-                  />
-                </el-tooltip>
-                <el-tooltip
-                  v-else
-                  class="box-item"
-                  effect="dark"
-                  content="取消收藏"
-                  placement="top"
-                >
-                  <img
-                    style="cursor: pointer"
-                    src="/icons/collect.svg"
-                    @click.stop="handleCollect(rows, 'delete')"
-                  />
-                </el-tooltip>
-                <el-tooltip
-                  class="box-item"
-                  effect="dark"
-                  content="下载"
-                  placement="top"
-                >
-                  <img
-                    style="cursor: pointer; margin-left: 16px; width: 18px"
-                    src="/icons/down.svg"
-                    @click.stop="handleFileOperate('self', 'download', rows)"
-                  />
-                </el-tooltip>
-                <el-tooltip
-                  class="box-item"
-                  effect="dark"
-                  content="更多操作"
-                  placement="top"
-                >
-                  <fileOperateMenu
-                    class="file-name_right-img"
-                    :file="rows"
-                    :listType="listType"
-                    @onCommand="handleFileOperate"
-                  >
-                    <img src="/icons/more_horiz.svg" />
-                  </fileOperateMenu>
-                </el-tooltip>
-              </div>
-              <div class="file-name_right" v-if="listType == 'collect'">
-                <el-tooltip
-                  class="box-item"
-                  effect="dark"
-                  content="取消收藏"
-                  placement="top"
-                >
-                  <img
-                    style="cursor: pointer"
-                    src="/icons/collect.svg"
-                    @click.stop="handleCollect(rows, 'delete')"
-                  />
-                </el-tooltip>
-                <el-tooltip
-                  class="box-item"
-                  effect="dark"
-                  content="下载"
-                  placement="top"
-                >
-                  <img
-                    style="cursor: pointer; margin-left: 16px; width: 18px"
-                    src="/icons/down.svg"
-                    @click.stop="handleFileOperate('self', 'download', rows)"
-                  />
-                </el-tooltip>
-                <el-tooltip
-                  class="box-item"
-                  effect="dark"
-                  content="更多操作"
-                  placement="top"
-                >
-                  <fileOperateMenu
-                    class="file-name_right-img"
-                    :file="rows"
-                    :listType="listType"
-                    @onCommand="handleFileOperate"
-                  >
-                    <img src="/icons/more_horiz.svg" />
-                  </fileOperateMenu>
-                </el-tooltip>
-              </div>
-              <div class="file-name_right" v-if="listType == 'recycleBin'">
-                <el-tooltip
-                  class="box-item"
-                  effect="dark"
-                  content="更多操作"
-                  placement="top"
-                >
-                  <fileOperateMenu
-                    class="file-name_right-img"
-                    :file="rows"
-                    :listType="listType"
-                    @onCommand="handleFileOperate"
-                  >
-                    <img src="/icons/more_horiz.svg" />
-                  </fileOperateMenu>
-                </el-tooltip>
-              </div>
-            </div> -->
           </div>
         </template>
 
@@ -868,8 +750,8 @@ const downloadFiles = (file) => {
     GET_TOKEN(),
   )
   // 将下载信息加入列表
-  downloadingFiles.value.push({ name, size, index, req })
-  downloadProgress.value.push({ name, index, progress: 0 })
+  downloadingFiles.value.unshift({ name, size, index, req })
+  downloadProgress.value.unshift({ name, index, progress: 0 })
   isDownloading.value = true
 }
 
@@ -1149,8 +1031,6 @@ const uploadFiles = async (fileList) => {
     isUploading.value = true
 
     fileList.forEach((file, index) => {
-      console.log(uploadingFiles.value.length)
-
       const targetIndex = uploadingFiles.value.length + 1
       const { name, size } = file
       const formData = new FormData()
@@ -1172,8 +1052,9 @@ const uploadFiles = async (fileList) => {
         GET_USERID(),
         GET_TOKEN(),
       )
-      uploadingFiles.value.push({ name, size, targetIndex, req })
-      uploadProgress.value.push({ name, targetIndex, progress: 0 })
+      // 确保最新的上传记录在前
+      uploadingFiles.value.unshift({ name, size, targetIndex, req })
+      uploadProgress.value.unshift({ name, targetIndex, progress: 0 })
     })
 
     // 分批上传文件，每次上传最多10个文件
