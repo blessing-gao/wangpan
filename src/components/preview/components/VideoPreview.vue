@@ -39,8 +39,8 @@ const props = defineProps({
 
 // const videoSrc = ref('http://www.shenben.club:9000/gjq/test.mp4')
 const segments = {
-  小张: [{ start: 5, end: 6 }],
-  小李: [{ start: 30, end: 40 }],
+  // 小张: [{ start: 5, end: 6 }],
+  // 小李: [{ start: 30, end: 40 }],
 }
 
 const videoPlayer = ref(null)
@@ -73,7 +73,7 @@ onMounted(() => {
 
   player.on('loadedmetadata', () => {
     videoDuration.value = player.duration
-    // updateMarkers()
+    updateMarkers()
   })
   player.on('timeupdate', updateProgressIndicator)
   setupProgressBarEvents()
