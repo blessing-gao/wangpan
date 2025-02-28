@@ -43,28 +43,51 @@ const useUserStore = defineStore('user', {
         return Promise.reject(error)
       }
     },
+    async getCookie(name) {
+      let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
+      if (match) return match[2]
+      return null
+    },
+    deleteCookie(name) {
+      // 设置 cookie 的过期时间为过去的时间，这样浏览器就会删除该 cookie
+      document.cookie =
+        name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/'
+    },
     async userInfo() {
       try {
-        // 从本地存储中获取 token
-        // const token = GET_TOKEN() // 假设你有 GET_TOKEN 方法从本地存储获取 token
-        // // 请求用户信息，假设接口为 reqUserInfo
-        // let parmas = {
-        //   token: token,
-        // }
-        // this.userId = 1
+        // 步骤
+        // 如果local中没有userid，从cookie中获取userid，如果cookie中没有，跳转到登录页面
         if (this.userId == '') {
-          window.location.href = import.meta.env.VITE_LOGIN_URL
+          this.userId = await this.getCookie('userId')
+          this.token = await this.getCookie('token')
+          console.log('userId', this.userId)
+
+          // 如果 cookie 中没有 userId，跳转到登录页面
+          if (!this.userId) {
+            window.location.href = import.meta.env.VITE_LOGIN_URL
+            return
+          } else {
+            SET_USERID(this.userId)
+            SET_TOKEN(this.token)
+          }
+
+          // 从 cookie 中删除 userId 和 token
+          this.deleteCookie('userId')
+          this.deleteCookie('token')
         }
 
-        // SET_USERID(this.userId)
         let url = window.location.href
-        // 通过userId获取到用户的第一个speaceId
-        // 如果当前的speaceId不为空或者路由包含了share，则不进行获取speaceId
         if (this.spaceId === '' && !url.includes('share')) {
-          let result = await panApi.getUserSpace({ userId: this.userId })
-          this.spaceId = result.data[0].spaceId
-          SET_PACEID(this.spaceId)
-          SET_USERNAME(result.data[0].spaceName)
+          const result = await panApi.getUserSpace({ userId: this.userId })
+          const { spaceId, spaceName } = result.data[0] || {}
+          if (spaceId) {
+            this.spaceId = spaceId
+            SET_PACEID(this.spaceId)
+            SET_USERNAME(spaceName)
+          } else {
+            console.error('Get user info failed:', error)
+            return Promise.reject(error)
+          }
         }
       } catch (error) {
         // 捕获请求失败时的错误
