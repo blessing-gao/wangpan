@@ -51,7 +51,7 @@ const constantRoutes = [
     name: 'VideoDetail',
     component: zyVideo,
     meta: {
-      link: true, // 可以根据需要设置
+      title: '详情', // 可以根据需要设置
     },
   },
   {
@@ -60,7 +60,8 @@ const constantRoutes = [
     component: () =>
       import(/* webpackChunkName: "404" */ '../views/sharePreview/index.vue'),
     meta: {
-      link: true, // 可以根据需要设置
+      title: '分享',
+      keepAlive: true,
     },
   },
   {

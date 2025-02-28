@@ -1,6 +1,6 @@
 // 统一管理项目用户相关的接口
 import request from '@/utils/request.js'
-import { GET_USERID } from '@/utils/auth'
+import { GET_PACEID } from '@/utils/auth'
 const path = import.meta.env.VITE_BASE_PREV
 
 /**
@@ -202,7 +202,7 @@ export function commentOptions(params) {
 // 文件收藏
 export function addCollect(data) {
   return request({
-    url: `${path}/userCollect/add`,
+    url: `${path}/userCollect/add?spaceId=${GET_PACEID()}`,
     method: 'post',
     data,
   })
