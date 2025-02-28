@@ -56,7 +56,8 @@
               @click="handleClick(item)"
             >
               <div class="history-img">
-                <img :src="item.url" :alt="item.name" />
+                <img v-if="item.url" :src="item.url" :alt="item.name" />
+                <img v-else src="/icons/seat.svg" :alt="item.name" />
               </div>
               <div class="history-detail">
                 <div class="history-detail-title">{{ item.name }}</div>
@@ -175,7 +176,7 @@ const getClassification = async () => {
       classifyList.value = result
     })
     .catch((err) => {
-      proxy.$modal.msgError(err.message)
+      console.error(err)
     })
 }
 
@@ -225,7 +226,7 @@ const getHistoryList = async () => {
       historyList.value = res.data
     })
     .catch((err) => {
-      proxy.$modal.msgError(err.message)
+      console.error(err)
     })
 }
 const uploadList = ref([])
@@ -237,7 +238,7 @@ const getUploadList = async () => {
       uploadList.value = res.data
     })
     .catch((err) => {
-      proxy.$modal.msgError(err.message)
+      console.error(err)
     })
 }
 
@@ -349,6 +350,7 @@ const jumpFilePath = (item) => {
   color: #333333;
   letter-spacing: 0;
   font-weight: 500;
+  margin-bottom: 0;
 }
 
 .history-content {
@@ -357,18 +359,19 @@ const jumpFilePath = (item) => {
   align-items: stretch;
   cursor: pointer;
   padding-bottom: 24px;
+  padding-top: 24px;
   border-bottom: 1px solid rgba(231, 231, 231, 1);
 }
 
 .history-img {
   margin-right: 20px;
-  background-color: #d9d9d9;
+  background-color: rgb(252, 240, 241);
   width: 140px;
   flex: 0 0 auto;
   border-radius: 5px;
+  text-align: center;
   img {
-    width: 100%;
-    height: auto;
+    height: 100%;
   }
 }
 

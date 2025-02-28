@@ -1,6 +1,6 @@
 // 统一管理项目用户相关的接口
 import request from '@/utils/request.js'
-import { GET_USERID } from '@/utils/auth'
+import { GET_USERID, GET_PACEID } from '@/utils/auth'
 const path = import.meta.env.VITE_BASE_PREV
 
 /**
@@ -11,7 +11,7 @@ const path = import.meta.env.VITE_BASE_PREV
  */
 export const channelList = () => {
   return request({
-    url: `${path}/workBench/recently/documentType?userId=${GET_USERID()}`,
+    url: `${path}/workBench/recently/documentType?spaceId=${GET_PACEID()}&userId=${GET_USERID()}`,
     method: 'get',
   })
 }
@@ -24,7 +24,7 @@ export const channelList = () => {
  */
 export const getHistoryList = () => {
   return request({
-    url: `${path}/workBench/recently/view?userId=${GET_USERID()}`,
+    url: `${path}/workBench/recently/view?spaceId=${GET_PACEID()}&userId=${GET_USERID()}`,
     method: 'get',
   })
 }
@@ -37,7 +37,7 @@ export const getHistoryList = () => {
  */
 export const getUploadList = () => {
   return request({
-    url: `${path}/workBench/recently/uploaded?userId=${GET_USERID()}`,
+    url: `${path}/workBench/recently/uploaded?spaceId=${GET_PACEID()}&userId=${GET_USERID()}`,
     method: 'get',
   })
 }
