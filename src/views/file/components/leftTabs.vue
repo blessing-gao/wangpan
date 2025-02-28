@@ -7,10 +7,17 @@
     "
   >
     <!-- 左侧二级导航 -->
-    <div style="display: flex; justify-content: center; padding-top: 12px;">
+    <div style="display: flex; justify-content: center; padding-top: 12px">
       <div class="left-footer">
         <div class="file-number">
           <div class="file-number-title">{{ userName }}</div>
+          <div class="file-number-number">
+            <img
+              style="width: 16px; margin-right: 7px"
+              src="/icons/编组 32.svg"
+            />
+            <span>{{ fileNumbers }}个</span>
+          </div>
         </div>
         <div class="use-size">
           <div class="use-size-left">
@@ -153,6 +160,7 @@ const getSpaceId = async () => {
 const usedSize = ref('0')
 const allSize = ref('0')
 const proportion = ref('0%')
+const fileNumbers = ref(0)
 const percentage = ref(0)
 const userName = ref(null)
 const getSpaceDetail = () => {
@@ -172,6 +180,7 @@ const getSpaceDetail = () => {
       }
       usedSize.value = formatSize(res.data.size)
       userName.value = res.data.name
+      fileNumbers.value = res.data.objects
     })
     .catch((err) => {
       console.error(err)

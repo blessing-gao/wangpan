@@ -66,6 +66,7 @@
               </div>
             </div>
           </div>
+          <div class="more" @click="handleMore">查看更多</div>
         </div>
       </div>
     </div>
@@ -120,6 +121,7 @@
               </div>
             </div>
           </div>
+          <div class="more" @click="handleMore">查看更多</div>
         </div>
       </div>
     </div>
@@ -224,6 +226,7 @@ const getHistoryList = async () => {
     .getHistoryList()
     .then((res) => {
       historyList.value = res.data
+      historyList.value = historyList.value.slice(0, 10)
     })
     .catch((err) => {
       console.error(err)
@@ -236,6 +239,7 @@ const getUploadList = async () => {
     .getUploadList()
     .then((res) => {
       uploadList.value = res.data
+      uploadList.value = uploadList.value.slice(0, 10)
     })
     .catch((err) => {
       console.error(err)
@@ -259,6 +263,12 @@ const jumpFilePath = (item) => {
     query: {
       name: item.name,
     },
+  })
+}
+
+const handleMore = () => {
+  router.push({
+    name: 'file',
   })
 }
 </script>
@@ -480,5 +490,11 @@ const jumpFilePath = (item) => {
   img {
     height: 100%;
   }
+}
+.more {
+  text-align: center;
+  margin-top: 10px;
+  cursor: pointer;
+  color: #aaa;
 }
 </style>

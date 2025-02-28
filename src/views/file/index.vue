@@ -11,6 +11,7 @@
         ref="table_ref"
         :tableHead="false"
         :border="false"
+        :hasPagination="false"
         :loading="loading"
         :columns="columns"
         :tableData="tableData"
