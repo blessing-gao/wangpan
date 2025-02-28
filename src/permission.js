@@ -34,8 +34,24 @@ router.beforeEach(async (to, from, next) => {
         } else {
           next() // 如果已经在 /notSpace 页面，继续导航
         }
-      } else if (!userId) {
-        window.location.href = import.meta.env.VITE_LOGIN_URL
+      } else if (this.userId == '') {
+        debugger
+        this.userId = await this.getCookie('userId')
+        this.token = await this.getCookie('token')
+        console.log('这里：userId', this.userId)
+
+        // 如果 cookie 中没有 userId，跳转到登录页面
+        if (!this.userId) {
+          window.location.href = import.meta.env.VITE_LOGIN_URL
+          return
+        } else {
+          SET_USERID(this.userId)
+          SET_TOKEN(this.token)
+        }
+
+        // 从 cookie 中删除 userId 和 token
+        this.deleteCookie('userId')
+        this.deleteCookie('token')
       } else {
         next({ path: '/404' })
       }

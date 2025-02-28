@@ -60,7 +60,6 @@ const useUserStore = defineStore('user', {
         if (this.userId == '') {
           this.userId = await this.getCookie('userId')
           this.token = await this.getCookie('token')
-          console.log('userId', this.userId)
 
           // 如果 cookie 中没有 userId，跳转到登录页面
           if (!this.userId) {

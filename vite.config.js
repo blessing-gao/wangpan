@@ -93,23 +93,18 @@ export default defineConfig(({ mode }) => {
         'Access-Control-Allow-Origin': '*'
       },
       proxy: {
-        '/preview': {
-          target: 'http://shenben.club:9000', // MinIO 的服务地址
-          changeOrigin: true, // 代理跨域
-          rewrite: (path) => path.replace(/^\/preview/, ''), // 可选，根据需要调整路径
-        },
         [env.VITE_BASE_PREV]: {
           target: env.VITE_BASE_URL,
           changeOrigin: true,
           rewrite: (path) => path.replace(env.VITE_BASE_PREV, '')
         },
-        '/sso': {
-          target: 'http://192.168.0.106:8080',
-          changeOrigin: true, // 是否修改请求头中的 origin
-          rewrite: (path) => path.replace(/^\/sso/, '/sso'), // 去掉路径中的 /sso 部分
+        '/preview': {
+          target: 'http://shenben.club:9000', // MinIO 的服务地址
+          changeOrigin: true, // 代理跨域
+          rewrite: (path) => path.replace(/^\/preview/, ''), // 可选，根据需要调整路径
         },
         '/browser': {
-          target: 'http://localhost:9980',
+          target: 'http://collabora:9980',
           changeOrigin: true,
           ws: true,
           onProxyReq(proxyReq, req) {
@@ -120,7 +115,7 @@ export default defineConfig(({ mode }) => {
             }
           },
           headers: {
-            Host: 'localhost:9980'
+            Host: 'collabora:9980'
           }
         },
       }
