@@ -6,12 +6,24 @@
       </template>
       <template #description>
         <div class="prompt">404</div>
+        <el-button
+          style="background: #de3a05; border-radius: 4px; color: #fff"
+          @click="jumpHome"
+        >
+          返回首页
+        </el-button>
       </template>
     </el-empty>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const jumpHome = () => {
+  router.push('/')
+}
+</script>
 
 <style lang="scss" scoped>
 .notspace {
