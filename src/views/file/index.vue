@@ -617,6 +617,7 @@ const clickFile = (folder) => {
     fileId.value = 0
     tabList.value = []
     isFolder.value = null
+    uploadParams.directoryId = 0
   } else {
     isLevelText.value = true
     fileId.value = folder.id
@@ -1197,10 +1198,12 @@ const handleCollect = (row, types) => {
   if (types == 'add') {
     api = 'addCollect'
     params.documentId = row.id
+    params.type = row.fileType == 0 ? 'folder' : 'file' 
     message = '收藏成功'
   } else {
     api = 'deleteCollect'
     params.documentId = row.id
+    params.type = row.fileType == 0 ? 'folder' : 'file' 
     message = '取消收藏成功'
   }
   panApi[api](params)
@@ -1234,6 +1237,10 @@ const handleOtherList = (data) => {
     listType.value = 'default'
     isFolder.value = null
     fileId.value = 0
+    isLevelText.value = false
+    tabList.value = []
+    isFolder.value = null
+    uploadParams.directoryId = 0
     getTableData()
   } else if (data.label == '最近使用') {
     listType.value = 'history'

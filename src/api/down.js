@@ -40,7 +40,7 @@ export function downloadFile(
       let completeDownload = req.response.size == fileSize
       if (req.status === 200 && completeDownload) {
         const rspHeader = req.getResponseHeader('Content-Disposition')
-        let filename = overrideFileName || 'download'
+        let filename = overrideFileName || 'download.zip'
         if (rspHeader) {
           let rspHeaderDecoded = decodeURIComponent(rspHeader)
           filename = rspHeaderDecoded.split('"')[1]
