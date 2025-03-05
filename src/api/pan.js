@@ -220,8 +220,9 @@ export function getCollect(params) {
 // 移除收藏
 export function deleteCollect(data) {
   return request({
-    url: `${path}/userCollect/remove?documentId=${data.documentId}`,
+    url: `${path}/userCollect/remove?documentId=${data.documentId}&spaceId=${GET_PACEID()}&userId=${data.userId}&type=${data.type}`,
     method: 'delete',
+    data,
   })
 }
 

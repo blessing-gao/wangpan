@@ -1201,9 +1201,12 @@ const handleCollect = (row, types) => {
     params.type = row.fileType == 0 ? 'folder' : 'file' 
     message = '收藏成功'
   } else {
+    console.log(2222)
     api = 'deleteCollect'
     params.documentId = row.id
     params.type = row.fileType == 0 ? 'folder' : 'file' 
+    console.log(params);
+    
     message = '取消收藏成功'
   }
   panApi[api](params)
