@@ -54,9 +54,8 @@ export function downloadFile(
       }
 
       const blob = new Blob(chunks)
-
       // 仅对文件类型校验大小
-      if (type === 'file' && blob.size !== fileSize) {
+      if (type === 'file' && blob.size != fileSize) {
         throw new Error('下载文件不完整')
       }
 
