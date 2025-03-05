@@ -100,7 +100,6 @@ const props = defineProps({
   },
 })
 
-console.log(props.downloadProgress)
 const downloadingCount = computed(() => {
   // 计算 downloadProgress 中 progress 为 100 的文件数量
   return props.downloadProgress.filter((item) => item.progress !== 100).length

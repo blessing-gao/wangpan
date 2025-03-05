@@ -288,3 +288,12 @@ export function restoreFiles(data) {
     data,
   })
 }
+
+// 获取文件夹大小
+export function folderSize(params) {
+  return request({
+    url: `${path}/document/folder/size`,
+    method: 'get',
+    params,
+  })
+}

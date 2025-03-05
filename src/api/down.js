@@ -1,3 +1,4 @@
+import { GET_PACEID } from '@/utils/auth'
 export function downloadFile(
   fileSize,
   overrideFileName = null,
@@ -10,66 +11,96 @@ export function downloadFile(
   toastCallback,
   userId,
   token,
+  type,
 ) {
   const path1 = import.meta.env.VITE_BASE_PREV
-  let path = `${path1}/document/download/${id}`
-  console.log(path)
+  const path = `${path1}/document/download/${id}?spaceId=${GET_PACEID()}`
+  const controller = new AbortController()
 
-  // 如果文件大小超过 50GiB（53687091200 字节），则使用浏览器下载
+  // 大文件处理保持原逻辑
   if (fileSize > 53687091200) {
     return new BrowserDownload(path, id, completeCallback, toastCallback)
   }
 
-  // 创建 XMLHttpRequest 实例
-  const req = new XMLHttpRequest()
-  req.open('GET', path, true)
-  req.responseType = 'blob'
-  req.setRequestHeader('User-Id', userId)
-  req.setRequestHeader('token', token)
-  req.send()
-
-  // 监听下载进度
-  req.addEventListener('progress', (evt) => {
-    let percentComplete = Math.round((evt.loaded / fileSize) * 100)
-    if (progressCallback) progressCallback(index, percentComplete, evt.loaded, fileSize) // 更新进度
+  let loadedBytes = 0
+  const progressTracker = new TransformStream({
+    transform(chunk, controller) {
+      loadedBytes += chunk.byteLength
+      const percent = Math.round((loadedBytes / fileSize) * 100)
+      progressCallback?.(index, percent, loadedBytes, fileSize)
+      controller.enqueue(chunk)
+    },
   })
 
-  // 请求状态变化时处理
-  req.onreadystatechange = () => {
-    if (req.readyState === XMLHttpRequest.DONE) {
-      let completeDownload = req.response.size == fileSize
-      if (req.status === 200 && completeDownload) {
-        const rspHeader = req.getResponseHeader('Content-Disposition')
-        let filename = overrideFileName || 'download.zip'
-        if (rspHeader) {
-          let rspHeaderDecoded = decodeURIComponent(rspHeader)
-          filename = rspHeaderDecoded.split('"')[1]
-        }
-        if (completeCallback) completeCallback(filename)
-        downloadWithLink(window.URL.createObjectURL(req.response), filename)
-      } else {
-        if (req.getResponseHeader('Content-Type') === 'application/json') {
-          const rspBody = JSON.parse(req.response)
-          if (rspBody.detailedMessage) {
-            errorCallback(rspBody.detailedMessage)
-            return
-          }
-        }
-        errorCallback('Unexpected response, download incomplete.')
+  fetch(path, {
+    headers: {
+      userid: userId,
+      token: token,
+    },
+    signal: controller.signal,
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        const error = await parseErrorResponse(response)
+        throw new Error(error)
       }
-    }
-  }
 
-  req.onerror = () => {
-    errorCallback('A network error occurred.')
-  }
+      const reader = response.body.pipeThrough(progressTracker).getReader()
+      const chunks = []
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        chunks.push(value)
+      }
 
-  req.onabort = () => {
-    if (abortCallback) abortCallback()
-  }
+      const blob = new Blob(chunks)
 
-  // 返回 XMLHttpRequest 实例，以便可以控制下载操作（例如取消下载）
-  return req
+      // 仅对文件类型校验大小
+      if (type === 'file' && blob.size !== fileSize) {
+        throw new Error('下载文件不完整')
+      }
+
+      // 处理文件名（优化正则匹配）
+      const disposition = response.headers.get('Content-Disposition')
+      let filename = type === 'file' ? overrideFileName : 'download.zip'
+      const filenameMatch = disposition?.match(
+        /filename\*?=(?:UTF-8''|utf-8'')?"?([^";]+)"?/i,
+      )
+      if (filenameMatch && filenameMatch[1]) {
+        filename = decodeURIComponent(filenameMatch[1])
+      }
+
+      // 优化下载逻辑
+      const blobUrl = URL.createObjectURL(blob)
+      try {
+        downloadWithLink(blobUrl, filename)
+        completeCallback?.(filename)
+      } finally {
+        URL.revokeObjectURL(blobUrl)
+      }
+    })
+    .catch((error) => {
+      if (error.name === 'AbortError') {
+        abortCallback?.()
+      } else {
+        errorCallback?.(error.message)
+      }
+    })
+
+  return {
+    abort: () => controller.abort(),
+    signal: controller.signal,
+  }
+}
+
+// 辅助函数解析错误响应
+async function parseErrorResponse(response) {
+  const contentType = response.headers.get('Content-Type')
+  if (contentType?.includes('application/json')) {
+    const errorBody = await response.json()
+    return errorBody.detailedMessage || '未知错误'
+  }
+  return `HTTP错误 ${response.status}`
 }
 
 function downloadWithLink(blobUrl, filename) {

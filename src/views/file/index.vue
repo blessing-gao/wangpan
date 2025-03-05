@@ -44,13 +44,13 @@
                     上传
                   </el-button>
                 </template>
-<!--                <div class="organization-content" @click="uploadFolder">-->
-<!--                  <img-->
-<!--                    src="/icons/文件管理.svg"-->
-<!--                    style="margin-right: 12px; width: 16px"-->
-<!--                  />-->
-<!--                  上传文件夹-->
-<!--                </div>-->
+                <!--                <div class="organization-content" @click="uploadFolder">-->
+                <!--                  <img-->
+                <!--                    src="/icons/文件管理.svg"-->
+                <!--                    style="margin-right: 12px; width: 16px"-->
+                <!--                  />-->
+                <!--                  上传文件夹-->
+                <!--                </div>-->
                 <div class="organization-content" @click="handleUploadFile">
                   <img
                     src="/icons/文件.svg"
@@ -735,8 +735,19 @@ const downloadProgress = ref(JSON.parse(get_downloadProgress()) || []) // 存储
 const downloadingFiles = ref(JSON.parse(get_downLoadingFiles()) || []) // 存储正在下载的文件
 const isDownloading = ref(false) // 是否正在下载
 // 下载文档
-const downloadFiles = (file) => {
-  const { name, size, id } = file
+const downloadFiles = async (file) => {
+  let size = ''
+  let name = ''
+  let id = ''
+  if (file.fileType === 1) {
+    size = file.size
+  } else {
+    size = await getFolderSize(file)
+  }
+  name = file.name
+  id = file.id
+  let type = file.fileType == '1' ? 'file' : 'folder'
+  // const { name, size, id } = file
   const index = downloadingFiles.value.length + 1
   const req = downloadFile(
     size,
@@ -750,11 +761,23 @@ const downloadFiles = (file) => {
     onToastNotification,
     GET_USERID(),
     GET_TOKEN(),
+    type,
   )
   // 将下载信息加入列表
   downloadingFiles.value.unshift({ name, size, index, req })
   downloadProgress.value.unshift({ name, index, progress: 0 })
   isDownloading.value = true
+}
+
+// 获取文件夹大小
+const getFolderSize = async (file) => {
+  let params = {
+    userId: GET_USERID(),
+    folderId: file.id,
+    spaceId: spaceId.value,
+  }
+  let result = await panApi.folderSize(params)
+  return result.data
 }
 
 const handleClear = () => {
@@ -783,19 +806,18 @@ const downProgress = (index, percent, loaded, total) => {
 
 // 下载完成回调
 const onDownloadComplete = (filename) => {
+  // 下载完成后自动清理进度
+  downloadProgress.value = downloadProgress.value.filter(
+    (p) => p.filename !== filename,
+  )
   set_downLoadingFiles(JSON.stringify(downloadingFiles.value))
   set_downloadProgress(JSON.stringify(downloadProgress.value))
-  // downloadingFiles.value = downloadingFiles.value.filter(
-  //   (file) => file.name !== filename,
-  // )
-  // downloadProgress.value = downloadProgress.value.filter(
-  //   (progress) => progress.filename !== filename,
-  // )
 }
 
 // 错误回调
 const onDownloadError = (errorMessage) => {
-  alert(`Error: ${errorMessage}`)
+  // alert(`Error: ${errorMessage}`)
+  proxy.$modal.msgWarning(errorMessage)
 }
 
 // 取消下载回调
@@ -811,17 +833,29 @@ const onToastNotification = (message) => {
 
 // 取消下载
 const cancelDownload = (index) => {
-  const file = downloadingFiles.value.find((file) => file.index === index)
-  if (file) {
+  const file = downloadingFiles.value.find((f) => f.index === index)
+  if (file?.req) {
     file.progress = 100
     file.loaded = 0
-    file.req.abort()
-    const index1 = downloadingFiles.value.indexOf(file)
-    if (index1 > -1) {
-      downloadingFiles.value.splice(index1, 1) // 从队列中移除文件
-      downloadProgress.value.splice(index1, 1) // 从队列中移除进度
-    }
+    file.req.abort() // 调用abort方法
+    downloadingFiles.value = downloadingFiles.value.filter(
+      (f) => f.index !== index,
+    )
+    downloadProgress.value = downloadProgress.value.filter(
+      (p) => p.index !== index,
+    )
   }
+  // const file = downloadingFiles.value.find((file) => file.index === index)
+  // if (file) {
+  //   file.progress = 100
+  //   file.loaded = 0
+  //   file.req.abort()
+  //   const index1 = downloadingFiles.value.indexOf(file)
+  //   if (index1 > -1) {
+  //     downloadingFiles.value.splice(index1, 1) // 从队列中移除文件
+  //     downloadProgress.value.splice(index1, 1) // 从队列中移除进度
+  //   }
+  // }
 }
 
 // 取消上传
@@ -1198,15 +1232,15 @@ const handleCollect = (row, types) => {
   if (types == 'add') {
     api = 'addCollect'
     params.documentId = row.id
-    params.type = row.fileType == 0 ? 'folder' : 'file' 
+    params.type = row.fileType == 0 ? 'folder' : 'file'
     message = '收藏成功'
   } else {
     console.log(2222)
     api = 'deleteCollect'
     params.documentId = row.id
-    params.type = row.fileType == 0 ? 'folder' : 'file' 
-    console.log(params);
-    
+    params.type = row.fileType == 0 ? 'folder' : 'file'
+    console.log(params)
+
     message = '取消收藏成功'
   }
   panApi[api](params)
