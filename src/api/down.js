@@ -111,29 +111,42 @@ export function downloadFile(
           let percent = 100
           let loadedBytes = null
           progressCallback?.(index, percent, loadedBytes, fileSize)
-          const clonedResponse = response.clone()
-
-          // 消费原始流并添加超时
-          const originalReader = response.body.getReader()
-          await readWithTimeout(originalReader)
-
-          // 处理克隆响应
-          const blob = await clonedResponse.blob()
-          console.log(blob);
           
-          if (blob.size === 0) throw new Error('空数据')
+          // 流式分块下载
+          const reader = response.body.getReader()
+          const chunks = []
+          let receivedBytes = 0
 
-          const filename = getFileName(clonedResponse) || 'download.zip'
-          
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            chunks.push(value)
+            receivedBytes += value.byteLength
+          }
+
+          const blob = new Blob(chunks)
+          console.log('最终Blob大小:', blob.size)
+
+          // 文件名处理
+          const filename = getFileName(response) || 'download.zip'
+          // const safeFilename = filename.replace(/[^a-zA-Z0-9_.-]/g, '')
+          // 使用优化后的下载方法
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
+          a.style.display = 'none'
           a.href = url
-          a.download = filename.replace(/"/g, '');
+          a.download = filename.replace(/"/g, '')
+          document.body.appendChild(a)
           a.click()
-          URL.revokeObjectURL(url)
+          setTimeout(() => {
+            document.body.removeChild(a)
+            URL.revokeObjectURL(url)
+          }, 100)
+
           completeCallback?.(filename)
         } catch (error) {
-          throw new Error(`非文件下载失败: ${error.message}`)
+          console.error('文件夹下载失败详情:', error)
+          throw new Error(`压缩包下载失败: ${error.message}`)
         }
       }
     })
