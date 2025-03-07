@@ -25,12 +25,38 @@ export function downloadFile(
   let loadedBytes = 0
   const progressTracker = new TransformStream({
     transform(chunk, controller) {
-      loadedBytes += chunk.byteLength
-      const percent = Math.round((loadedBytes / fileSize) * 100)
-      progressCallback?.(index, percent, loadedBytes, fileSize)
-      controller.enqueue(chunk)
+      if (type === 'file') {
+        loadedBytes += chunk.byteLength
+        const percent = Math.round((loadedBytes / fileSize) * 100)
+        progressCallback?.(index, percent, loadedBytes, fileSize)
+        controller.enqueue(chunk)
+      } else {
+        loadedBytes = fileSize
+        const percent = 100
+        progressCallback?.(index, percent, loadedBytes, fileSize)
+        controller.enqueue(chunk)
+      }
     },
   })
+
+  const readWithTimeout = async (reader, timeout = 3000) => {
+    let readCount = 0
+    while (true) {
+      try {
+        const readPromise = reader.read()
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('流读取超时')), timeout),
+        )
+        const { done } = await Promise.race([readPromise, timeoutPromise])
+        console.log(`读取完成，done=${done}`)
+        if (done) break
+      } catch (error) {
+        console.error('流读取异常:', error)
+        await reader.cancel()
+        throw error
+      }
+    }
+  }
 
   fetch(path, {
     headers: {
@@ -40,42 +66,75 @@ export function downloadFile(
     signal: controller.signal,
   })
     .then(async (response) => {
+      console.log('响应状态:', response.status)
+
       if (!response.ok) {
         const error = await parseErrorResponse(response)
         throw new Error(error)
       }
+      if (type === 'file') {
+        const reader = response.body.pipeThrough(progressTracker).getReader()
+        const chunks = []
 
-      const reader = response.body.pipeThrough(progressTracker).getReader()
-      const chunks = []
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        chunks.push(value)
-      }
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          chunks.push(value)
+        }
 
-      const blob = new Blob(chunks)
-      // 仅对文件类型校验大小
-      if (type === 'file' && blob.size != fileSize) {
-        throw new Error('下载文件不完整')
-      }
+        const blob = new Blob(chunks)
+        // 仅对文件类型校验大小
+        if (type === 'file' && blob.size != fileSize) {
+          throw new Error('下载文件不完整')
+        }
 
-      // 处理文件名（优化正则匹配）
-      const disposition = response.headers.get('Content-Disposition')
-      let filename = type === 'file' ? overrideFileName : 'download.zip'
-      const filenameMatch = disposition?.match(
-        /filename\*?=(?:UTF-8''|utf-8'')?"?([^";]+)"?/i,
-      )
-      if (filenameMatch && filenameMatch[1]) {
-        filename = decodeURIComponent(filenameMatch[1])
-      }
+        // 处理文件名（优化正则匹配）
+        const disposition = response.headers.get('Content-Disposition')
+        let filename = type === 'file' ? overrideFileName : 'download.zip'
+        const filenameMatch = disposition?.match(
+          /filename\*?=(?:UTF-8''|utf-8'')?"?([^";]+)"?/i,
+        )
+        if (filenameMatch && filenameMatch[1]) {
+          filename = decodeURIComponent(filenameMatch[1])
+        }
 
-      // 优化下载逻辑
-      const blobUrl = URL.createObjectURL(blob)
-      try {
-        downloadWithLink(blobUrl, filename)
-        completeCallback?.(filename)
-      } finally {
-        URL.revokeObjectURL(blobUrl)
+        // 优化下载逻辑
+        const blobUrl = URL.createObjectURL(blob)
+        try {
+          downloadWithLink(blobUrl, filename)
+          completeCallback?.(filename)
+        } finally {
+          URL.revokeObjectURL(blobUrl)
+        }
+      } else {
+        try {
+          let percent = 100
+          let loadedBytes = null
+          progressCallback?.(index, percent, loadedBytes, fileSize)
+          const clonedResponse = response.clone()
+
+          // 消费原始流并添加超时
+          const originalReader = response.body.getReader()
+          await readWithTimeout(originalReader)
+
+          // 处理克隆响应
+          const blob = await clonedResponse.blob()
+          console.log(blob);
+          
+          if (blob.size === 0) throw new Error('空数据')
+
+          const filename = getFileName(clonedResponse) || 'download.zip'
+          
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = filename.replace(/"/g, '');
+          a.click()
+          URL.revokeObjectURL(url)
+          completeCallback?.(filename)
+        } catch (error) {
+          throw new Error(`非文件下载失败: ${error.message}`)
+        }
       }
     })
     .catch((error) => {
@@ -90,6 +149,14 @@ export function downloadFile(
     abort: () => controller.abort(),
     signal: controller.signal,
   }
+}
+
+// 辅助函数：解析文件名
+function getFileName(response) {
+  const disposition = response.headers.get('Content-Disposition')
+  if (!disposition) return null
+  const filenameMatch = disposition.match(/filename\*?=(?:UTF-8''|)([^;]+)/i)
+  return filenameMatch?.[1] ? decodeURIComponent(filenameMatch[1]) : null
 }
 
 // 辅助函数解析错误响应

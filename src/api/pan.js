@@ -80,7 +80,7 @@ export const uploadFile = (data) => {
  */
 export const downloadFile = (id) => {
   return request({
-    url: `${path}/document/download/${id}`,
+    url: `${path}/document/download/${id}?spaceId=${GET_PACEID()}`,
     method: 'get',
     responseType: 'blob',
   })

@@ -35,7 +35,6 @@ router.beforeEach(async (to, from, next) => {
           next() // 如果已经在 /notSpace 页面，继续导航
         }
       } else if (this.userId == '') {
-        debugger
         this.userId = await this.getCookie('userId')
         this.token = await this.getCookie('token')
         console.log('这里：userId', this.userId)

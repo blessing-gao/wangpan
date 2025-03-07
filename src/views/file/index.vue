@@ -743,6 +743,22 @@ const downloadFiles = async (file) => {
     size = file.size
   } else {
     size = await getFolderSize(file)
+    // panApi.downloadFile(file.id).then((res) => {
+    //   console.log(res.data);
+    //   let blob = new Blob([res.data])
+    //   let _fileNames = res.headers['content-disposition']
+    //     .split(';')[1]
+    //     .split('=')[1]
+    //     .trim()
+    //     .replace(/"/g, '')
+    //     .split('.')
+    //   _fileNames[0] = decodeURI(_fileNames[0])
+    //   let link = document.createElement('a')
+    //   link.href = window.URL.createObjectURL(blob)
+    //   link.download = _fileNames.join('.')
+    //   link.click()
+    //   window.URL.revokeObjectURL(link.href)
+    // })
   }
   name = file.name
   id = file.id
