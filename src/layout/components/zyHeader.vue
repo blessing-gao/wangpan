@@ -55,6 +55,9 @@
           {{ item.spaceName }}
         </div>
       </el-popover>
+      <div class="organization" style="margin-right: 12px;">
+        {{ GET_USERNAME() }}
+      </div>
 
       <div class="right_header_icon">
         <userAvatar />
@@ -68,7 +71,7 @@
 <script setup>
 // import { Search } from '@element-plus/icons-vue'
 import { ref, getCurrentInstance, onMounted } from 'vue'
-import { GET_USERID, GET_PACEID, SET_PACEID, SET_USERNAME } from '@/utils/auth'
+import { GET_USERID, GET_PACEID, SET_PACEID, SET_USERNAME, GET_USERNAME } from '@/utils/auth'
 import uploadSearch from '../../components/uploadSearch.vue'
 import inputSearch from '../../components/inputSearch.vue'
 import userAvatar from '../../components/userAvatar.vue'
