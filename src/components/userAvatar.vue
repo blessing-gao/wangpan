@@ -50,7 +50,7 @@
         </div>
       </div>
       <div class="footer-btn">
-        <div class="btn-style" style="margin-bottom: 24px">
+        <!-- <div class="btn-style" style="margin-bottom: 24px">
           <img
             style="width: 16px; margin-right: 16px"
             src="/icons/个人信息.svg"
@@ -63,7 +63,7 @@
             src="/icons/修改密码.svg"
           />
           <span>修改密码</span>
-        </div>
+        </div> -->
         <div class="btn-style" @click="loginOut">
           <img
             style="width: 16px; margin-right: 16px"
