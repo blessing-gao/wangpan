@@ -493,9 +493,10 @@ const handleBlur = () => {
 
 // 执行搜索
 const handleSearch = () => {
-  if (formInline.name && formInline.name != '') {
-    getTableData()
+  if (formInline.name == '') {
+    formInline.name = null
   }
+  getTableData()
 }
 
 const changetype = () => {
