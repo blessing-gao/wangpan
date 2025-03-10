@@ -17,12 +17,28 @@
         </template>
         <template #extra>
           <div>
-            <el-button plain v-if="states!='share'" @click="handleShare">分享</el-button>
-            <el-button plain v-if="isEdit" @click="handleEdit">编辑</el-button>
+            <el-button plain v-if="states != 'share'" @click="handleShare">
+              分享
+            </el-button>
+            <el-button
+              plain
+              v-if="!isEdit && file_type == 'wps' && props.states == 'preview'"
+              @click="handleEdit"
+            >
+              编辑
+            </el-button>
+            <el-button plain v-if="isEdit" @click="handlePreview">
+              预览
+            </el-button>
             <el-button plain :loading="downloading" @click="downloadFiles">
               下载
             </el-button>
-            <!--<el-button plain v-if="isEdit">上传新版本</el-button>-->
+            <el-button
+              plain
+              v-if="isEdit && file_type == 'wps' && props.states == 'preview'"
+            >
+              上传新版本
+            </el-button>
           </div>
         </template>
       </el-page-header>
@@ -52,7 +68,11 @@
           <div v-if="file_path == ''" class="loading">
             <p>加载中...</p>
           </div>
-          <previewPDF v-else :content="{ path: file_path }" />
+          <VueOfficePdf
+            style="height: 100vh; border: none; box-shadow: none"
+            v-else
+            :src="file_path"
+          />
         </div>
         <div
           v-else-if="file_type === 'image'"
@@ -62,6 +82,14 @@
             <p>图片加载中...</p>
           </div>
           <previewImage v-else :content="{ path: file_path }" />
+        </div>
+        <div v-else-if="file_type === 'pre'" style="width: 100%; height: 100%">
+          <div v-if="file_path == ''" class="loading">
+            <p>加载中...</p>
+          </div>
+          <pre v-else style="white-space: pre-wrap; padding: 20px">{{
+            txtContent
+          }}</pre>
         </div>
         <div
           v-else-if="file_type === 'audio'"
@@ -95,6 +123,29 @@
         </div>
         <div
           v-else-if="file_type === 'word'"
+          style="display: flex; justify-content: center; align-items: center"
+        >
+          <div v-if="file_path == ''" class="loading">
+            <p>加载中...</p>
+          </div>
+          <VueOfficeDocx
+            v-else
+            style="height: 100vh; border: none; box-shadow: none"
+            :src="file_path"
+          />
+        </div>
+        <!-- <div
+          v-else-if="file_type === 'ppt'"
+          style="display: flex; justify-content: center; align-items: center"
+        >
+          <div v-if="file_path == ''" class="loading">
+            <p>加载中...</p>
+          </div>
+          
+          <pptPreview v-else :blobUrl="file_path" />
+        </div> -->
+        <div
+          v-else-if="file_type === 'wps'"
           style="
             width: 100%;
             height: 100%;
@@ -103,14 +154,34 @@
             align-items: center;
           "
         >
-          <div v-if="file_path == ''" class="loading">
-            <p>文档加载中...</p>
+          <div
+            v-if="!isEdit"
+            style="
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <div v-if="file_path == ''" class="loading">
+              <p>文档加载中...</p>
+            </div>
+            <!-- 预览 -->
+            <previewPDF :content="{ path: file_path }" />
           </div>
-          <vue-office-docx
+          <div
             v-else
-            :src="file_path"
-            style="width: 100%; height: 100%"
-          />
+            style="
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <previewPDF :content="{ path: file_path + '?edit=0' }" />
+          </div>
         </div>
         <div v-else-if="file_type == ''" class="error-content">
           <p>
@@ -131,19 +202,19 @@
           <el-tab-pane label="详情" name="first">
             <documentDetail ref="documentDetailRefs" :documentId="id" />
           </el-tab-pane>
-          <!--          <el-tab-pane label="标签" name="second">-->
-          <!--            <fileTags />-->
-          <!--          </el-tab-pane>-->
-          <!--          <el-tab-pane label="总结" name="third">-->
-          <!--            <div class="summarize">-->
-          <!--              <el-button plain @click="handleClickSummarize">-->
-          <!--                <img src="/assets/编组 4.png" alt="" />-->
-          <!--              </el-button>-->
-          <!--            </div>-->
-          <!--            <summarize ref="summarizeRefs" />-->
-          <!--          </el-tab-pane>-->
-          <!--          <el-tab-pane label="评论" name="fourth">评论</el-tab-pane>-->
-          <!--          <el-tab-pane label="动态" name="five">动态</el-tab-pane>-->
+          <!-- <el-tab-pane label="标签" name="second">
+            <fileTags />
+          </el-tab-pane>
+          <el-tab-pane label="总结" name="third">
+            <div class="summarize">
+              <el-button plain @click="handleClickSummarize">
+                <img src="/assets/编组 4.png" alt="" />
+              </el-button>
+            </div>
+            <summarize ref="summarizeRefs" />
+          </el-tab-pane>
+          <el-tab-pane label="评论" name="fourth">评论</el-tab-pane>
+          <el-tab-pane label="动态" name="five">动态</el-tab-pane> -->
         </el-tabs>
       </div>
     </div>
@@ -166,8 +237,10 @@ import summarize from '../summarize.vue'
 import audioPreview from './components/customizeAudio.vue'
 import documentDetail from './components/documentDetail.vue'
 import shareDialog from '../../components/shareDialog.vue'
+import pptPreview from './components/pptPreview.vue'
 import VueOfficeDocx from '@vue-office/docx'
 import '@vue-office/docx/lib/index.css'
+import VueOfficePdf from '@vue-office/pdf'
 import ExcelPreview from './components/ExcelPreview.vue'
 import '@/styles/components/fileDetail.css' // 引入普通的 CSS 文件
 
@@ -187,6 +260,7 @@ const activeName = ref('first')
 const summarizeRefs = ref(null)
 const isEdit = ref(false)
 const id = ref('') // 用来存储文件id
+const fileExt = ref(null)
 
 // 根据id请求文件信息
 const fetchFileInfo = async () => {
@@ -197,14 +271,7 @@ const fetchFileInfo = async () => {
     try {
       await panApi.providerOptions(id.value).then(async (res) => {
         file_name.value = res.data.name || '未知文件'
-        const exts = collaboraOnlineExts.map((item) => item.ext)
-        const fileExt = file_name.value.split('.').pop().toLowerCase()
-        if (exts.includes(fileExt)) {
-          const isExt = collaboraOnlineExts.filter((item) => {
-            return item.ext === file_name.value.split('.').pop().toLowerCase()
-          })
-          isEdit.value = isExt[0].action == 'edit'
-        }
+        fileExt.value = file_name.value.split('.').pop().toLowerCase()
         nextTick(() => {
           documentDetailRefs.value.getFileDetail()
         })
@@ -214,16 +281,10 @@ const fetchFileInfo = async () => {
           const folder = extractPath(res.data.uniqueKey)
           // 拼合文件地址
           const path1 = `/preview/${GET_USERNAME()}/${folder}${file_name.value}`
-          console.log(path1)
           file_path.value = path1
-        } else if (
-          file_type.value == 'image' ||
-          file_type.value == 'excel' ||
-          file_type.value == 'word'
-        ) {
+        } else if (file_type.value == 'image' || file_type.value == 'pdf') {
           const videoBlob = await panApi.downloadFile(id.value)
           file_path.value = URL.createObjectURL(videoBlob.data)
-          console.log(file_path.value)
         } else {
           file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
         }
@@ -242,7 +303,7 @@ const shareFileInfo = async () => {
   let result = await shareApi.share(uuid[uuid.length - 1])
   id.value = result.data.id
   file_name.value = result.data.name || '未知文件'
-  file_type.value = determineFileType(result.data.name)
+  file_type.value = determineFileTypeShare(result.data.name)
   nextTick(() => {
     documentDetailRefs.value.getFileDetail()
   })
@@ -251,12 +312,18 @@ const shareFileInfo = async () => {
     file_type.value == 'audio' ||
     file_type.value == 'image' ||
     file_type.value == 'excel' ||
-    file_type.value == 'word'
+    file_type.value == 'word' ||
+    file_type.value == 'pdf' ||
+    file_type.value == 'ppt'
   ) {
     const videoBlob = await panApi.downloadFile(id.value)
     file_path.value = URL.createObjectURL(videoBlob.data)
-
-    console.log(file_path.value)
+    console.log(file_path.value);
+    
+  } else if (file_type.value == 'pre') {
+    const videoBlob = await panApi.downloadFile(id.value)
+    file_path.value = URL.createObjectURL(videoBlob.data)
+    fetchTxtContent(file_path.value)
   } else {
     file_path.value = window.location.href
   }
@@ -273,11 +340,7 @@ function extractPath(filePath) {
 const determineFileType = (contentType) => {
   if (contentType.includes('mp4')) {
     return 'video'
-  } else if (
-    contentType.includes('ppt') ||
-    contentType.includes('pdf') ||
-    contentType.includes('txt')
-  ) {
+  } else if (contentType.includes('pdf')) {
     return 'pdf'
   } else if (
     contentType.includes('png') ||
@@ -289,15 +352,67 @@ const determineFileType = (contentType) => {
   } else if (contentType.includes('mp3')) {
     return 'audio'
   } else if (
+    contentType.includes('docx') ||
+    contentType.includes('doc') ||
+    contentType.includes('xlsx') ||
+    contentType.includes('xls') ||
+    contentType.includes('csv') ||
+    contentType.includes('ppt') ||
+    contentType.includes('txt')
+  ) {
+    return 'wps'
+  } else {
+    return '' // 如果是其他类型文件，返回空字符串
+  }
+}
+
+// 根据contentType判断分享文件类型
+const determineFileTypeShare = (contentType) => {
+  if (contentType.includes('mp4')) {
+    return 'video'
+  } else if (contentType.includes('pdf')) {
+    return 'pdf'
+  } else if (
+    contentType.includes('png') ||
+    contentType.includes('jpg') ||
+    contentType.includes('svg') ||
+    contentType.includes('jpeg')
+  ) {
+    return 'image'
+  } else if (contentType.includes('mp3')) {
+    return 'audio'
+  } else if (contentType.includes('docx') || contentType.includes('doc')) {
+    return 'word'
+  } else if (
     contentType.includes('xlsx') ||
     contentType.includes('xls') ||
     contentType.includes('csv')
   ) {
     return 'excel'
-  } else if (contentType.includes('docx') || contentType.includes('doc')) {
-    return 'word'
+  } else if (contentType.includes('txt')) {
+    return 'pre'
+  } else if (contentType.includes('ppt')) {
+    return 'wps'
   } else {
     return '' // 如果是其他类型文件，返回空字符串
+  }
+}
+
+const txtContent = ref(null)
+
+const fetchTxtContent = async (blobUrl) => {
+  try {
+    // 1. 通过 fetch 获取 Blob 数据
+    const response = await fetch(blobUrl)
+    if (!response.ok) throw new Error('网络请求失败')
+    // 2. 获取 Blob 对象并验证类型
+    const blob = await response.blob()
+    console.log(blob)
+    // 3. 将 Blob 转换为文本
+    const text = await blob.text()
+    txtContent.value = text
+  } catch (err) {
+    console.log(err)
   }
 }
 
@@ -370,6 +485,12 @@ const handleShare = () => {
 
 const handleEdit = () => {
   // 编辑
+  isEdit.value = true
+}
+
+const handlePreview = () => {
+  // 预览
+  isEdit.value = false
 }
 </script>
 <style lang="scss" scoped>
@@ -404,5 +525,10 @@ const handleEdit = () => {
   color: #de3a05;
   background-color: rgba(255, 255, 255, 0.7);
   // position: absolute;
+}
+
+:deep(.vue-office-pdf-wrapper) {
+  padding-top: 0 !important;
+  background-color: transparent !important;
 }
 </style>

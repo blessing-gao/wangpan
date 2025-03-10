@@ -5,6 +5,8 @@
       frameborder="0"
       width="100%"
       height="100%"
+      sandbox="allow-scripts allow-same-origin allow-forms"
+      referrerpolicy="no-referrer"
     ></iframe>
   </div>
 </template>
