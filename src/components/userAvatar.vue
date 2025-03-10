@@ -181,6 +181,7 @@ const router = useRouter()
 
 const loginOut = async () => {
   await userStore.userLogout(window.location.href)
+  localStorage.clear()
   // router.push({
   //   path: `/login`,
   // })
