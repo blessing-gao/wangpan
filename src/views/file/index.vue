@@ -153,7 +153,7 @@
               >
                 <img style="width: 14px" src="/icons/Vector.svg" />
               </el-button>
-
+              <!-- 刷新 -->
               <el-button style="margin-left: 12px" @click="handleRefresh">
                 <img style="width: 14px" src="/icons/刷新.svg" />
               </el-button>
@@ -579,8 +579,6 @@ const hanldeRowClick = (column) => {
     uploadParams.uniqueKey = column.uniqueKey
     tabList.value.push(column)
     isFolder.value = column
-    console.log(isFolder.value)
-
     getTableData()
   } else {
     const exts = collaboraOnlineExts.map((item) => item.ext)
@@ -1478,7 +1476,6 @@ const handleRefresh = () => {
   formInline.size = 10
   formInline.docFileType = null
   formInline.name = null
-  fileId.value = 0
   switch (listType.value) {
     case 'default':
       getTableData()
