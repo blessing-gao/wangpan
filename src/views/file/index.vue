@@ -1107,31 +1107,6 @@ const uploadFiles = async (fileList) => {
       uploadingFiles.value.unshift({ name, size, targetIndex, req })
       uploadProgress.value.unshift({ name, targetIndex, progress: 0 })
     })
-
-    // 分批上传文件，每次上传最多10个文件
-    // const batchSize = 10
-    // let currentBatchIndex = 0
-
-    // // 上传文件直到没有剩余文件
-    // const uploadNextBatch = async () => {
-    //   const batchFiles = fileList.slice(
-    //     currentBatchIndex,
-    //     currentBatchIndex + batchSize,
-    //   )
-    //   if (batchFiles.length > 0) {
-    //     await uploadFileBatch(batchFiles)
-    //     currentBatchIndex += batchSize
-    //     uploadNextBatch() // 递归调用上传下一个批次
-    //   } else {
-    //     return
-    //   }
-    // }
-
-    // uploadNextBatch()
-
-    // getTableData()
-    // // 还需要调用左侧tab的查询接口
-    // leftTabsRefs.value.getLeftTabs(spaceId.value)
   }
 }
 
@@ -1147,13 +1122,11 @@ const updateProgress = (name, id, percent, loaded, total) => {
 }
 
 const onUpdataComplete = (id) => {
+  const file = uploadProgress.value.find(f => f.targetIndex === id)
+  if (file) file.progress = 100
   set_uploadingFiles(JSON.stringify(uploadingFiles.value))
   set_uploadProgress(JSON.stringify(uploadProgress.value))
   getTableData()
-  // uplaodingFiles.value = uplaodingFiles.value.filter((file) => file.id !== id)
-  // uploadProgress.value = uploadProgress.value.filter(
-  //   (progress) => progress.id !== id,
-  // )
 }
 
 const onUploadError = (errorMessage) => {
