@@ -19,17 +19,18 @@ export function uploadFile(
   req.open('POST', path, true)
   req.setRequestHeader('userId', userId)
   req.setRequestHeader('token', token)
-
+  let totalSize = 0
   // 监听上传进度
   req.upload.addEventListener('progress', (evt) => {
     if (evt.lengthComputable) {
+      totalSize = evt.total
       let percentComplete = Math.round((evt.loaded / evt.total) * 100)
       if (progressCallback)
         setTimeout(() => {
           progressCallback(
             name,
             targetIndex,
-            percentComplete,
+            percentComplete - 1,
             evt.loaded,
             evt.total,
           ) // 更新进度
@@ -41,6 +42,13 @@ export function uploadFile(
   req.onreadystatechange = () => {
     if (req.readyState === XMLHttpRequest.DONE) {
       if (req.status === 200) {
+        progressCallback(
+          name,
+          targetIndex,
+          100,
+          totalSize, // 使用保存的总大小
+          totalSize,
+        )
         const rspHeader = req.getResponseHeader('Content-Disposition')
 
         let filename = overrideFileName || 'upload'
@@ -48,8 +56,7 @@ export function uploadFile(
           let rspHeaderDecoded = decodeURIComponent(rspHeader)
           filename = rspHeaderDecoded.split('"')[1]
         }
-
-        if (completeCallback) completeCallback()
+        if (completeCallback) completeCallback(targetIndex)
       } else {
         if (req.getResponseHeader('Content-Type') === 'application/json') {
           const rspBody = JSON.parse(req.response)
