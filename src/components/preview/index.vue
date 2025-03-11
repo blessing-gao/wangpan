@@ -275,8 +275,7 @@ const fetchFileInfo = async () => {
           file_type.value == 'image' ||
           file_type.value == 'excel' ||
           file_type.value == 'word' ||
-          file_type.value == 'pdf' ||
-          file_type.value == 'wps'
+          file_type.value == 'pdf' 
         ) {
           const videoBlob = await panApi.downloadFile(id.value)
           file_path.value = URL.createObjectURL(videoBlob.data)
@@ -312,8 +311,7 @@ const shareFileInfo = async () => {
     file_type.value == 'image' ||
     file_type.value == 'excel' ||
     file_type.value == 'word' ||
-    file_type.value == 'pdf' ||
-    file_type.value == 'wps'
+    file_type.value == 'pdf'
   ) {
     const videoBlob = await panApi.downloadFile(id.value)
     file_path.value = URL.createObjectURL(videoBlob.data)
