@@ -104,7 +104,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/preview/, ''), // 可选，根据需要调整路径
         },
         '/browser': {
-          target: 'http://collabora:9980',
+          target: 'http://localhost:9980',
           changeOrigin: true,
           ws: true,
           onProxyReq(proxyReq, req) {
@@ -115,7 +115,7 @@ export default defineConfig(({ mode }) => {
             }
           },
           headers: {
-            Host: 'collabora:9980'
+            Host: 'localhost:9980'
           }
         },
       }

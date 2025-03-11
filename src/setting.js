@@ -1,3 +1,3 @@
 export default {
-  title: '浙音网盘',
+  title: '浙音云盘',
 }

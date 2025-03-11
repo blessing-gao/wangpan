@@ -1268,7 +1268,7 @@ const handleOtherList = (data) => {
     isFolder.value = null
     uploadParams.directoryId = 0
     getTableData()
-  } else if (data.label == '最近使用') {
+  } else if (data.label == '最近查看') {
     listType.value = 'history'
     getHistoryList()
   }
