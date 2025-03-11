@@ -55,7 +55,7 @@
         >
           <template #default="{ node, data }">
             <span class="custom-tree-node">
-              <template v-if="data.label == '最近使用'">
+              <template v-if="data.label == '最近查看'">
                 <img
                   style="margin-right: 12px; width: 16px"
                   src="/icons/矩形.svg"
@@ -242,7 +242,7 @@ onMounted(async () => {
 const otherList = ref([
   {
     id: 0,
-    label: '最近使用',
+    label: '最近查看',
   },
   {
     id: 1,

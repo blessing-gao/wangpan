@@ -6,7 +6,7 @@ const path = import.meta.env.VITE_BASE_PREV
 const API = {
   LOGIN_URL: `${path}/user/login`,
   USERINFO_URL: `${path}/space/project/17`,
-  LOGOUT_URL: `/doc/ssologout`,
+  LOGOUT_URL: `${path}/sso/logout`,
 }
 
 // 登录接口
@@ -19,7 +19,7 @@ export const reqUserInfo = (params) => request.get(API.USERINFO_URL, params)
 // export const reqLogout = (params) => request.get(API.LOGOUT_URL, params)
 export const reqLogout = (params) => {
   return request({
-    url: `/doc/sso/logout`,
+    url: `${path}/sso/logout`,
     method: 'get',
     params
   })

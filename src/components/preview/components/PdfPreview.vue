@@ -28,7 +28,7 @@ const iframeUrl = ref(null)
 const loadPdf = () => {
   // 假设content.path为pdf文件的URL
   // iframeUrl.value = props.content.path;  // 在这里填入实际的路径或获取链接
-  // iframeUrl.value = '/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=http://101.37.166.27:8080/wopi/files/3752367152326250496'
+  // iframeUrl.value = 'http://172.16.50.239:9980/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=http://pan.zjcm.edu.cn/api/doc/wopi/files/3805975986739089408'
 }
 
 onMounted(() => {

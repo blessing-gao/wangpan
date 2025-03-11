@@ -2,7 +2,7 @@ FROM bitnami/nginx:1.18
 
 WORKDIR /app
 # 设置默认环境变量
-ENV API_BACKEND=http://document-svc
+ENV API_BACKEND=http://document-svc:8080
 
 COPY nginx.conf /opt/bitnami/nginx/conf/nginx.conf
 COPY dist /app
