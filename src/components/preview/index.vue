@@ -20,7 +20,7 @@
             <el-button plain v-if="states != 'share'" @click="handleShare">
               分享
             </el-button>
-            <el-button
+            <!-- <el-button
               plain
               v-if="!isEdit && file_type == 'wps' && props.states == 'preview'"
               @click="handleEdit"
@@ -29,7 +29,7 @@
             </el-button>
             <el-button plain v-if="isEdit" @click="handlePreview">
               预览
-            </el-button>
+            </el-button> -->
             <el-button plain :loading="downloading" @click="downloadFiles">
               下载
             </el-button>
@@ -134,16 +134,16 @@
             :src="file_path"
           />
         </div>
-        <!-- <div
+        <div
           v-else-if="file_type === 'ppt'"
           style="display: flex; justify-content: center; align-items: center"
         >
           <div v-if="file_path == ''" class="loading">
             <p>加载中...</p>
           </div>
-          
+
           <pptPreview v-else :blobUrl="file_path" />
-        </div> -->
+        </div>
         <div
           v-else-if="file_type === 'wps'"
           style="
@@ -154,23 +154,12 @@
             align-items: center;
           "
         >
-          <div
-            v-if="!isEdit"
-            style="
-              width: 100%;
-              height: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-            "
-          >
-            <div v-if="file_path == ''" class="loading">
-              <p>文档加载中...</p>
-            </div>
-            <!-- 预览 -->
-            <previewPDF :content="{ path: file_path }" />
+          <div v-if="file_path == ''" class="loading">
+            <p>文档加载中...</p>
           </div>
-          <div
+          <!-- 预览 -->
+          <previewPDF v-else :content="{ path: file_path }" />
+          <!-- <div
             v-else
             style="
               width: 100%;
@@ -181,7 +170,7 @@
             "
           >
             <previewPDF :content="{ path: file_path + '?edit=0' }" />
-          </div>
+          </div> -->
         </div>
         <div v-else-if="file_type == ''" class="error-content">
           <p>
@@ -282,9 +271,19 @@ const fetchFileInfo = async () => {
           // 拼合文件地址
           const path1 = `/preview/${GET_USERNAME()}/${folder}${file_name.value}`
           file_path.value = path1
-        } else if (file_type.value == 'image' || file_type.value == 'pdf') {
+        } else if (
+          file_type.value == 'image' ||
+          file_type.value == 'excel' ||
+          file_type.value == 'word' ||
+          file_type.value == 'pdf' ||
+          file_type.value == 'wps'
+        ) {
           const videoBlob = await panApi.downloadFile(id.value)
           file_path.value = URL.createObjectURL(videoBlob.data)
+        } else if (file_type.value == 'pre') {
+          const videoBlob = await panApi.downloadFile(id.value)
+          file_path.value = URL.createObjectURL(videoBlob.data)
+          fetchTxtContent(file_path.value)
         } else {
           file_path.value = `/browser/0b27e85/cool.html?lang=zh-CN&WOPISrc=${res.data.url}`
         }
@@ -314,12 +313,11 @@ const shareFileInfo = async () => {
     file_type.value == 'excel' ||
     file_type.value == 'word' ||
     file_type.value == 'pdf' ||
-    file_type.value == 'ppt'
+    file_type.value == 'wps'
   ) {
     const videoBlob = await panApi.downloadFile(id.value)
     file_path.value = URL.createObjectURL(videoBlob.data)
-    console.log(file_path.value);
-    
+    console.log(file_path.value)
   } else if (file_type.value == 'pre') {
     const videoBlob = await panApi.downloadFile(id.value)
     file_path.value = URL.createObjectURL(videoBlob.data)
@@ -342,6 +340,10 @@ const determineFileType = (contentType) => {
     return 'video'
   } else if (contentType.includes('pdf')) {
     return 'pdf'
+  } else if (contentType.includes('ppt')) {
+    return 'wps'
+  } else if (contentType.includes('txt')) {
+    return 'pre'
   } else if (
     contentType.includes('png') ||
     contentType.includes('jpg') ||
@@ -352,21 +354,48 @@ const determineFileType = (contentType) => {
   } else if (contentType.includes('mp3')) {
     return 'audio'
   } else if (
-    contentType.includes('docx') ||
-    contentType.includes('doc') ||
     contentType.includes('xlsx') ||
     contentType.includes('xls') ||
-    contentType.includes('csv') ||
-    contentType.includes('ppt') ||
-    contentType.includes('txt')
+    contentType.includes('csv')
   ) {
-    return 'wps'
+    return 'excel'
+  } else if (contentType.includes('docx') || contentType.includes('doc')) {
+    return 'word'
   } else {
     return '' // 如果是其他类型文件，返回空字符串
   }
 }
+// const determineFileType = (contentType) => {
+//   if (contentType.includes('mp4')) {
+//     return 'video'
+//   } else if (contentType.includes('pdf')) {
+//     return 'pdf'
+//   } else if (
+//     contentType.includes('png') ||
+//     contentType.includes('jpg') ||
+//     contentType.includes('svg') ||
+//     contentType.includes('jpeg')
+//   ) {
+//     return 'image'
+//   } else if (contentType.includes('mp3')) {
+//     return 'audio'
+//   } else if (
+//     contentType.includes('docx') ||
+//     contentType.includes('doc') ||
+//     contentType.includes('xlsx') ||
+//     contentType.includes('xls') ||
+//     contentType.includes('csv') ||
+//     contentType.includes('ppt') ||
+//     contentType.includes('txt')
+//   ) {
+//     return 'wps'
+//   } else {
+//     return '' // 如果是其他类型文件，返回空字符串
+//   }
+// }
 
 // 根据contentType判断分享文件类型
+
 const determineFileTypeShare = (contentType) => {
   if (contentType.includes('mp4')) {
     return 'video'
