@@ -1130,7 +1130,8 @@ const onUpdataComplete = (id) => {
 }
 
 const onUploadError = (errorMessage) => {
-  alert(`Error: ${errorMessage}`)
+  // alert(`Error: ${errorMessage}`)
+  proxy.$modal.msgError(errorMessage)
 }
 
 // 取消上传回调
