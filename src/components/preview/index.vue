@@ -145,6 +145,20 @@
           <pptPreview v-else :blobUrl="file_path" />
         </div>
         <div
+          v-else-if="file_type === 'pptx'"
+          style="display: flex; justify-content: center; align-items: center"
+        >
+          <div v-if="file_path == ''" class="loading">
+            <p>加载中...</p>
+          </div>
+
+          <VueOfficePptx
+            style="height: 100vh; border: none; box-shadow: none"
+            v-else
+            :src="file_path"
+          />
+        </div>
+        <div
           v-else-if="file_type === 'wps'"
           style="
             width: 100%;
@@ -230,6 +244,7 @@ import pptPreview from './components/pptPreview.vue'
 import VueOfficeDocx from '@vue-office/docx'
 import '@vue-office/docx/lib/index.css'
 import VueOfficePdf from '@vue-office/pdf'
+import VueOfficePptx from '@vue-office/pptx'
 import ExcelPreview from './components/ExcelPreview.vue'
 import '@/styles/components/fileDetail.css' // 引入普通的 CSS 文件
 
@@ -265,6 +280,8 @@ const fetchFileInfo = async () => {
           documentDetailRefs.value.getFileDetail()
         })
         file_type.value = determineFileType(res.data.name)
+        console.log(file_type.value)
+
         if (file_type.value == 'video' || file_type.value == 'audio') {
           // 获取文件夹地址
           const folder = extractPath(res.data.uniqueKey)
@@ -275,7 +292,8 @@ const fetchFileInfo = async () => {
           file_type.value == 'image' ||
           file_type.value == 'excel' ||
           file_type.value == 'word' ||
-          file_type.value == 'pdf' 
+          file_type.value == 'pdf' ||
+          file_type.value == 'pptx'
         ) {
           const videoBlob = await panApi.downloadFile(id.value)
           file_path.value = URL.createObjectURL(videoBlob.data)
@@ -338,7 +356,9 @@ const determineFileType = (contentType) => {
     return 'video'
   } else if (contentType.includes('pdf')) {
     return 'pdf'
-  } else if (contentType.includes('ppt')) {
+  } else if (contentType.includes('pptx')) {
+    return 'pptx'
+  } else if (contentType.includes('ppt') || contentType.includes('doc')) {
     return 'wps'
   } else if (contentType.includes('txt')) {
     return 'pre'
@@ -357,7 +377,7 @@ const determineFileType = (contentType) => {
     contentType.includes('csv')
   ) {
     return 'excel'
-  } else if (contentType.includes('docx') || contentType.includes('doc')) {
+  } else if (contentType.includes('docx')) {
     return 'word'
   } else {
     return '' // 如果是其他类型文件，返回空字符串
@@ -408,7 +428,7 @@ const determineFileTypeShare = (contentType) => {
     return 'image'
   } else if (contentType.includes('mp3')) {
     return 'audio'
-  } else if (contentType.includes('docx') || contentType.includes('doc')) {
+  } else if (contentType.includes('docx')) {
     return 'word'
   } else if (
     contentType.includes('xlsx') ||
@@ -418,7 +438,9 @@ const determineFileTypeShare = (contentType) => {
     return 'excel'
   } else if (contentType.includes('txt')) {
     return 'pre'
-  } else if (contentType.includes('ppt')) {
+  } else if (contentType.includes('pptx')) {
+    return 'pptx'
+  } else if (contentType.includes('ppt') || contentType.includes('doc')) {
     return 'wps'
   } else {
     return '' // 如果是其他类型文件，返回空字符串
