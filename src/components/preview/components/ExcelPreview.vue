@@ -1,11 +1,12 @@
 <template>
-  <vue-office-excel :src="file_path" style="width: 100%; height: 100%" />
+  <div class="excel-preview">
+    <vue-office-excel :src="file_path" />
+  </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { defineProps } from 'vue'
 import VueOfficeExcel from '@vue-office/excel'
-//引入相关样式
 import '@vue-office/excel/lib/index.css'
 
 const props = defineProps({
@@ -14,8 +15,16 @@ const props = defineProps({
     required: true,
   },
 })
-
 </script>
-<style lang="scss" scoped>
 
+<style scoped>
+.excel-preview {
+  width: 100%;
+  height: 100%;
+}
+
+:deep(.vue-office-excel) {
+  width: 100%;
+  height: 100%;
+}
 </style>

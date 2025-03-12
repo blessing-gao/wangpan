@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  collabora:
+    image: weiwoyonzhe-docker.pkg.coding.net/zheyin/document/collabora:1.0.0
+    container_name: collabora
+    restart: always
+    environment:
+      - domain=shenben\\.club:38088
+      - username=admin
+      - password=adminpassword
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:net.post_allow.host[0]=shenben.club:38088 --o:net.frame_ancestors=shenben.club:38088
+      - TZ=Asia/Shanghai
+    cap_add:
+      - MKNOD
+    ports:
+      - "9980:9980"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - proxy-net
+
+  nginx:
+    image: weiwoyonzhe-docker.pkg.coding.net/zheyin/document/document-ui:1.0
+    container_name: document-web
+    restart: always
+    ports:
+      - "443:443"
+    depends_on:
+      - collabora
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    driver: bridge
